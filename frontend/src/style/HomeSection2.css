@@ -1,0 +1,95 @@
+.home-section-2 .right .card-box-wrap {
+  /* display: grid; */
+  /* grid-template-columns: repeat(2, 1fr); */
+  /* gap: 20px; */
+  /* align-items: start; */
+  /* width: 600px; */
+  position: relative;
+}
+
+.flip-card-item {
+  width: 330px;
+  height: 370px;
+  cursor: pointer;
+  perspective: 1100px;
+  display: block;
+}
+
+.card-front,
+.card-back {
+  width: 330px;
+  height: 370px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  /* border: 1px solid #ccc; */
+  background-color: #adc0b943;
+  border-radius: 20px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.card-content h2,
+.card-content p {
+  margin: 10px;
+}
+
+.card-back {
+  background-color: #00a896;
+}
+
+.type-01 {
+  /* top: 150px; */
+  /* left: 250px; */
+  right: 0;
+  position: absolute;
+}
+.type-02 {
+  /* top: 150px; */
+  /* left: -120px; */
+  top: 200px;
+  position: absolute;
+}
+.type-03 {
+  top: 400px;
+  /* left: 250px; */
+  right: 0;
+  position: absolute;
+}
+
+.right {
+  width: 690px;
+  height: 800px;
+  position: relative;
+}
+
+.content-wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 100px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 100px;
+}
+
+.section-2-content {
+  width: 80%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.left {
+  height: 500px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+}
+
+.title-box {
+  width: 350px;
+}
+
+.desc,
+.btn-box {
+  padding-left: 5px;
+}
