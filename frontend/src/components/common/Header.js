@@ -10,9 +10,9 @@ function Header() {
         <div class="header-inner">
           <div class="logo-box">
             <h1>
-              <a href="/">
+              <Link to="/">
                 <img src={hanalogo} alt="HanaFamily" />
-              </a>
+              </Link>
             </h1>
             <div class="title">
               <p>
@@ -26,9 +26,9 @@ function Header() {
             <nav>
               <ul id="ulMenu">
                 <li class="nav-li">
-                  <a href="/" class="nav-alink">
+                  <Link to="/assets" className="nav-alink">
                     내 자산
-                  </a>
+                  </Link>
                 </li>
                 <li class="nav-li">
                   <a href="/" class="nav-alink">
@@ -42,9 +42,9 @@ function Header() {
                 </li>
               </ul>
             </nav>
-            <a href="/ACT/PCWACT01030101B.hsb" class="btn-link login">
+            <Link to="/auth" class="btn-link login">
               로그인
-            </a>
+            </Link>
             <a href="/ACT/PCWACT01030101B.hsb" class="btn-link register">
               회원 가입
             </a>

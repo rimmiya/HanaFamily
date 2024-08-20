@@ -1,0 +1,138 @@
+.auth-page {
+  width: 80%;
+  text-align: center;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 40px;
+}
+
+.tabs {
+  display: flex;
+  justify-content: center;
+  /* margin-bottom: 20px; */
+}
+
+.tab-button {
+  background: none;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: all 0.3s ease;
+}
+
+.tab-button.active {
+  color: white;
+  background-color: #3b5998;
+  border-radius: 20px;
+}
+
+.auth-form,
+.find-form,
+.register-form {
+  margin: 0 auto;
+  max-width: 550px;
+  background-color: #f9f9f9;
+  padding: 20px;
+  border-radius: 10px;
+  /* border: 1px solid #ddd; */
+}
+
+.auth-form input,
+.find-form input,
+.register-form input {
+  display: block;
+  width: 100%;
+  height: 40px;
+  padding: 10px;
+  margin-bottom: 10px;
+  border-radius: 30px;
+  border: 1px solid #ddd;
+}
+
+.submit-button {
+  width: 100%;
+  padding: 10px;
+  background-color: #000;
+  color: white;
+  border: none;
+  border-radius: 30px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.auth-page-title {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  width: 500px;
+}
+
+.auth-page-title p {
+  font-size: 25px;
+  /* font-weight: bold; */
+  font-family: "CustomFont";
+  margin: 0;
+}
+
+.auth-page-content {
+  width: 100%;
+  height: 650px;
+}
+
+.content {
+  height: 100%;
+}
+
+.auth-form-container {
+  /* width: 80%; */
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.auth-form-container h2 {
+  font-family: "CustomFont";
+  text-align: left;
+  font-size: 40px;
+  font-weight: 600;
+  /* margin: 0; */
+}
+
+.auth-form-inner .inner-title {
+  font-family: "CustomFont";
+  /* text-align: left; */
+  font-size: 20px;
+  font-weight: bold;
+  margin: 0;
+  height: 50px;
+  border-bottom: 1px solid #000;
+  margin-bottom: 10px;
+}
+
+.auth-form p {
+  font-family: "CustomFont";
+  text-align: left;
+  font-size: 15px;
+  font-weight: bold;
+  /* margin: 0; */
+  margin-top: 5px;
+}
+
+.auth-form {
+  padding-top: 50px;
+  padding-bottom: 50px;
+  width: 80%;
+  display: flex;
+  justify-content: center;
+}
+.auth-form-inner {
+  width: 80%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.center {
+  display: flex;
+  justify-content: center;
+}

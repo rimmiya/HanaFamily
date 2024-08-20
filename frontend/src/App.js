@@ -1,8 +1,8 @@
 import React from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-// import Navbar from "./components/Header";
-// import Home from "./components/Home";
 import Main from "./pages/Main";
+import Assets from "./pages/Assets";
+import Auth from "./pages/Auth";
 
 function About() {
   return <h2>About Page</h2>;
@@ -18,8 +18,8 @@ function App() {
       <Router>
         <Routes>
           <Route path="/" element={<Main />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/contact" element={<Contact />} />
+          <Route path="/assets" element={<Assets />} />
+          <Route path="/auth" element={<Auth />} />
         </Routes>
       </Router>
     </div>
