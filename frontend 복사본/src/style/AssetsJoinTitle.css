@@ -1,0 +1,21 @@
+.assets-title-container {
+  width: 100%;
+  background-color: rgba(30, 219, 156, 0.201);
+  font-family: "CustomFont";
+  min-height: 200px;
+  display: flex;
+}
+
+.assets-title {
+  width: 80%;
+  margin-left: auto;
+  margin-right: auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.assets-title h2 {
+  font-size: 35px;
+  margin-top: 10px;
+}

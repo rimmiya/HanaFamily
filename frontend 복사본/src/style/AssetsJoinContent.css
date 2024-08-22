@@ -1,0 +1,146 @@
+.assets-join-content-container {
+  width: 100%;
+  min-height: 300px;
+  margin-bottom: 50px;
+}
+
+.assets-join-content {
+  width: 80%;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 30px;
+  /* display: flex;
+  justify-content: space-between;
+  align-items: center; */
+}
+.assets-join-steps {
+  width: 50%;
+  margin-left: auto;
+  margin-right: auto;
+}
+/* 완료된 스텝 간 바 색상 변경 */
+.ant-steps-item-finish .ant-steps-item-tail::after {
+  background-color: #009178 !important; /* 완료된 스텝의 바 색상 */
+}
+
+.ant-steps-item-finish .ant-steps-item-tail::after,
+.ant-steps-item-process .ant-steps-item-tail::after,
+.ant-steps-item-wait .ant-steps-item-tail::after {
+  height: 3px !important; /* 바 굵기 */
+}
+
+.terms-content,
+.select-company-content,
+.select-account-content {
+  width: 90%;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 20px;
+  /* display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center; */
+}
+
+.accordion {
+  width: 90%;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 20px;
+  /* border: #00765f 1.5px solid;
+  border-top: 5px solid #00765f;
+  border-radius: 0 0 8px 8px; */
+}
+
+.tabs-and-selections {
+  width: 90%;
+  margin: auto;
+  margin-top: 20px;
+  padding: 20px;
+  border: #00765f 1.5px solid;
+  border-top: 5px solid #00765f;
+  border-radius: 0 0 8px 8px;
+}
+
+.tabs {
+  display: flex;
+  justify-content: flex-start;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.tab {
+  padding: 3px 25px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background-color: white;
+  cursor: pointer;
+}
+
+.tab.active {
+  background-color: #009178;
+  border: 0;
+  color: white;
+}
+
+.items-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 20px;
+}
+
+.item {
+  width: 100px;
+  height: 100px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  flex-direction: column;
+}
+
+.item.selected {
+  /* background-color: #009178; */
+  /* color: white; */
+  border: 3px solid #00765f;
+}
+
+.select-all-container {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.select-all-container button {
+  background-color: #00765f;
+  /* opacity: 0.7; */
+  box-shadow: 0;
+  /* color: #00765f; */
+}
+
+.select-all-container button:hover {
+  background-color: #3edebe !important;
+  color: white;
+}
+/* 활성화된 아코디언 헤더의 배경색 제거 및 텍스트 색상 유지 */
+.accordion-button:not(.collapsed) {
+  background-color: transparent !important;
+  color: inherit;
+  box-shadow: none;
+}
+
+/* 아코디언 헤더의 기본 배경색 및 보더 제거 */
+.accordion-button {
+  background-color: transparent !important;
+  color: inherit;
+  box-shadow: none;
+  border: none;
+}
+
+/* 아코디언 헤더의 포커스 시 스타일 제거 */
+.accordion-button:focus {
+  box-shadow: none;
+}
