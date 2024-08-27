@@ -4,6 +4,7 @@ import Main from "./pages/Main";
 import Assets from "./pages/Assets/AssetsHome";
 import Auth from "./pages/Auth";
 import AssetsJoin from "./pages/Assets/AssetsJoin";
+import AssetsMain from "./pages/Assets/AssetsMain";
 
 function About() {
   return <h2>About Page</h2>;
@@ -21,6 +22,7 @@ function App() {
           <Route path="/" element={<Main />} />
           <Route path="/assets" element={<Assets />} />
           <Route path="/assetsjoin" element={<AssetsJoin />} />
+          <Route path="/assetsmain" element={<AssetsMain />} />
           <Route path="/auth" element={<Auth />} />
         </Routes>
       </Router>
