@@ -15,7 +15,7 @@ function AssetsMainTitle() {
           <LightbulbOutlinedIcon></LightbulbOutlinedIcon>
           <p>자산</p>
         </Link>
-        <Link to="/assetsmain" className="assets-menu">
+        <Link to="/assetsaccount" className="assets-menu">
           <AccountBalanceOutlinedIcon></AccountBalanceOutlinedIcon>
           <p>계좌</p>
         </Link>

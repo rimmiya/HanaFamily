@@ -1,0 +1,52 @@
+/* CustomProgressBar.css */
+
+.progress-wrapper {
+  width: 100%;
+  margin-top: 20px;
+}
+
+.progress-bar-container {
+  position: relative;
+  height: 20px;
+  background-color: #e9ecef;
+  border-radius: 10px;
+  overflow: visible; /* 툴팁이 바깥으로 나오도록 설정 */
+}
+
+.progress-bar {
+  height: 100%;
+  /* background-color: #00978d; 진행 바 색상 */
+  background: #48a7a5fb;
+  /* background: linear-gradient(
+    90deg,
+    rgba(120, 232, 255, 0.7) 0%,
+    rgba(0, 151, 141, 0.7) 52%,
+    rgba(3, 106, 76, 0.7) 100%
+  ); */
+  border-radius: 10px 0 0 10px;
+}
+
+.progress-tooltip {
+  position: absolute;
+  top: 100%; /* 툴팁을 진행 바 아래로 이동 */
+  background-color: #04b89d;
+  color: #fff;
+  padding: 5px 10px;
+  font-size: 12px;
+  border-radius: 5px;
+  white-space: nowrap;
+  /* z-index: 1; */
+  transform: translateX(-50%);
+  margin-top: 5px; /* 진행 바와의 간격을 확보 */
+}
+
+.progress-tooltip::after {
+  content: "";
+  position: absolute;
+  top: -10px; /* 삼각형을 툴팁 바로 위로 배치 */
+  left: 50%;
+  transform: translateX(-50%); /* 삼각형을 중심으로 맞춤 */
+  border-width: 5px; /* 삼각형의 크기 */
+  border-style: solid;
+  border-color: transparent transparent #04b89d transparent; /* 삼각형의 윗부분만 색상 채우기 */
+}
