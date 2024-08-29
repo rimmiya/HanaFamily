@@ -20,7 +20,7 @@ function AssetsMainTitle() {
           <p>계좌</p>
         </Link>
 
-        <Link to="/assetsmain" className="assets-menu">
+        <Link to="/assetssecurities" className="assets-menu">
           <LineChartOutlined style={{ fontSize: "24px" }} />
           <p>투자</p>
         </Link>

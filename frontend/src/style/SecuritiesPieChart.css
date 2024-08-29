@@ -1,0 +1,20 @@
+.investment-analysis-container {
+  color: #333;
+  text-align: center;
+  padding: 20px;
+}
+
+.chart-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.recharts-wrapper {
+  position: relative;
+}
+
+.recharts-text {
+  fill: #333;
+  font-weight: bold;
+}

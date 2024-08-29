@@ -11,7 +11,6 @@ import "../../style/AssetsAccountContent.css";
 import CustomProgressBar from "./Charts/CustomProgressBar";
 import { Swiper, SwiperSlide } from "swiper/react"; // Swiper와 SwiperSlide를 import
 import "swiper/swiper-bundle.css"; // Swiper 스타일 import
-// import { CSSTransition, TransitionGroup } from "react-transition-group";
 
 const hanalogo = `${process.env.PUBLIC_URL}/img/img-hana-symbol.png`;
 const data = [

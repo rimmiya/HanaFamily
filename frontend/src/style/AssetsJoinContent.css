@@ -144,3 +144,9 @@
 .accordion-button:focus {
   box-shadow: none;
 }
+
+.accordion-body {
+  display: block; /* Ensure it's visible */
+  visibility: visible;
+  overflow: visible;
+}

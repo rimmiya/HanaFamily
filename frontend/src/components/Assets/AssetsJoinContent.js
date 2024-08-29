@@ -32,10 +32,10 @@ const steps = [
     title: "기관 선택",
   },
   {
-    title: "Third",
+    title: "자산 연결",
   },
   {
-    title: "Last",
+    title: "완료",
   },
 ];
 

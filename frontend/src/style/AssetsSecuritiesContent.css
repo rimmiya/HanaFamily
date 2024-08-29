@@ -1,0 +1,97 @@
+.assets-securities-container {
+  width: 100%;
+  padding: 20px;
+  display: flex;
+  justify-content: space-between;
+  background-color: #ffffff; /* White background */
+  font-family: "Pretendard-Regular";
+}
+
+.assets-securities-content {
+  display: flex;
+  justify-content: space-between;
+  width: 80%;
+  margin-left: auto;
+  margin-right: auto;
+  padding-top: 20px;
+}
+
+.assets-securities-left,
+.assets-securities-right {
+  width: 50%;
+  padding-right: 30px;
+}
+
+/* Total investment amount section */
+.total-securities-container {
+  width: 90%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-bottom: 10px;
+}
+
+.total-securities-container h2 {
+  font-size: 24px;
+  margin-bottom: 10px;
+}
+
+.total-securities-container h1 {
+  font-size: 32px;
+  font-weight: bold;
+  color: #000;
+}
+
+.total-securities-container p {
+  font-size: 18px;
+}
+
+.toggle-amount-btn {
+  background-color: #f0f0f0;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 14px;
+  margin-bottom: 10px;
+  height: 30px;
+  width: 40%;
+}
+
+/* Securities list */
+.securities-section {
+  margin-bottom: 20px;
+}
+
+.securities-card {
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 0px 5px rgba(0, 0, 0, 0.1);
+  padding-left: 30px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  padding-right: 30px;
+}
+
+.securities-detail-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 15px;
+  margin-bottom: 15px;
+}
+
+.securities-details-row {
+  margin-bottom: 10px;
+}
+
+.assets-securities-right {
+  height: fit-content;
+}
+
+.assets-securities-chart {
+  border-radius: 12px;
+  box-shadow: 0 0px 5px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  height: fit-content;
+}
