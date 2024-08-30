@@ -25,12 +25,12 @@ function AssetsMainTitle() {
           <p>투자</p>
         </Link>
 
-        <Link to="/assetsmain" className="assets-menu">
+        <Link to="/assetsloan" className="assets-menu">
           <PaidOutlinedIcon></PaidOutlinedIcon>
           <p>대출</p>
         </Link>
 
-        <Link to="/assetsmain" className="assets-menu">
+        <Link to="/assetsinsurance" className="assets-menu">
           <HealthAndSafetyOutlinedIcon></HealthAndSafetyOutlinedIcon>
           <p>보험</p>
         </Link>

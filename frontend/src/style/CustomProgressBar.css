@@ -13,7 +13,7 @@
   overflow: visible; /* 툴팁이 바깥으로 나오도록 설정 */
 }
 
-.progress-bar {
+.custom-progress-bar {
   height: 100%;
   /* background-color: #00978d; 진행 바 색상 */
   background: #48a7a5fb;

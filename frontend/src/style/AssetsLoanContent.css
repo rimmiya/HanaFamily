@@ -1,0 +1,94 @@
+.assets-loan-container {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  padding-top: 20px;
+}
+
+.assets-loan-content {
+  display: flex;
+  justify-content: space-between;
+  width: 80%;
+  margin-left: auto;
+  margin-right: auto;
+  padding-top: 20px;
+}
+
+.assets-loan-left,
+.assets-loan-right {
+  width: 50%;
+  padding-right: 30px;
+}
+
+.assets-loan-title {
+  display: flex;
+  align-items: baseline;
+  flex-direction: column;
+}
+
+.assets-loan-title h2 {
+  margin-right: 10px;
+  font-size: 24px;
+}
+
+.assets-loan-title h1 {
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.loan-status-bar {
+  margin: 20px 0;
+  width: 95%;
+}
+
+.loan-status-text {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 5px;
+  margin-bottom: 40px;
+}
+
+.loan-item {
+  margin-bottom: 20px;
+}
+
+.loan-item h3 {
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+.loan-item h2 {
+  font-size: 22px;
+  margin-bottom: 15px;
+}
+
+.assets-loan-list {
+  width: 95%;
+}
+
+.loan-item-header {
+  display: flex;
+  justify-content: space-between;
+}
+
+.loan-details {
+  background-color: #f9f9f9;
+  border-radius: 10px;
+  padding: 20px 30px 20px 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px; /* 각 항목 사이의 간격 */
+}
+
+.loan-detail-item {
+  font-size: 17px;
+  display: flex;
+  justify-content: space-between; /* 좌우로 배치 */
+  font-weight: 600; /* 글씨 두께 설정 */
+}
+
+.loan-detail-item p {
+  margin: 0;
+}

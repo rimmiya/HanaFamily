@@ -7,7 +7,10 @@ function CustomProgressBar({ currentAmount, goalAmount }) {
   return (
     <div className="progress-wrapper">
       <div className="progress-bar-container">
-        <div className="progress-bar" style={{ width: `${progress}%` }}></div>
+        <div
+          className="custom-progress-bar"
+          style={{ width: `${progress}%` }}
+        ></div>
         <div
           className="progress-tooltip"
           style={{ left: `${progress}%`, transform: "translateX(-50%)" }}
