@@ -7,6 +7,8 @@ import AssetsJoin from "./pages/Assets/AssetsJoin";
 import AssetsMain from "./pages/Assets/AssetsMain";
 import AssetsAccount from "./pages/Assets/AssetsAccount";
 import AssetsSecurities from "./pages/Assets/AssetsSecurities";
+import AssetsLoan from "./pages/Assets/AssetsLoan";
+import AssetsInsurance from "./pages/Assets/AssetsInsurance";
 
 function About() {
   return <h2>About Page</h2>;
@@ -27,6 +29,8 @@ function App() {
           <Route path="/assetsmain" element={<AssetsMain />} />
           <Route path="/assetsaccount" element={<AssetsAccount />} />
           <Route path="/assetssecurities" element={<AssetsSecurities />} />
+          <Route path="/assetsloan" element={<AssetsLoan />} />
+          <Route path="/assetsinsurance" element={<AssetsInsurance />} />
           <Route path="/auth" element={<Auth />} />
         </Routes>
       </Router>

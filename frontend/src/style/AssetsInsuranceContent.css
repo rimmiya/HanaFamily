@@ -1,0 +1,72 @@
+.assets-insurance-container {
+  width: 100%;
+  padding-top: 20px;
+  display: flex;
+  justify-content: center;
+  background-color: #ffffff; /* White background */
+  margin-bottom: 30px;
+}
+
+.assets-insurance-content {
+  width: 80%;
+  padding-top: 20px;
+}
+
+.assets-insurance-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.assets-insurance-list {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* 한 줄에 4개씩 배치 */
+  gap: 20px; /* 카드 사이의 간격 */
+}
+
+.insurance-item {
+  background-color: #f9f9f9;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* 약간의 그림자 추가 */
+}
+
+.insurance-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 5px;
+  width: 100%;
+}
+
+.insurance-item-footer {
+  display: flex;
+  flex-direction: row;
+  /* justify-content: space-between; */
+  font-size: 14px;
+  color: #666;
+  margin-top: 5px;
+}
+
+.insurance-item-details {
+  margin-top: 10px;
+  font-size: 14px;
+  color: #333;
+}
+
+.insurance-item h3 {
+  margin: 0;
+}
+
+.insurance-item-footer p,
+.insurance-item-details p {
+  margin: 5px 0;
+}
+
+.insurance-item-details-date {
+  background-color: #ffffff;
+  border-radius: 10px;
+  padding: 20px 20px 10px 20px;
+  margin-top: 10px;
+}
