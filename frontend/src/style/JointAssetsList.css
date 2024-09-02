@@ -1,0 +1,36 @@
+/* 전체 컨테이너 */
+.joint-assets-list-container {
+  width: 100%;
+  padding-top: 20px;
+  padding-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+  /* background-color: #fcfcfc; */
+  font-family: "Pretendard-Regular";
+}
+
+.joint-assets-list-content {
+  display: flex;
+  justify-content: space-between;
+  /* width: 80%; */
+  /* margin-left: auto; */
+  /* margin-right: auto; */
+  /* padding-top: 20px; */
+}
+
+.assets-account-left,
+.assets-account-right {
+  width: 50%;
+  padding-right: 30px;
+}
+
+.joint-assets-list {
+  background-color: #f0f0f0;
+  min-width: 330px;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: row;
+  /* justify-content: space-between; */
+  padding: 30px 40px;
+  gap: 50px;
+}

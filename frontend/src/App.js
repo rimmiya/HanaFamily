@@ -9,14 +9,8 @@ import AssetsAccount from "./pages/Assets/AssetsAccount";
 import AssetsSecurities from "./pages/Assets/AssetsSecurities";
 import AssetsLoan from "./pages/Assets/AssetsLoan";
 import AssetsInsurance from "./pages/Assets/AssetsInsurance";
-
-function About() {
-  return <h2>About Page</h2>;
-}
-
-function Contact() {
-  return <h2>Contact Page</h2>;
-}
+import JointAssets from "./pages/JointAssets/JointAssets";
+import JointAssetsJoin from "./pages/JointAssets/JointAssetsJoin";
 
 function App() {
   return (
@@ -31,6 +25,8 @@ function App() {
           <Route path="/assetssecurities" element={<AssetsSecurities />} />
           <Route path="/assetsloan" element={<AssetsLoan />} />
           <Route path="/assetsinsurance" element={<AssetsInsurance />} />
+          <Route path="/jointassets" element={<JointAssets />} />
+          <Route path="/jointassetsjoin" element={<JointAssetsJoin />} />
           <Route path="/auth" element={<Auth />} />
         </Routes>
       </Router>

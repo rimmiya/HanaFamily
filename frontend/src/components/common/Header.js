@@ -36,7 +36,7 @@ function Header() {
                   </a>
                 </li>
                 <li class="nav-li">
-                  <a href="/" class="nav-alink">
+                  <a href="/jointassets" class="nav-alink">
                     함께 관리
                   </a>
                 </li>
