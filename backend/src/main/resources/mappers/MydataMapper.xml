@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.ac.kopo.hanafamily.mydata.mapper.MyDataMapper">
+
+  <!-- 계좌 삽입 -->
+  <insert id="insertMyDataAccounts" parameterType="kr.ac.kopo.hanafamily.mydata.dto.AccountDTO">
+    INSERT INTO tb_Account (account_no, user_no, account_name, account_password, account_balance, account_create_date, account_status, bank_code, account_type, account_limit, account_expire_date)
+    VALUES (#{account.accountNo}, #{userNo}, #{account.accountName}, #{account.accountPassword}, #{account.accountBalance}, SYSDATE, #{account.accountStatus}, #{account.bankCode}, #{account.accountType}, #{account.accountLimit}, #{account.accountExpireDate})
+  </insert>
+
+  <!-- 카드 삽입 -->
+  <insert id="insertMyDataCards" parameterType="kr.ac.kopo.hanafamily.mydata.dto.CardDTO">
+    INSERT INTO tb_Card (card_no, user_no, card_passwd, card_period, card_cvc, card_user, card_name, card_type, card_limit, card_code, card_balance, card_product_code)
+    VALUES (#{card.cardNo}, #{userNo}, #{card.passwd}, #{card.cardPeriod}, #{card.cvc}, #{card.cardUser}, #{card.cardName}, #{card.cardType}, #{card.cardLimit}, #{card.cardCode}, #{card.cardBalance}, #{card.cardProductCode})
+  </insert>
+
+  <!-- 대출 삽입 -->
+  <insert id="insertMyDataLoans" parameterType="kr.ac.kopo.hanafamily.mydata.dto.LoanDTO">
+    INSERT INTO tb_Loan (loan_id, loan_type, loan_amount, loan_date, loan_state, loan_term, user_no, loan_code, loan_end_date, loan_name, loan_rate, loan_balance, loan_interest, loan_account, loan_bank)
+    VALUES (#{loan.loanId}, #{loan.loanType}, #{loan.loanAmount}, #{loan.loanDate}, #{loan.loanState}, #{loan.loanTerm}, #{userNo}, #{loan.loanCode}, #{loan.loanEndDate}, #{loan.loanName}, #{loan.loanRate}, #{loan.loanBalance}, #{loan.loanInterest}, #{loan.loanAccount}, #{loan.loanBank})
+  </insert>
+
+  <!-- 보험 삽입 -->
+  <insert id="insertMyDataInsurances" parameterType="kr.ac.kopo.hanafamily.mydata.dto.InsuranceDTO">
+    INSERT INTO tb_Insurance (insurance_id, insurance_type, insurance_amount, insurance_start_date, insurance_end_date, insurance_term, insurance_state, insurance_renewal, insurance_payment_type, insurance_payment_cycle, insurance_payment_total, insurance_payment_date, user_no, insurance_code, insurance_name, insurance_account, insurance_company)
+    VALUES (#{insurance.insuranceId}, #{insurance.insuranceType}, #{insurance.insuranceAmount}, #{insurance.insuranceStartDate}, #{insurance.insuranceEndDate}, #{insurance.insuranceTerm}, #{insurance.insuranceState}, #{insurance.insuranceRenewal}, #{insurance.insurancePaymentType}, #{insurance.insurancePaymentCycle}, #{insurance.insurancePaymentTotal}, #{insurance.insurancePaymentDate}, #{userNo}, #{insurance.insuranceCode}, #{insurance.insuranceName}, #{insurance.insuranceAccount}, #{insurance.insuranceCompany})
+  </insert>
+
+  <!-- 증권 삽입 -->
+  <insert id="insertMyDataSecurities" parameterType="kr.ac.kopo.hanafamily.mydata.dto.SecurityDTO">
+    INSERT INTO tb_Security (security_id, security_account, security_name, security_balance, security_type, security_date, security_state, user_no, security_code, security_rate, security_interest, security_bank)
+    VALUES (#{security.securityId}, #{security.securityAccount}, #{security.securityName}, #{security.securityBalance}, #{security.securityType}, #{security.securityDate}, #{security.securityState}, #{userNo}, #{security.securityCode}, #{security.securityRate}, #{security.securityInterest}, #{security.securityBank})
+  </insert>
+
+  <!-- 은행 거래 내역 삽입 -->
+  <insert id="insertBankStatement" parameterType="kr.ac.kopo.hanafamily.mydata.dto.BankStatementDTO">
+    INSERT INTO tb_BankStatement (transaction_no, account_no, transaction_amount, transaction_date, transaction_type, account_balance, user_no, before_balance, account_no_to)
+    VALUES (#{bankStatement.transactionNo}, #{bankStatement.accountNo}, #{bankStatement.transactionAmount}, #{bankStatement.transactionDate}, #{bankStatement.transactionType}, #{bankStatement.accountBalance}, #{userNo}, #{bankStatement.beforeBalance}, #{bankStatement.accountNoTo})
+  </insert>
+
+  <!-- 카드 거래 내역 삽입 -->
+  <insert id="insertCardStatement" parameterType="kr.ac.kopo.hanafamily.mydata.dto.TransactionDTO">
+    INSERT INTO tb_Transaction (transaction_id, card_no, transaction_amount, transaction_date, transaction_type, transaction_account_balance, user_no, transaction_before_balance, transaction_location, transaction_category, transaction_status)
+    VALUES (#{cardStatement.transactionId}, #{cardStatement.cardNo}, #{cardStatement.transactionAmount}, #{cardStatement.transactionDate}, #{cardStatement.transactionType}, #{cardStatement.accountBalance}, #{userNo}, #{cardStatement.beforeBalance}, #{cardStatement.location}, #{cardStatement.category}, #{cardStatement.transactionStatus})
+  </insert>
+
+  <!-- 주식 거래 내역 삽입 -->
+  <insert id="insertStockStatement" parameterType="kr.ac.kopo.hanafamily.mydata.dto.StockDTO">
+    INSERT INTO tb_Stock (stock_id, stock_type, stock_count, stock_amount, stock_date, stock_state, user_no, stock_code, stock_name, stock_balance, security_account, security_code)
+    VALUES (#{stockStatement.stockId}, #{stockStatement.stockType}, #{stockStatement.stockCount}, #{stockStatement.stockAmount}, #{stockStatement.stockDate}, #{stockStatement.stockState}, #{userNo}, #{stockStatement.stockCode}, #{stockStatement.stockName}, #{stockStatement.stockBalance}, #{stockStatement.securityAccount}, #{stockStatement.securityCode})
+  </insert>
+
+</mapper>

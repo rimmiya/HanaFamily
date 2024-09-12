@@ -15,7 +15,7 @@ public class BankStatementDTO {
   private Date transactionDate;
   private String transactionType;
   private Integer accountBalance;
-  private String userNo;
+  private Integer userNo;
   private Integer beforeBalance;
   private String accountNoTo;
 }

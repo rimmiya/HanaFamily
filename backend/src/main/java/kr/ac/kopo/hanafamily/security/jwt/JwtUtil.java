@@ -47,7 +47,7 @@ public class JwtUtil {
         .claim("userNo", userDTO.getUserDTO().getUserNo())
         .claim("userId", userDTO.getUserDTO().getUserId())
         .claim("userName", userDTO.getUserDTO().getUserName())
-//        .claim("imgURL", userDTO.getImgUrl())
+        .claim("familyId", userDTO.getUserDTO().getFamilyId())
         .setIssuedAt(Date.from(now.toInstant()))
         .setExpiration(Date.from(tokenValidity.toInstant()))
         .signWith(key, SignatureAlgorithm.HS256)
@@ -64,9 +64,9 @@ public class JwtUtil {
     return parseClaims(token).get("name", String.class);
   }
 
-  public String getUserId(String token) {
-    return parseClaims(token).get("userId", String.class);
-  }
+//  public String getUserId(String token) {
+//    return parseClaims(token).get("userId", String.class);
+//  }
 
   public String resolveToken(HttpServletRequest request) {
     String bearerToken = request.getHeader("Authorization");

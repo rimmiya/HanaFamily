@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.ac.kopo.hanafamily.invitation.mapper.InvitationMapper">
+
+  <!-- 초대장 삽입 -->
+  <insert id="insertInvitation" parameterType="kr.ac.kopo.hanafamily.invitation.dto.InvitationDTO">
+    INSERT INTO tb_invitation (user_no, invitee_phone, invite_key, is_used, expiry_date, created_at)
+    VALUES (#{invitation.userNo}, #{invitation.inviteePhone}, #{invitation.inviteKey}, #{invitation.isUsed}, #{invitation.expiryDate}, #{invitation.createdAt})
+  </insert>
+
+  <!-- 초대장 조회 -->
+  <select id="getLastInsertId" resultType="int">
+    SELECT id
+    FROM tb_invitation
+    WHERE invite_key = #{inviteKey}
+  </select>
+
+
+  <!-- 초대장 조회 -->
+  <select id="findByInviteKey" resultType="kr.ac.kopo.hanafamily.invitation.dto.InvitationDTO">
+    SELECT * FROM tb_invitation WHERE invite_key = #{inviteKey}
+  </select>
+
+  <!-- 초대장 사용 여부 업데이트 -->
+  <update id="markAsUsed">
+    UPDATE tb_invitation SET is_used = 1 WHERE id = #{id}
+  </update>
+
+  <select id="getUserIdByInviteKey" resultType="String">
+    SELECT u.user_id
+    FROM tb_invitation i
+           JOIN tb_users u ON i.user_no = u.user_no
+    WHERE i.invite_key = #{inviteKey}
+  </select>
+</mapper>

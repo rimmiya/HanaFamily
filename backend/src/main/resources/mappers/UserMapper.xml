@@ -19,5 +19,52 @@
     WHERE user_id = #{userId}
   </select>
 
+  <select id = "getPhoneNumberById" parameterType="String" resultType="String">
+    SELECT
+      user_phone_no
+    FROM tb_users
+    WHERE user_id = #{userId}
+  </select>
+
+  <insert id="insertFamily" useGeneratedKeys="true" keyProperty="familyId" keyColumn="family_id" parameterType="kr.ac.kopo.hanafamily.invitation.dto.FamilyDTO">
+    INSERT INTO tb_family (family_registration_date, family_status, family_invitation_date, family_invitation_status)
+    VALUES (SYSDATE, 'ACTIVE', SYSDATE, 'ACCEPTED')
+  </insert>
+
+  <update id="updateUserFamilyId">
+    UPDATE tb_users SET family_id = #{familyId} WHERE user_id = #{userId}
+  </update>
+
+  <select id="getUserFamilyId" resultType="Integer">
+    SELECT family_id FROM tb_users WHERE user_id = #{userId}
+  </select>
+
+  <!-- resultMap을 사용한 매핑 -->
+  <resultMap id="FamilyMemberMap" type="kr.ac.kopo.hanafamily.user.domain.FamilyMemberDTO">
+    <!-- familyId 매핑 -->
+    <id property="familyId" column="family_id"/>
+
+    <!-- familyMembers 매핑: 여러 개의 UserDTO를 familyMembers에 매핑 -->
+    <collection property="familyMembers" ofType="kr.ac.kopo.hanafamily.user.domain.UserDTO">
+      <id property="userId" column="user_id"/>
+      <result property="userName" column="user_name"/>
+      <result property="userPhoneNo" column="user_phone_no"/>
+      <result property="userEmail" column="user_email"/>
+      <result property="userStatus" column="user_status"/>
+    </collection>
+  </resultMap>
+
+  <!-- 패밀리 멤버를 조회하는 쿼리 -->
+  <select id="getFamilyMembers" parameterType="Integer" resultMap="FamilyMemberMap">
+    SELECT
+      family_id,
+      user_id,
+      user_name,
+      user_phone_no,
+      user_email,
+      user_status
+    FROM tb_users
+    WHERE family_id = #{familyId}
+  </select>
 </mapper>
 

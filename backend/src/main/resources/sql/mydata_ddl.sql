@@ -10,6 +10,26 @@ CREATE TABLE tb_family (
                            family_invitee_no            Integer                  -- 수락자
 );
 
+CREATE SEQUENCE family_seq
+    START WITH 1 -- 초기 값
+    INCREMENT BY 1 -- 증가 값
+    NOCACHE; -- 시퀀스 값 캐싱 안 함
+
+CREATE OR REPLACE TRIGGER trg_tb_family_id
+    BEFORE INSERT ON tb_family
+    FOR EACH ROW
+    WHEN (NEW.family_id IS NULL) -- family_id 값이 NULL일 때만 시퀀스 적용
+BEGIN
+    SELECT family_seq.NEXTVAL INTO :NEW.family_id FROM dual;
+END;
+/
+
+DROP SEQUENCE family_seq;
+DROP TRIGGER trg_tb_family_id;
+
+
+-- ALTER TABLE tb_users drop constraint fk_users_family;
+
 CREATE TABLE tb_users (
                           user_no         Integer PRIMARY KEY,  -- 사용자 번호 (기본키)
                           user_name       VARCHAR2(100) NOT NULL,    -- 사용자 이름
@@ -255,3 +275,9 @@ ALTER TABLE tb_Stock ADD CONSTRAINT Stock_FK FOREIGN KEY (user_no) REFERENCES tb
 -- ALTER TABLE tb_Stock ADD CONSTRAINT Stock_FK1 FOREIGN KEY (security_code) REFERENCES tb_Security (security_code);
 -- ALTER TABLE tb_Stock ADD CONSTRAINT Stock_FK2 FOREIGN KEY (security_account) REFERENCES tb_Security (security_account);
 
+-- 고유 제약 조건 확인
+SELECT constraint_name, column_name
+FROM all_cons_columns
+WHERE table_name = 'TB_FAMILY' AND constraint_name LIKE 'SYS%';
+
+drop table tb_family;
