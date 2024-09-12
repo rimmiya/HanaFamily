@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.ac.kopo.mydata.mapper.MydataMapper">
+
+<!--  <select id="getUser" resultType="kr.ac.kopo.mydata.domain.UserDTO">-->
+<!--    SELECT *-->
+<!--    FROM tb_members-->
+<!--    WHERE-->
+<!--      USER_ID = #{id}-->
+<!--  </select>-->
+
+<!--  <select id = "getUserById" parameterType="String" resultType="kr.ac.kopo.hanafamily.user.domain.UserDTO">-->
+<!--    SELECT-->
+<!--      *-->
+<!--    FROM tb_members-->
+<!--    WHERE user_id = #{id}-->
+<!--  </select>-->
+
+</mapper>
+
