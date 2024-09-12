@@ -14,6 +14,9 @@ import JointAssetsJoin from "./pages/JointAssets/JointAssetsJoin";
 import FamilyJoinRedirect from "./pages/JointAssets/FamilyJoinRedirect";
 import InviteSuccess from "./components/JointAssets/InviteSuccess";
 import InviteFailed from "./components/JointAssets/InviteFailed";
+import TogetherAccount from "./pages/TogetherAccount/TogetherAccount";
+import TogetherAccountJoin from "./pages/TogetherAccount/TogetherAccountJoin";
+import ConfirmationAccount from "./pages/TogetherAccount/ConfirmationAccount";
 
 function App() {
   return (
@@ -32,7 +35,9 @@ function App() {
         <Route path="/invite-success" element={<InviteSuccess />} />
         <Route path="/invite-failed" element={<InviteFailed />} />
         <Route path="/familyjoinredirect" element={<FamilyJoinRedirect />} />
-
+        <Route path="/togetheraccount" element={<TogetherAccount />} />
+        <Route path="/togetheraccountjoin" element={<TogetherAccountJoin />} />
+        <Route path="/confirmationaccount" element={<ConfirmationAccount />} />
         <Route path="/auth" element={<Auth />} />
       </Routes>
     </div>

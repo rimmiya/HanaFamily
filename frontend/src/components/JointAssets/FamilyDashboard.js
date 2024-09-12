@@ -267,7 +267,7 @@ function FamilyDashboard() {
         >
           <HouseHoldAccount></HouseHoldAccount>
         </div>
-        <FixedExpenditureManagement initialData={consumptionData} />
+        <FixedExpenditureManagement />
       </div>
       <div style={styles.column}>
         <FamilyAssetsStatus data={assetsData} totalAmount={totalAssets} />

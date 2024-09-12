@@ -58,6 +58,11 @@ function Header() {
                     상품 추천
                   </a>
                 </li>
+                <li class="nav-li">
+                  <a href="/togetheraccount" class="nav-alink">
+                    함께 적금
+                  </a>
+                </li>
               </ul>
             </nav>
             {user ? (

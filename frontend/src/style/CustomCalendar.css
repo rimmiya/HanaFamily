@@ -1,29 +1,5 @@
 /* CustomCalendar.css */
 
-.react-calendar {
-  width: 100%;
-}
-
-.react-calendar__tile {
-  position: relative;
-  padding: 10px;
-  text-align: center;
-  background: none;
-  border-radius: 10px;
-  transition: background-color 0.2s;
-  height: 100px; /* 타일의 고정 높이 설정 */
-  overflow: hidden;
-}
-
-.react-calendar__tile:hover {
-  background-color: #ffe6e6;
-  border-radius: 10px;
-}
-
-.events {
-  margin-top: 5px; /* 타일 상단에 여백을 주어 날짜와 겹치지 않게 함 */
-}
-
 .event {
   display: inline-block;
   width: 100%;
@@ -56,4 +32,74 @@
 
 .react-calendar__tile abbr {
   color: black; /* 날짜 텍스트를 검정색으로 변경 */
+}
+.main-content {
+  display: flex;
+  justify-content: space-around;
+  margin: 20px;
+}
+
+.details-container {
+  display: flex;
+  flex-direction: column;
+  width: 50%;
+}
+
+.calendar-container {
+  width: 40%;
+}
+
+.budget-container,
+.schedule-container {
+  margin: 10px;
+}
+
+form {
+  margin-top: 20px;
+}
+
+input,
+select {
+  margin: 5px;
+}
+
+button {
+  margin-top: 10px;
+}
+
+/* 이벤트 기본 스타일 */
+.fc-event {
+  text-decoration: none !important; /* 밑줄 제거 */
+  color: black; /* 텍스트 색상 */
+}
+
+/* 링크의 기본 스타일 제거 */
+a {
+  text-decoration: none !important; /* 모든 링크의 밑줄 제거 */
+  color: black; /* 텍스트 색상 */
+}
+
+/* 일요일 빨간색 */
+.fc .fc-day-sun {
+  /* background-color: #fff5f5; 연한 빨간색 배경 */
+  color: red; /* 글자 색상 빨간색 */
+}
+
+/* 토요일 파란색 */
+.fc .fc-day-sat {
+  /* background-color: #f0f8ff; 연한 파란색 배경 */
+  color: blue; /* 글자 색상 파란색 */
+}
+
+/* 캘린더 셀에 보더 추가 */
+.fc .fc-daygrid-day {
+  border: 1px solid #ccc; /* 셀 보더 */
+}
+
+.fc {
+  border-bottom: 0.5px solid #ccc; /* 날짜 위에 있는 부분에도 보더 추가 */
+}
+
+.fc-toolbar-title {
+  font-size: 25px !important; /* 캘린더 제목 폰트 크기 */
 }

@@ -1,20 +1,28 @@
 import React, { useState } from "react";
-import Calendar from "react-calendar";
-import "react-calendar/dist/Calendar.css";
-import { Modal, Button, Select, Input, DatePicker } from "antd"; // Ant Design의 Modal, Button, Select, Input, DatePicker 사용
+import FullCalendar from "@fullcalendar/react";
+import dayGridPlugin from "@fullcalendar/daygrid"; // 월별 보기
+import timeGridPlugin from "@fullcalendar/timegrid"; // 시간별 보기
+import interactionPlugin from "@fullcalendar/interaction"; // 클릭 및 드래그 등의 인터랙션
+import bootstrapPlugin from "@fullcalendar/bootstrap"; // FullCalendar에서 Bootstrap 플러그인 사용
+import { Modal, Button, Select, Input, DatePicker, Switch } from "antd"; // Ant Design 사용
 import dayjs from "dayjs"; // 날짜 처리를 위한 dayjs 사용
 import "../../style/CustomCalendar.css"; // 커스텀 CSS 파일
+import "bootstrap/dist/css/bootstrap.min.css"; // 기본 Bootstrap CSS
+import "bootswatch/dist/minty/bootstrap.min.css"; // Minty 테마 추가
+import "@fortawesome/fontawesome-free/css/all.min.css"; // Font Awesome 임포트
+import koLocale from "@fullcalendar/core/locales/ko";
 
 const { Option } = Select;
 
 function FamilyCalendar({ initialData = [] }) {
   const [data, setData] = useState(initialData);
-  const [selectedDate, setSelectedDate] = useState(new Date());
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [newEventName, setNewEventName] = useState("");
   const [newEventAmount, setNewEventAmount] = useState("");
   const [newEventType, setNewEventType] = useState("일정");
-  const [newEventDate, setNewEventDate] = useState(dayjs()); // 추가된 날짜 상태
+  const [newEventDate, setNewEventDate] = useState(dayjs()); // 시작 날짜 상태
+  const [newEventEndDate, setNewEventEndDate] = useState(null); // 종료 날짜 상태
+  const [isEndDateEnabled, setIsEndDateEnabled] = useState(false); // 종료일 활성화 토글 상태
   const [filter, setFilter] = useState("전체");
   const [modalContent, setModalContent] = useState(null); // 클릭된 일정의 내용을 저장
 
@@ -25,11 +33,9 @@ function FamilyCalendar({ initialData = [] }) {
 
   const handleOk = () => {
     if (modalContent) {
-      // 일정 클릭으로 열린 모달을 닫을 때
-      setModalContent(null);
+      setModalContent(null); // 일정 클릭으로 열린 모달을 닫을 때
     } else {
-      // 새로운 일정 추가 모달을 닫을 때
-      addEvent();
+      addEvent(); // 새로운 일정 추가 모달을 닫을 때
     }
     setIsModalVisible(false);
   };
@@ -44,83 +50,66 @@ function FamilyCalendar({ initialData = [] }) {
     if (newEventName.trim() === "") return;
 
     const newEvent = {
-      name: newEventName,
+      title: newEventName,
       value: parseInt(newEventAmount, 10) || 0,
       type: newEventType,
-      date: newEventDate.toDate(),
+      startDate: newEventDate.format("YYYY-MM-DD"), // 시작일
+      endDate:
+        isEndDateEnabled && newEventEndDate
+          ? newEventEndDate.format("YYYY-MM-DD")
+          : null, // 종료일, 종료일이 활성화된 경우에만 설정
     };
 
     setData([...data, newEvent]);
     setNewEventName("");
     setNewEventAmount("");
+    setNewEventEndDate(null); // 종료일 초기화
+    setIsEndDateEnabled(false); // 종료일 활성화 토글 초기화
   };
 
-  // 선택된 날짜와 일치하는 데이터를 필터링
+  // 필터링된 이벤트만 캘린더에 표시
   const filteredData = data.filter(
     (item) => filter === "전체" || item.type === filter
   );
 
-  const displayData = filteredData.filter(
-    (item) =>
-      item.date.getFullYear() === selectedDate.getFullYear() &&
-      item.date.getMonth() === selectedDate.getMonth() &&
-      item.date.getDate() === selectedDate.getDate()
-  );
-
-  // 캘린더 타일에 스타일을 적용하고, 오늘 날짜에 대한 특별한 표시를 추가
-  const tileContent = ({ date, view }) => {
-    if (view === "month") {
-      const eventsOnDate = filteredData.filter(
-        (item) =>
-          item.date.getFullYear() === date.getFullYear() &&
-          item.date.getMonth() === date.getMonth() &&
-          item.date.getDate() === date.getDate()
-      );
-
-      return (
-        <div className="events">
-          {eventsOnDate.map((event, index) => (
-            <div
-              key={index}
-              className="event"
-              style={{
-                color:
-                  event.type === "수입"
-                    ? "red"
-                    : event.type === "지출"
-                    ? "blue"
-                    : "#000",
-                fontWeight: "bold",
-                marginTop: "2px",
-                textAlign: "center",
-                cursor: "pointer",
-              }}
-              onClick={() => {
-                setModalContent(event);
-                showModal();
-              }}
-            >
-              {event.type === "수입" || event.type === "지출"
-                ? `${
-                    event.type === "수입" ? "+" : "-"
-                  }${event.value.toLocaleString()}`
-                : event.name}
-            </div>
-          ))}
-        </div>
-      );
-    }
-  };
+  // FullCalendar에서 사용하는 이벤트 데이터 형식으로 변환
+  const events = filteredData.map((item) => ({
+    title:
+      item.type === "수입" || item.type === "지출"
+        ? `${item.type === "수입" ? "+" : "-"}${item.value.toLocaleString()}`
+        : item.title,
+    start: item.startDate,
+    end: item.endDate || item.startDate, // 종료일이 있으면 종료일을 사용, 없으면 시작일만 사용
+    backgroundColor:
+      item.type === "수입" ? "red" : item.type === "지출" ? "blue" : "#13aec3",
+  }));
 
   // 필터링 버튼에 대한 핸들러
   const handleFilterChange = (value) => {
     setFilter(value);
   };
 
+  // FullCalendar에서 날짜 클릭 시 발생하는 이벤트
+  const handleDateClick = (info) => {
+    setNewEventDate(dayjs(info.date));
+    showModal();
+  };
+
+  // FullCalendar에서 이벤트 클릭 시 모달에 상세 정보 표시
+  const handleEventClick = (info) => {
+    const clickedEvent = data.find(
+      (event) =>
+        event.startDate === info.event.startStr &&
+        event.title === info.event.title
+    );
+    setModalContent(clickedEvent);
+    showModal();
+  };
+
   return (
     <div style={styles.container}>
       <h3 style={{ fontFamily: "CustomFont" }}>가족 일정 관리</h3>
-      <div style={styles.filterContainer}>
+      {/* <div style={styles.filterContainer}>
         <Select
           defaultValue="전체"
           onChange={handleFilterChange}
@@ -131,19 +120,22 @@ function FamilyCalendar({ initialData = [] }) {
           <Option value="지출">지출</Option>
           <Option value="일정">일정</Option>
         </Select>
-      </div>
+      </div> */}
 
       <div style={styles.calendarContainer}>
-        <Calendar
-          onClickDay={setSelectedDate}
-          value={selectedDate}
-          tileContent={tileContent}
-          tileClassName={({ date, view }) =>
-            view === "month" &&
-            date.getTime() === new Date().setHours(0, 0, 0, 0)
-              ? "highlight-today"
-              : ""
-          }
+        <FullCalendar
+          plugins={[
+            dayGridPlugin,
+            timeGridPlugin,
+            interactionPlugin,
+            bootstrapPlugin,
+          ]}
+          initialView="dayGridMonth"
+          events={events}
+          dateClick={handleDateClick}
+          eventClick={handleEventClick}
+          themeSystem="bootstrap"
+          locale={koLocale} // 한국어 로케일 적용
         />
       </div>
 
@@ -164,21 +156,17 @@ function FamilyCalendar({ initialData = [] }) {
       >
         {modalContent ? (
           <div>
-            <p>이름: {modalContent.name}</p>
+            <p>이름: {modalContent.title}</p>
             <p>
               금액:{" "}
               {modalContent.value ? modalContent.value.toLocaleString() : "N/A"}
               원
             </p>
             <p>타입: {modalContent.type}</p>
-            <p>
-              날짜:{" "}
-              {modalContent.date.toLocaleDateString("ko-KR", {
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-              })}
-            </p>
+            <p>시작일: {dayjs(modalContent.startDate).format("YYYY-MM-DD")}</p>
+            {modalContent.endDate && (
+              <p>종료일: {dayjs(modalContent.endDate).format("YYYY-MM-DD")}</p>
+            )}
           </div>
         ) : (
           <>
@@ -210,6 +198,21 @@ function FamilyCalendar({ initialData = [] }) {
               onChange={(date) => setNewEventDate(date)}
               style={styles.input}
             />
+            <div style={{ marginBottom: "10px" }}>
+              <span>종료일 사용: </span>
+              <Switch
+                checked={isEndDateEnabled}
+                onChange={(checked) => setIsEndDateEnabled(checked)}
+              />
+            </div>
+            {isEndDateEnabled && (
+              <DatePicker
+                value={newEventEndDate}
+                onChange={(date) => setNewEventEndDate(date)}
+                style={styles.input}
+                placeholder="종료일 선택"
+              />
+            )}
           </>
         )}
       </Modal>
@@ -221,12 +224,10 @@ const styles = {
   container: {
     display: "flex",
     flexDirection: "column",
-    // alignItems: "center",
     backgroundColor: "#f0f8ff",
     borderRadius: "10px",
     padding: "20px",
     position: "relative",
-    // width: "45%",
     background: "#ffffff",
     borderRadius: "20px",
   },
