@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.ac.kopo.finance.mapper.bank.BankMapper">
+
+  <select id="getBankAccountData" resultType="kr.ac.kopo.finance.dto.AccountDTO">
+    SELECT
+      account_no AS accountNo,                  -- 계좌 번호
+      user_no AS userNo,                        -- 사용자 번호
+      account_name AS accountName,              -- 계좌 이름
+      account_password AS accountPassword,      -- 계좌 비밀번호
+      account_balance AS accountBalance,        -- 계좌 잔액
+      account_create_date AS createDate,        -- 계좌 생성일
+      account_status AS accountStatus,          -- 계좌 상태
+      bank_code AS bankCode,                    -- 은행 코드
+      account_type AS accountType,              -- 계좌 유형
+      account_limit AS accountLimit,            -- 계좌 한도
+      account_expire_date AS accountExpireDate  -- 계좌 만료일
+    FROM tb_account
+    WHERE
+      user_no = #{userNo}
+      AND bank_code = #{bankCode}
+  </select>
+
+
+  <select id="getLoanData" resultType="kr.ac.kopo.finance.dto.LoanDTO">
+    SELECT
+      loan_id AS loanId,               -- 대출 ID
+      loan_type AS loanType,           -- 대출 유형
+      loan_amount AS loanAmount,       -- 대출 금액
+      loan_date AS loanDate,           -- 대출 날짜
+      loan_state AS loanState,         -- 대출 상태
+      loan_term AS loanTerm,           -- 대출 기간
+      user_no AS userNo,               -- 사용자 번호
+      loan_code AS loanCode,           -- 대출 코드
+      loan_end_date AS loanEndDate,    -- 대출 종료일
+      loan_name AS loanName,           -- 대출 이름
+      loan_rate AS loanRate,           -- 대출 이자율
+      loan_balance AS loanBalance,     -- 대출 잔액
+      loan_interest AS loanInterest,   -- 대출 이자
+      loan_account AS loanAccount,     -- 대출 계좌
+      loan_bank AS loanBank            -- 대출 은행
+    FROM tb_loan
+    WHERE
+      user_no = #{userNo}
+      AND loan_code = #{loanCode}
+  </select>
+
+  <select id="getBankStatementData" resultType="kr.ac.kopo.finance.dto.BankStatementDTO">
+    SELECT
+      transaction_no AS transactionNo,        -- 거래 번호
+      account_no AS accountNo,                -- 계좌 번호
+      transaction_amount AS transactionAmount,-- 거래 금액
+      transaction_date AS transactionDate,    -- 거래 날짜
+      transaction_type AS transactionType,    -- 거래 유형
+      account_balance AS accountBalance,      -- 거래 후 잔액
+      user_no AS userNo,                      -- 사용자 번호
+      before_balance AS beforeBalance,        -- 거래 전 잔액
+      account_no_to AS accountNoTo            -- 송금 시 상대방 계좌 번호
+    FROM tb_BankStatement
+    WHERE
+      user_no = #{userNo}
+      AND account_no = #{accountNo}
+  </select>
+
+
+</mapper>

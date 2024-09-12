@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.ac.kopo.finance.mapper.security.SecurityMapper">
+
+  <select id="getSecurityData" resultType="kr.ac.kopo.finance.dto.SecurityDTO">
+    SELECT
+      security_id AS securityId,           -- 증권 ID
+      security_account AS securityAccount, -- 증권 계좌
+      security_name AS securityName,       -- 증권 이름
+      security_balance AS securityBalance, -- 증권 잔액
+      security_type AS securityType,       -- 증권 유형
+      security_date AS securityDate,       -- 증권 날짜
+      security_state AS securityState,     -- 증권 상태
+      user_no AS userNo,                   -- 사용자 번호
+      security_code AS securityCode,       -- 증권 코드
+      security_rate AS securityRate,       -- 증권 이자율
+      security_interest AS securityInterest, -- 증권 이자
+      security_bank AS securityBank        -- 증권 은행
+    FROM tb_security
+    WHERE
+      user_no = #{userNo}
+      AND security_code = #{securityCode}
+  </select>
+
+  <select id="getStockData" resultType="kr.ac.kopo.finance.dto.StockDTO">
+    SELECT
+      stock_id AS stockId,                 -- 보유 주식 ID
+      stock_type AS stockType,             -- 주식 유형
+      stock_count AS stockCount,           -- 주식 수량
+      stock_amount AS stockAmount,         -- 주식 매입 단가
+      stock_date AS stockDate,             -- 주식 날짜
+      stock_state AS stockState,           -- 주식 상태
+      user_no AS userNo,                   -- 사용자 번호
+      stock_code AS stockCode,             -- 주식 코드
+      stock_name AS stockName,             -- 주식 이름
+      stock_balance AS stockBalance,       -- 주식 잔액
+      security_account AS securityAccount, -- 주식 계좌
+      security_code AS securityCode        -- 증권 코드
+    FROM tb_Stock
+    WHERE
+      user_no = #{userNo}
+      AND security_account = #{securityAccount}
+  </select>
+
+
+</mapper>

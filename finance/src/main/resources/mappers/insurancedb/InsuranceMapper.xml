@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.ac.kopo.finance.mapper.insurance.InsuranceMapper">
+
+  <select id="getInsuranceData" resultType="kr.ac.kopo.finance.dto.InsuranceDTO">
+    SELECT
+      insurance_id AS insuranceId,                 -- 보험 ID
+      insurance_type AS insuranceType,             -- 보험 유형
+      insurance_amount AS insuranceAmount,         -- 보험 금액
+      insurance_start_date AS insuranceStartDate,  -- 보험 가입 날짜
+      insurance_end_date AS insuranceEndDate,      -- 보험 종료일
+      insurance_term AS insuranceTerm,             -- 보험 기간
+      insurance_state AS insuranceState,           -- 보험 상태
+      insurance_renewal AS insuranceRenewal,       -- 보험 갱신 여부
+      insurance_payment_type AS insurancePaymentType,  -- 보험 납입 구분
+      insurance_payment_cycle AS insurancePaymentCycle, -- 보험 납입 주기
+      insurance_payment_total AS insurancePaymentTotal, -- 보험 총 납입횟수
+      insurance_payment_date AS insurancePaymentDate,   -- 보험 납입일
+      user_no AS userNo,                             -- 사용자 번호
+      insurance_code AS insuranceCode,               -- 보험 코드
+      insurance_name AS insuranceName,               -- 보험 이름
+      insurance_account AS insuranceAccount,         -- 보험 계좌
+      insurance_company AS insuranceCompany          -- 보험 회사
+    FROM tb_insurance
+    WHERE
+      user_no = #{userNo}
+      AND insurance_code = #{insuranceCode}
+  </select>
+
+</mapper>

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.ac.kopo.finance.mapper.card.CardMapper">
+
+  <select id="getCardData" resultType="kr.ac.kopo.finance.dto.CardDTO">
+    SELECT
+      card_no AS cardNo,                  -- 카드 번호
+      user_no AS userNo,                  -- 사용자 번호
+      card_passwd AS passwd,              -- 카드 비밀번호
+      card_period AS cardPeriod,          -- 카드 유효 기간
+      card_cvc AS cvc,                    -- 카드 CVC
+      card_user AS cardUser,              -- 카드 사용자
+      card_name AS cardName,              -- 카드 이름
+      card_type AS cardType,              -- 카드 유형
+      card_limit AS cardLimit,            -- 카드 한도
+      card_code AS cardCode,              -- 카드 코드
+      card_balance AS cardBalance,        -- 카드 잔액
+      card_product_code AS cardProductCode -- 카드 상품 코드
+    FROM tb_card
+    WHERE
+      user_no = #{userNo}
+      AND card_code = #{cardCode}
+  </select>
+
+  <select id="getTransactionData" resultType="kr.ac.kopo.finance.dto.TransactionDTO">
+    SELECT
+      transaction_id AS transactionId,           -- 거래 ID
+      card_no AS cardNo,                         -- 카드 번호
+      transaction_amount AS transactionAmount,   -- 거래 금액
+      transaction_date AS transactionDate,       -- 거래 날짜
+      transaction_type AS transactionType,       -- 거래 유형
+      transaction_account_balance AS accountBalance,  -- 거래 후 잔액
+      user_no AS userNo,                         -- 사용자 번호
+      transaction_before_balance AS beforeBalance,  -- 거래 전 잔액
+      transaction_location AS location,          -- 거래 위치
+      transaction_category AS category,          -- 거래 카테고리
+      transaction_status AS transactionStatus    -- 거래 상태
+    FROM tb_Transaction
+    WHERE
+      user_no = #{userNo}
+      AND card_no = #{cardNo}
+  </select>
+
+</mapper>
