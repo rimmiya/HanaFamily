@@ -35,9 +35,6 @@ function FamilyConsumptionPattern({ data }) {
       type: "packedbubble",
       height: "100%",
     },
-    title: {
-      text: "가계 소비 패턴 분석",
-    },
     tooltip: {
       useHTML: true,
       pointFormat: "<b>{point.name}:</b> {point.value}원",
@@ -82,6 +79,7 @@ function FamilyConsumptionPattern({ data }) {
 
   return (
     <div style={styles.container}>
+      <h3 style={{ fontFamily: "CustomFont" }}>가계 소비 패턴</h3>
       <HighchartsReact highcharts={Highcharts} options={options} />
     </div>
   );
@@ -92,8 +90,10 @@ const styles = {
     backgroundColor: "#f0f8ff",
     borderRadius: "10px",
     padding: "20px",
-    textAlign: "center",
-    width: "44%",
+    // textAlign: "center",
+    // width: "45%",
+    background: "#ffffff",
+    borderRadius: "20px",
   },
 };
 

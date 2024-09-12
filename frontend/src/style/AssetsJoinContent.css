@@ -46,7 +46,7 @@
   width: 90%;
   margin-left: auto;
   margin-right: auto;
-  margin-top: 20px;
+  margin-top: 10px;
   /* border: #00765f 1.5px solid;
   border-top: 5px solid #00765f;
   border-radius: 0 0 8px 8px; */
@@ -149,4 +149,21 @@
   display: block; /* Ensure it's visible */
   visibility: visible;
   overflow: visible;
+}
+
+.scrollable-content {
+  max-height: 200px; /* 스크롤 영역의 최대 높이 */
+  overflow-y: auto; /* 수직 스크롤 활성화 */
+  /* padding: 20px; */
+  /* background-color: #f0f8ff; */
+}
+
+@keyframes bounce {
+  0%,
+  100% {
+    transform: translateY(0); /* 처음과 끝은 원래 위치 */
+  }
+  50% {
+    transform: translateY(-10px); /* 중간에 살짝 위로 이동 */
+  }
 }

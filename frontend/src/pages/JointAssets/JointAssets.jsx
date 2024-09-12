@@ -9,35 +9,12 @@ import Footer from "../../components/common/Footer";
 
 function JointAssets() {
   return (
-    <div>
+    <div style={{ background: "#f1f1f1" }}>
       <Header></Header>
       <JointAssetsTitle></JointAssetsTitle>
-      <div
-        style={{
-          width: "90%",
-          display: "flex",
-          justifyContent: "center",
-          marginLeft: "auto",
-          marginRight: "auto",
-          marginTop: "34px",
-        }}
-      >
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            flexDirection: "column",
-            width: "45%",
-          }}
-        >
-          <JointAssetsMainContent></JointAssetsMainContent>
-          <JointAssetsList></JointAssetsList>
-        </div>
-        <div style={{ width: "45%" }}>
-          <HouseHoldAccount></HouseHoldAccount>
-        </div>
-      </div>
+
       <FamilyDashboard></FamilyDashboard>
+
       <Footer></Footer>
     </div>
   );

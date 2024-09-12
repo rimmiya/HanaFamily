@@ -1,6 +1,11 @@
 .assets-title-container {
   width: 100%;
-  background-color: rgba(30, 219, 156, 0.201);
+  background: rgb(18, 161, 253);
+  background: linear-gradient(
+    298deg,
+    rgb(18 161 253 / 54%) 26%,
+    rgb(15 184 149 / 38%) 71%
+  );
   font-family: "CustomFont";
   min-height: 200px;
   display: flex;

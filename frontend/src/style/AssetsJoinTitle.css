@@ -4,6 +4,7 @@
   font-family: "CustomFont";
   min-height: 200px;
   display: flex;
+  color: #363636;
 }
 
 .assets-title {

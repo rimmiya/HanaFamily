@@ -23,7 +23,7 @@
     rgba(0, 151, 141, 0.7) 52%,
     rgba(3, 106, 76, 0.7) 100%
   ); */
-  border-radius: 10px 0 0 10px;
+  border-radius: 10px;
 }
 
 .progress-tooltip {

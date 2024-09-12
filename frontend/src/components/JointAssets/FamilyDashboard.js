@@ -1,8 +1,13 @@
 import React from "react";
 import FamilyAssetsStatus from "./FamilyAssetsStatus";
 import FamilyLoanStatus from "./FamilyLoanStatus";
-import FixedExpenditureManagement from "./FixedExpenditureManagement";
+import JointAssetsList from "./JointAssetsList";
+import JointAssetsMainContent from "./JointAssetsMainContent";
+import HouseHoldAccount from "./HouseHoldAccount";
+import FixedExpenditureManagement from "./FamilyCalendar";
 import FamilyConsumptionPattern from "./FamilyConsumptionPattern";
+import BucketListAccount from "./BucketListAccount";
+import FamilyInsurance from "./FamilyInsurance";
 
 function FamilyDashboard() {
   const assetsData = [
@@ -48,12 +53,14 @@ function FamilyDashboard() {
       value: 500000000,
       interestRate: 2.5,
       person: "김하나",
+      monthlyPayment: 2000000,
     },
     {
       name: "신용대출",
       value: 50000000,
       interestRate: 3.1,
       person: "김두율",
+      monthlyPayment: 500000,
     },
   ];
 
@@ -204,15 +211,69 @@ function FamilyDashboard() {
     0
   );
 
+  const insuranceData = [
+    {
+      name: "삼성생명",
+      type: "생명보험",
+      coverageAmount: 100000000, // 보장 금액
+      premium: 500000, // 월 보험료
+      person: "김하나",
+    },
+    {
+      name: "현대해상",
+      type: "자동차 보험",
+      coverageAmount: 30000000, // 보장 금액
+      premium: 150000, // 월 보험료
+      person: "김두율",
+    },
+    {
+      name: "DB손해보험",
+      type: "상해보험",
+      coverageAmount: 20000000, // 보장 금액
+      premium: 200000, // 월 보험료
+      person: "김하나",
+    },
+  ];
+
   return (
     <div style={styles.dashboard}>
-      <div style={styles.row}>
+      <div style={styles.column}>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            flexDirection: "column",
+            // width: "45%",
+            padding: "20px",
+            // marginLeft: "15px",
+            // border: "1px solid #d9d9d9",
+            background: "#ffffff",
+            borderRadius: "20px",
+          }}
+        >
+          <JointAssetsMainContent></JointAssetsMainContent>
+          <JointAssetsList></JointAssetsList>
+        </div>
+        <BucketListAccount></BucketListAccount>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            flexDirection: "column",
+            // width: "45%",
+            background: "#ffffff",
+            borderRadius: "20px",
+          }}
+        >
+          <HouseHoldAccount></HouseHoldAccount>
+        </div>
+        <FixedExpenditureManagement initialData={consumptionData} />
+      </div>
+      <div style={styles.column}>
         <FamilyAssetsStatus data={assetsData} totalAmount={totalAssets} />
         <FamilyLoanStatus data={loanData} totalLoanAmount={totalLoanAmount} />
-      </div>
-      <div style={styles.row}>
-        <FixedExpenditureManagement initialData={consumptionData} />
-        <FamilyConsumptionPattern data={consumptionData} />
+        <FamilyInsurance data={insuranceData}></FamilyInsurance>
+        {/* <FamilyConsumptionPattern data={consumptionData} /> */}
       </div>
     </div>
   );
@@ -221,16 +282,18 @@ function FamilyDashboard() {
 const styles = {
   dashboard: {
     display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
+    flexDirection: "row",
+    alignItems: "flex-start",
     gap: "40px",
     width: "90%",
     marginLeft: "auto",
     marginRight: "auto",
     marginTop: "34px",
+    marginBottom: "40px",
   },
-  row: {
+  column: {
     display: "flex",
+    flexDirection: "column",
     justifyContent: "center",
     width: "100%",
     gap: "30px",

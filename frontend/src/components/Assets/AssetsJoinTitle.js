@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import "../../style/AssetsJoinTitle.css";
 
 function AssetsJoinTitle() {
+  const mydataImg = `${process.env.PUBLIC_URL}/img/mydata-join-title.png`;
   return (
     <div className="assets-title-container">
       <div className="assets-title">
@@ -14,6 +15,9 @@ function AssetsJoinTitle() {
             한번에 관리해 보세요 !
           </h2>
         </div>
+        {/* <div className="right-assets-title" style={{ marginRight: "200px" }}>
+          <img src={mydataImg} alt="mydata" style={{ height: "150px" }} />
+        </div> */}
       </div>
     </div>
   );

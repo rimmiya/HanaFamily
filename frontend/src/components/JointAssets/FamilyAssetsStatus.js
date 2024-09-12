@@ -1,27 +1,37 @@
-import { MarginTwoTone } from "@mui/icons-material";
 import React, { useState } from "react";
 import { PieChart, Pie, Cell, ResponsiveContainer, Sector } from "recharts";
 
 function FamilyAssetsStatus({ data, totalAmount }) {
   const [activeIndex, setActiveIndex] = useState(null);
-  const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
+  const [hoveredEntry, setHoveredEntry] = useState(null); // Hover된 자산 데이터 저장
+  const COLORS = ["#7173f4", "#489cd5", "#30b4c1", "#18ceae"];
+
+  // 자산 중에서 가장 큰 값을 찾음
+  const largestAsset = data.reduce((prev, current) => {
+    return current.value > prev.value ? current : prev;
+  });
 
   const onPieEnter = (_, index) => {
     setActiveIndex(index);
+    setHoveredEntry(data[index]); // Pie 차트에 호버 시 해당 항목 저장
   };
 
   const onPieLeave = () => {
     setActiveIndex(null);
+    setHoveredEntry(null); // Pie 차트에서 마우스를 뗄 때 데이터 초기화
   };
 
-  const onLabelClick = (index) => {
+  const onLabelHover = (index) => {
+    setHoveredEntry(data[index]); // 레전드에 호버 시 해당 항목 저장
     setActiveIndex(index);
   };
 
-  const onPieClick = (_, index) => {
-    setActiveIndex(index);
+  const onLabelLeave = () => {
+    setHoveredEntry(null); // 레전드에서 마우스를 뗄 때 데이터 초기화
+    setActiveIndex(null);
   };
 
+  // 활성화된 섹터를 렌더링
   const renderActiveShape = (props) => {
     const {
       cx,
@@ -39,13 +49,11 @@ function FamilyAssetsStatus({ data, totalAmount }) {
     return (
       <g>
         <text
-          x={cx}
-          y={cy - 10}
-          dy={8}
+          x="50%"
+          y="40%"
           textAnchor="middle"
           fill={fill}
-          fontSize={20}
-          fontWeight="bold"
+          style={{ fontSize: "18px", fontWeight: "bold" }}
         >
           {payload.name}
         </text>
@@ -59,14 +67,22 @@ function FamilyAssetsStatus({ data, totalAmount }) {
           fill={fill}
         />
         <text
-          x={cx}
-          y={cy + 10}
+          x="50%"
+          y="50%"
           textAnchor="middle"
           fill={fill}
-          fontSize={20}
-          fontWeight="bold"
+          style={{ fontSize: "18px", fontWeight: "bold" }}
         >
-          {`${(percent * 100).toFixed(2)}% (${value.toLocaleString()}원)`}
+          {`${(percent * 100).toFixed(2)}%`}
+        </text>
+        <text
+          x="50%"
+          y="60%"
+          textAnchor="middle"
+          fill={fill}
+          style={{ fontSize: "18px", fontWeight: "bold" }}
+        >
+          {` (${value.toLocaleString()}원)`}
         </text>
       </g>
     );
@@ -74,7 +90,13 @@ function FamilyAssetsStatus({ data, totalAmount }) {
 
   return (
     <div style={styles.container}>
-      <h3 style={styles.title}>가족자산현황</h3>
+      <div style={{ height: "52px", display: "flex", alignItems: "center" }}>
+        <h3 style={{ fontFamily: "CustomFont" }}>가족자산현황</h3>
+      </div>
+      {/* 가장 많은 자산에 대한 메시지 표시 */}
+      <div style={styles.largestAssetMessage}>
+        우리가족은 {largestAsset.name} 자산이 가장 많아요!
+      </div>
       <div style={styles.chartContainer}>
         <ResponsiveContainer width="50%" height={250}>
           <PieChart>
@@ -84,13 +106,12 @@ function FamilyAssetsStatus({ data, totalAmount }) {
               data={data}
               cx="50%"
               cy="50%"
-              innerRadius={70}
+              innerRadius={80}
               outerRadius={110}
               fill="#8884d8"
               dataKey="value"
               onMouseEnter={onPieEnter}
               onMouseLeave={onPieLeave}
-              onClick={onPieClick}
             >
               {data.map((entry, index) => (
                 <Cell
@@ -103,8 +124,32 @@ function FamilyAssetsStatus({ data, totalAmount }) {
                 />
               ))}
             </Pie>
+            {/* 차트 중앙에 총 자산 금액을 표시 */}
+            {activeIndex === null && (
+              <>
+                <text
+                  x="50%"
+                  y="40%"
+                  textAnchor="middle"
+                  dominantBaseline="middle"
+                  style={{ fontSize: "22px", fontWeight: "bold", fill: "#333" }}
+                >
+                  총 금액
+                </text>
+                <text
+                  x="50%"
+                  y="55%"
+                  textAnchor="middle"
+                  dominantBaseline="middle"
+                  style={{ fontSize: "18px", fontWeight: "bold", fill: "#333" }}
+                >
+                  {totalAmount.toLocaleString()}원
+                </text>
+              </>
+            )}
           </PieChart>
         </ResponsiveContainer>
+        {/* Legend - 2개씩 정렬 */}
         <div style={styles.details}>
           {data.map((entry, index) => (
             <div
@@ -117,10 +162,10 @@ function FamilyAssetsStatus({ data, totalAmount }) {
                     : "#666",
                 fontWeight: activeIndex === index ? "bold" : "normal",
                 cursor: "pointer",
+                // width: "48%", // 2개씩 정렬하기 위해 각 항목의 너비를 48%로 설정
               }}
-              onMouseEnter={() => setActiveIndex(index)}
-              onMouseLeave={onPieLeave}
-              onClick={() => onLabelClick(index)}
+              onMouseEnter={() => onLabelHover(index)}
+              onMouseLeave={onLabelLeave}
             >
               <div
                 style={{
@@ -135,11 +180,16 @@ function FamilyAssetsStatus({ data, totalAmount }) {
                   {entry.name}&nbsp;
                   {((entry.value / totalAmount) * 100).toFixed(2)} %
                 </p>
-                {entry.people.map((person, i) => (
-                  <p key={i} style={styles.detailValue}>
-                    {person.name}: {person.amount.toLocaleString()}원
-                  </p>
-                ))}
+                {/* Hover 시 구성원 정보를 표시 */}
+                {hoveredEntry === entry && (
+                  <div>
+                    {entry.people.map((person, i) => (
+                      <p key={i} style={styles.detailValue}>
+                        {person.name}: {person.amount.toLocaleString()}원
+                      </p>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           ))}
@@ -151,36 +201,28 @@ function FamilyAssetsStatus({ data, totalAmount }) {
 
 const styles = {
   container: {
-    backgroundColor: "#f0f8ff",
     borderRadius: "10px",
     padding: "20px",
-    textAlign: "center",
-    width: "44%",
-  },
-  title: {
-    marginBottom: "10px",
-    color: "#004d40",
+    background: "#ffffff",
+    borderRadius: "20px",
   },
   chartContainer: {
     display: "flex",
     alignItems: "center",
-    justifyContent: "space-between",
-  },
-  centerText: {
-    fontSize: "16px",
-    fontWeight: "bold",
-    fill: "#333",
+    justifyContent: "space-around",
+    flexDirection: "row",
+    height: "80%",
   },
   details: {
     display: "flex",
+    flexWrap: "wrap",
+    height: "315px",
+    justifyContent: "space-evenly",
     flexDirection: "column",
-    justifyContent: "space-around",
-    textAlign: "left",
-    width: "50%",
+    width: "40%",
   },
   detailItem: {
     display: "flex",
-    // alignItems: "center",
     alignItems: "flex-start",
     marginBottom: "10px",
   },
@@ -193,14 +235,19 @@ const styles = {
   },
   detailTitle: {
     margin: 0,
-    // fontSize: "16px",
     color: "black",
   },
   detailValue: {
     margin: 0,
-    // fontSize: "14px",
     color: "black",
     marginLeft: "30px",
+  },
+  largestAssetMessage: {
+    // marginTop: "20px",
+    // textAlign: "center",
+    fontSize: "20px",
+    // fontWeight: "bold",
+    color: "#333",
   },
 };
 

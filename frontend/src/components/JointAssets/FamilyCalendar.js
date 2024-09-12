@@ -7,7 +7,7 @@ import "../../style/CustomCalendar.css"; // 커스텀 CSS 파일
 
 const { Option } = Select;
 
-function FixedExpenditureManagement({ initialData = [] }) {
+function FamilyCalendar({ initialData = [] }) {
   const [data, setData] = useState(initialData);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -119,6 +119,7 @@ function FixedExpenditureManagement({ initialData = [] }) {
 
   return (
     <div style={styles.container}>
+      <h3 style={{ fontFamily: "CustomFont" }}>가족 일정 관리</h3>
       <div style={styles.filterContainer}>
         <Select
           defaultValue="전체"
@@ -220,12 +221,14 @@ const styles = {
   container: {
     display: "flex",
     flexDirection: "column",
-    alignItems: "center",
+    // alignItems: "center",
     backgroundColor: "#f0f8ff",
     borderRadius: "10px",
     padding: "20px",
     position: "relative",
-    width: "44%",
+    // width: "45%",
+    background: "#ffffff",
+    borderRadius: "20px",
   },
   filterContainer: {
     marginBottom: "20px",
@@ -253,4 +256,4 @@ const styles = {
   },
 };
 
-export default FixedExpenditureManagement;
+export default FamilyCalendar;

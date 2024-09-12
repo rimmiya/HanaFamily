@@ -17,6 +17,7 @@ export const userSlice = createSlice({
         userId: decodedToken.userId,
         userName: decodedToken.userName,
         userNo: decodedToken.userNo,
+        familyId: decodedToken.familyId || null,
       }; // 디코딩한 정보에서 사용자 ID와 이름을 추출
       state.token = action.payload.token; // JWT 토큰을 상태에 저장
       state.isLoggedIn = true;
@@ -35,7 +36,7 @@ export const userSlice = createSlice({
 });
 
 // 생성된 액션들을 외부에서 사용할 수 있도록 export
-export const { setLoginSuccess, logout } = userSlice.actions;
+export const { setLoginSuccess, logout, setFamilyId } = userSlice.actions;
 
 // 초기 상태를 localStorage에서 불러와 설정
 const preloadedState = {

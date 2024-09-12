@@ -1,9 +1,22 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { logout } from "../../store.js";
 import "../../style/Header.css";
 
 function Header() {
   const hanalogo = `${process.env.PUBLIC_URL}/img/img-hana-symbol.png`;
+
+  const user = useSelector((state) => state.user.userInfo);
+  const dispatch = useDispatch();
+
+  let navigate = useNavigate();
+
+  const handleLogout = () => {
+    navigate("/"); // 홈페이지로 리디렉션
+    dispatch(logout()); // Redux store에서 로그아웃 처리
+  };
+
   return (
     <header class="main">
       <div class="header-box main" style={{ left: "0px" }}>
@@ -40,14 +53,30 @@ function Header() {
                     함께 관리
                   </a>
                 </li>
+                <li class="nav-li">
+                  <a href="/jointassets" class="nav-alink">
+                    상품 추천
+                  </a>
+                </li>
               </ul>
             </nav>
-            <Link to="/auth?tab=login" class="btn-link login">
-              로그인
-            </Link>
-            <Link to="/auth?tab=register" class="btn-link register">
-              회원 가입
-            </Link>
+            {user ? (
+              <>
+                <span>{user.userName}</span>
+                <button onClick={handleLogout} className="btn-link">
+                  로그아웃
+                </button>
+              </>
+            ) : (
+              <>
+                <Link to="/auth?tab=login" className="btn-link login">
+                  로그인
+                </Link>
+                <Link to="/auth?tab=register" className="btn-link register">
+                  회원 가입
+                </Link>
+              </>
+            )}
             {/* <button class="total-menu" onclick="$('#popMenu').modalOpen(this)"><span class="a11y-hide">전체메뉴 열기</span></button> */}
           </div>
         </div>

@@ -1,8 +1,8 @@
 /* 전체 컨테이너 */
 .joint-assets-list-container {
-  width: 100%;
+  width: 620px;
   padding-top: 20px;
-  padding-bottom: 20px;
+  /* padding-bottom: 20px; */
   display: flex;
   justify-content: space-between;
   /* background-color: #fcfcfc; */
@@ -18,19 +18,15 @@
   /* padding-top: 20px; */
 }
 
-.assets-account-left,
-.assets-account-right {
-  width: 50%;
-  padding-right: 30px;
-}
-
 .joint-assets-list {
   background-color: #f0f0f0;
-  min-width: 330px;
+  width: 620px;
   border-radius: 10px;
   display: flex;
   flex-direction: row;
+  flex-wrap: wrap;
   /* justify-content: space-between; */
-  padding: 30px 40px;
-  gap: 50px;
+  padding: 20px 36px;
+  row-gap: 40px;
+  column-gap: 40px;
 }

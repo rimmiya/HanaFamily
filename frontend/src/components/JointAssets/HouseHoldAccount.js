@@ -22,11 +22,13 @@ function HouseHoldAccount() {
         display: "flex",
         justifyContent: "space-between",
         flexDirection: "column",
-        marginLeft: "15px",
+        padding: "20px",
+        // marginLeft: "15px",
+        // marginRight: "15px",
       }}
     >
       <div style={{ display: "flex", marginBottom: "10px" }}>
-        <h3>공동 가계부</h3>&nbsp;&nbsp;
+        <h3 style={{ fontFamily: "CustomFont" }}>공동 가계부</h3>&nbsp;&nbsp;
         <h3 style={{ color: "#009178" }}>{nowMonth}월</h3>
       </div>
       <div>
@@ -41,10 +43,20 @@ function HouseHoldAccount() {
           <ProgressBar
             now={progress}
             label={`${progress}%`}
-            // variant="progress-bar-color-009178"
-            variant="success"
             style={{ height: "25px" }}
-          />
+          >
+            <div
+              className="progress-bar"
+              style={{
+                width: `${progress}%`,
+                backgroundColor: "#0fb895", // 바 색상 변경
+                textAlign: "right",
+                paddingRight: "15px",
+              }}
+            >
+              {progress}%
+            </div>
+          </ProgressBar>
 
           <p
             style={{

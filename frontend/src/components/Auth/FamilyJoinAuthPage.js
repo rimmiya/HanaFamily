@@ -3,10 +3,12 @@ import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios"; // Axios 라이브러리 임포트
 import { useDispatch, useSelector } from "react-redux";
 import { setLoginSuccess } from "../../store.js";
-import AuthTabs from "./AuthTabs"; // 탭 컴포넌트 불러오기
+import AuthTabs from "./AuthTabs.js"; // 탭 컴포넌트 불러오기
 import "../../style/AuthPage.css"; // 필요한 스타일 추가
+import Modal from "@mui/material/Modal"; // Material-UI 모달 컴포넌트 사용
+import Box from "@mui/material/Box"; // Material-UI Box 컴포넌트
 
-function AuthPage() {
+function FamilyJoinAuthPage({ inviteKey }) {
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const initialTab = queryParams.get("tab") || "login";
@@ -15,36 +17,98 @@ function AuthPage() {
   const [userId, setUserId] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false); // 로더 상태 추가
+  const [isModalOpen, setIsModalOpen] = useState(false); // 모달 상태 추가
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
-    setIsLoading(true); // 로그인 시도시 로더 활성화
+    setIsLoading(true); // 로그인 시도 시 로더 활성화
     e.preventDefault();
     console.log("로그인 시도:", userId, password); // 나중에 삭제
+
     try {
+      // 로그인 API 호출
       const response = await axios.post(
         "http://localhost:8080/api/user/login",
         {
           userId: userId,
           userPw: password,
+          // inviteKey: inviteKey, // 초대장 키 함께 전달
         }
       );
+
       if (response.status === 200) {
         console.log(response.data);
         // JWT 토큰을 Redux 스토어에 저장
         dispatch(setLoginSuccess({ token: response.data }));
-        navigate("/"); // 홈페이지로 리디렉션
+
+        // 초대장 검증 API 호출
+        const verifyResponse = await axios.post(
+          "http://localhost:8080/api/invitations/verify",
+          {
+            inviteKey: inviteKey,
+            userId: userId, // 로그인된 사용자의 전화번호
+          }
+        );
+
+        if (verifyResponse.status === 200) {
+          setIsModalOpen(true); // 초대 성공 시 모달 열기
+          setTimeout(() => {
+            setIsModalOpen(false);
+            navigate("/assetsjoin"); // 3초 후 초대 성공 페이지로 이동
+          }, 3000);
+        } else {
+          navigate("/invite-failed"); // 초대 실패 페이지로 이동
+        }
       } else {
         alert("아이디 또는 비밀번호가 일치하지 않습니다.");
       }
     } catch (error) {
       console.error("로그인 실패:", error.response);
       alert("로그인 실패. 다시 시도해주세요.");
-      setIsLoading(false);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleRegister = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await axios.post(
+        "http://localhost:8080/api/user/register",
+        {
+          userId: userId,
+          userPw: password,
+          // inviteKey: inviteKey, // 초대장 키 함께 전달
+        }
+      );
+
+      if (response.status === 200) {
+        // 회원가입 성공 처리
+        const verifyResponse = await axios.post(
+          "http://localhost:8080/api/invitations/verify",
+          {
+            inviteKey: inviteKey,
+            userId: userId, // 등록된 사용자의 전화번호
+          }
+        );
+
+        if (verifyResponse.status === 200) {
+          setIsModalOpen(true); // 초대 성공 시 모달 열기
+          setTimeout(() => {
+            setIsModalOpen(false);
+            navigate("/assetsjoin"); // 3초 후 초대 성공 페이지로 이동
+          }, 3000);
+        } else {
+          navigate("/invite-failed"); // 초대 실패 페이지로 이동
+        }
+      } else {
+        alert("회원가입에 실패했습니다.");
+      }
+    } catch (error) {
+      console.error("회원가입 실패:", error.response);
+      alert("회원가입 실패. 다시 시도해주세요.");
     }
   };
 
@@ -371,7 +435,9 @@ function AuthPage() {
                 </div>
                 <div className="agree-box">
                   <button className="cancel-button">취소</button>
-                  <button className="register-button">회원가입</button>
+                  <button onClick={handleRegister} className="submit-button">
+                    회원가입
+                  </button>
                 </div>
               </div>
             </div>
@@ -393,8 +459,29 @@ function AuthPage() {
           <div className="content">{renderContent()}</div>
         </div>
       </div>
+      {/* 모달 UI */}
+      <Modal open={isModalOpen} onClose={() => setIsModalOpen(false)}>
+        <Box
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            bgcolor: "background.paper",
+            borderRadius: "10px",
+            boxShadow: 24,
+            p: 4,
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+          }}
+        >
+          <h2>초대 완료</h2>
+          <p>가족 초대가 완료되었습니다!</p>
+        </Box>
+      </Modal>
     </div>
   );
 }
 
-export default AuthPage;
+export default FamilyJoinAuthPage;

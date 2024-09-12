@@ -1,18 +1,34 @@
+import { background } from "@chakra-ui/react";
 import React from "react";
 import ProgressBar from "react-bootstrap/ProgressBar";
 
 function FamilyLoanStatus({ data, totalLoanAmount }) {
+  // 총 대출 금액 대비 퍼센트 계산
+  const progress = (totalLoanAmount / 1000000000) * 100; // 예산에 따른 대출 비율
+
   return (
     <div style={styles.container}>
       <h3 style={styles.title}>가족대출현황</h3>
       <div style={styles.amount}>
-        총 대출 잔액: {totalLoanAmount.toLocaleString()}원
+        대출 잔액 {totalLoanAmount.toLocaleString()}원
       </div>
       <div style={styles.progressContainer}>
-        <ProgressBar
-          now={(totalLoanAmount / 1000000000) * 100} // 예산에 따른 대출 비율
-          style={styles.progressBar}
-        />
+        {/* ProgressBar 디자인 수정 */}
+        <ProgressBar now={progress} style={{ height: "25px" }}>
+          <div
+            className="progress-bar"
+            style={{
+              width: `${progress}%`,
+              backgroundColor: "#13aec3", // 바 색상 변경
+              textAlign: "right",
+              paddingRight: "15px",
+              color: "#fff", // 텍스트 색상
+              fontWeight: "bold",
+            }}
+          >
+            {progress.toFixed(2)}%
+          </div>
+        </ProgressBar>
       </div>
       <div style={styles.loanDetails}>
         {data.map((loan, index) => (
@@ -24,7 +40,14 @@ function FamilyLoanStatus({ data, totalLoanAmount }) {
               </span>
             </div>
             <div style={styles.loanPerson}>대출인: {loan.person}</div>
-            <div style={styles.loanValue}>{loan.value.toLocaleString()}원</div>
+            <div style={{ display: "flex", justifyContent: "space-between" }}>
+              <div>
+                이번 달 예상 상환 금액: {loan.monthlyPayment.toLocaleString()}원
+              </div>
+              <div style={styles.loanValue}>
+                {loan.value.toLocaleString()}원
+              </div>
+            </div>
           </div>
         ))}
       </div>
@@ -37,40 +60,40 @@ const styles = {
     backgroundColor: "#f0f8ff",
     borderRadius: "10px",
     padding: "20px",
-    width: "44%",
+    // width: "45%",
+    background: "#ffffff",
+    borderRadius: "20px",
   },
   title: {
     marginBottom: "10px",
-    color: "#004d40",
-    fontSize: "18px",
-    fontWeight: "bold",
+    // color: "#004d40",
+    fontFamily: "CustomFont",
   },
   amount: {
     fontSize: "22px",
-    fontWeight: "bold",
+    // fontWeight: "bold",
     color: "#333",
     marginBottom: "10px",
   },
   progressContainer: {
     marginBottom: "20px",
   },
-  progressBar: {
-    height: "20px",
-    backgroundColor: "#d9f7be",
-    borderRadius: "10px",
-    boxShadow: "inset 0 1px 2px rgba(0,0,0,0.1)",
-  },
   loanDetails: {
     marginTop: "20px",
   },
   loanItem: {
     marginBottom: "15px",
+    background: "#f8f8f8",
+    padding: "20px",
+    borderRadius: "10px",
   },
   loanName: {
-    fontSize: "16px",
+    fontSize: "18px",
     fontWeight: "bold",
     color: "#333",
     marginBottom: "5px",
+    alignItems: "center",
+    display: "flex",
   },
   loanPerson: {
     fontSize: "14px",
