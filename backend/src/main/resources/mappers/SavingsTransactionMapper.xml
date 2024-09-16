@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.ac.kopo.hanafamily.savings.mapper.SavingsTransactionMapper">
+
+  <!-- Result Map for SavingsTransactionDTO -->
+  <resultMap id="SavingsTransactionResultMap" type="kr.ac.kopo.hanafamily.savings.dto.SavingsTransactionDTO">
+    <id property="transactionId" column="TRANSACTION_ID" />
+    <result property="savingAccountNo" column="SAVING_ACCOUNT_NO" />
+    <result property="userNo" column="USER_NO" />
+    <result property="amount" column="AMOUNT" />
+    <result property="afterAmount" column="AFTER_AMOUNT" />
+    <result property="transactionDate" column="TRANSACTION_DATE" />
+    <result property="transactionType" column="TRANSACTION_TYPE" />
+  </resultMap>
+
+  <!-- Select Transactions by Saving Account No -->
+  <select id="selectTransactionsBySavingAccountNo" parameterType="String" resultMap="SavingsTransactionResultMap">
+    SELECT
+      TRANSACTION_ID,
+      SAVING_ACCOUNT_NO,
+      USER_NO,
+      AMOUNT,
+      AFTER_AMOUNT,
+      TRANSACTION_DATE,
+      TRANSACTION_TYPE
+    FROM
+      TB_SAVINGS_TRANSACTION
+    WHERE
+      SAVING_ACCOUNT_NO = #{savingAccountNo}
+    ORDER BY
+      TRANSACTION_DATE DESC
+  </select>
+
+  <!-- Insert Savings Transaction -->
+  <insert id="insertSavingsTransaction" parameterType="kr.ac.kopo.hanafamily.savings.dto.SavingsTransactionDTO">
+    INSERT INTO TB_SAVINGS_TRANSACTION (
+      TRANSACTION_ID,
+      SAVING_ACCOUNT_NO,
+      USER_NO,
+      AMOUNT,
+      AFTER_AMOUNT,
+      TRANSACTION_DATE,
+      TRANSACTION_TYPE
+    ) VALUES (
+               SEQ_TRANSACTION_ID.NEXTVAL,
+               #{savingAccountNo},
+               #{userNo},
+               #{amount},
+               #{afterAmount},
+               #{transactionDate},
+               #{transactionType}
+             )
+  </insert>
+
+</mapper>

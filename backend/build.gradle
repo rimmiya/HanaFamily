@@ -43,6 +43,9 @@ dependencies {
 	implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
 	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
 	runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
+
+	// SMS
+	implementation 'net.nurigo:sdk:4.3.0'
 }
 
 tasks.named('test') {

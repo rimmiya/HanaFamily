@@ -5,7 +5,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-@MapperScan({"kr.ac.kopo.hanafamily.user.mapper", "kr.ac.kopo.hanafamily.invitation.mapper", "kr.ac.kopo.hanafamily.mydata.mapper"})
+@MapperScan({"kr.ac.kopo.hanafamily.user.mapper", "kr.ac.kopo.hanafamily.invitation.mapper", "kr.ac.kopo.hanafamily.mydata.mapper", "kr.ac.kopo.hanafamily.savings.mapper"})
 public class BackendApplication {
 
 	public static void main(String[] args) {

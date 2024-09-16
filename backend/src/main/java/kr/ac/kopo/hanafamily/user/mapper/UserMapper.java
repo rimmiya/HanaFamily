@@ -20,11 +20,17 @@ public interface UserMapper {
 //
 //  boolean isCorrectPassword(LoginRequest request);
 
+  UserDTO selectUserByNo(@Param("userNo") Integer userNo);
+
+  UserDTO getFamilyIdByUserNo(@Param("userNo") Integer userNo);
+
   UserDTO getUser(@Param("userId") String userId, @Param("userPw") String userPw);
 
   UserDTO getUserById(@Param("userId") String userId);
 
   String getPhoneNumberById(@Param("userId") String userId);
+
+  String getPhoneNumberByNo(@Param("userNo") Integer userNo);
 
   Integer getUserFamilyId(@Param("userId") String userId);
 

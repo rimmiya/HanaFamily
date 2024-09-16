@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.ac.kopo.hanafamily.savings.mapper.AccountMapper">
+
+  <!-- Result Map for AccountDTO -->
+  <resultMap id="AccountResultMap" type="kr.ac.kopo.hanafamily.mydata.dto.AccountDTO">
+    <id property="accountNo" column="ACCOUNT_NO" />
+    <result property="userNo" column="USER_NO" />
+    <result property="accountBalance" column="ACCOUNT_BALANCE" />
+    <!-- 필요한 추가 필드가 있다면 여기에 추가 -->
+  </resultMap>
+
+  <!-- Select Account by Account No -->
+  <select id="findAccountByAccountNo" parameterType="String" resultMap="AccountResultMap">
+    SELECT
+      ACCOUNT_NO,
+      USER_NO,
+      ACCOUNT_BALANCE
+    FROM
+      TB_ACCOUNT
+    WHERE
+      ACCOUNT_NO = #{accountNo}
+  </select>
+
+  <!-- Update Account Balance -->
+  <update id="updateAccount" parameterType="kr.ac.kopo.hanafamily.mydata.dto.AccountDTO">
+    UPDATE
+      TB_ACCOUNT
+    SET
+      ACCOUNT_BALANCE = #{accountBalance}
+    WHERE
+      ACCOUNT_NO = #{accountNo}
+  </update>
+
+</mapper>

@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.ac.kopo.hanafamily.savings.mapper.SavingProductMapper">
+
+  <!-- Result Map for SavingProductDTO -->
+  <resultMap id="SavingProductResultMap" type="kr.ac.kopo.hanafamily.savings.dto.SavingProductDTO">
+    <id property="savingAccountNo" column="SAVING_ACCOUNT_NO" />
+    <result property="userNo" column="USER_NO" />
+    <result property="goalAmount" column="GOAL_AMOUNT" />
+    <result property="currentAmount" column="CURRENT_AMOUNT" />
+    <result property="startDate" column="START_DATE" />
+    <result property="endDate" column="END_DATE" />
+    <result property="interestRate" column="INTEREST_RATE" />
+    <result property="bonusInterestRate" column="BONUS_INTEREST_RATE" />
+    <result property="minDuration" column="MIN_DURATION" />
+    <result property="maxDuration" column="MAX_DURATION" />
+    <result property="savingStatus" column="SAVING_STATUS" />
+    <result property="productId" column="PRODUCT_ID" />
+    <result property="representativeAccountNo" column="SAVING_ACCOUNT_NO" />
+    <!-- representativeAccountNo은 데이터베이스 컬럼에 없으므로 매핑하지 않음 -->
+  </resultMap>
+
+  <!-- Select SavingProduct by Account No -->
+  <select id="selectSavingProductByAccountNo" parameterType="String" resultMap="SavingProductResultMap">
+    SELECT
+      SAVING_ACCOUNT_NO,
+      USER_NO,
+      GOAL_AMOUNT,
+      CURRENT_AMOUNT,
+      START_DATE,
+      END_DATE,
+      INTEREST_RATE,
+      BONUS_INTEREST_RATE,
+      MIN_DURATION,
+      MAX_DURATION,
+      SAVING_STATUS,
+      PRODUCT_ID,
+      REPRESENTATIVE_ACCOUNT_NO
+    FROM
+      TB_SAVING_PRODUCT
+    WHERE
+      SAVING_ACCOUNT_NO = #{savingAccountNo}
+  </select>
+
+  <!-- Select SavingProducts by User No -->
+  <select id="selectSavingProductsByUserNo" parameterType="Integer" resultMap="SavingProductResultMap">
+    SELECT
+      SAVING_ACCOUNT_NO,
+      USER_NO,
+      GOAL_AMOUNT,
+      CURRENT_AMOUNT,
+      START_DATE,
+      END_DATE,
+      INTEREST_RATE,
+      BONUS_INTEREST_RATE,
+      MIN_DURATION,
+      MAX_DURATION,
+      SAVING_STATUS,
+      PRODUCT_ID,
+      REPRESENTATIVE_ACCOUNT_NO
+    FROM
+      TB_SAVING_PRODUCT
+    WHERE
+      USER_NO = #{userNo}
+  </select>
+
+  <!-- Insert SavingProduct -->
+  <insert id="insertSavingProduct" parameterType="kr.ac.kopo.hanafamily.savings.dto.SavingProductDTO">
+    INSERT INTO TB_SAVING_PRODUCT (
+      SAVING_ACCOUNT_NO,
+      USER_NO,
+      GOAL_AMOUNT,
+      CURRENT_AMOUNT,
+      START_DATE,
+      END_DATE,
+      INTEREST_RATE,
+      BONUS_INTEREST_RATE,
+      MIN_DURATION,
+      MAX_DURATION,
+      SAVING_STATUS,
+      PRODUCT_ID,
+      REPRESENTATIVE_ACCOUNT_NO
+    ) VALUES (
+               #{savingAccountNo},
+               #{userNo},
+               #{goalAmount},
+               #{currentAmount},
+               #{startDate},
+               #{endDate},
+               #{interestRate},
+               #{bonusInterestRate},
+               #{minDuration},
+               #{maxDuration},
+               #{savingStatus},
+               #{productId},
+               #{representativeAccountNo}
+             )
+  </insert>
+
+  <!-- Update SavingProduct -->
+  <update id="updateSavingProduct" parameterType="kr.ac.kopo.hanafamily.savings.dto.SavingProductDTO">
+    UPDATE
+      TB_SAVING_PRODUCT
+    SET
+      GOAL_AMOUNT = #{goalAmount},
+      CURRENT_AMOUNT = #{currentAmount},
+      START_DATE = #{startDate},
+      END_DATE = #{endDate},
+      INTEREST_RATE = #{interestRate},
+      BONUS_INTEREST_RATE = #{bonusInterestRate},
+      MIN_DURATION = #{minDuration},
+      MAX_DURATION = #{maxDuration},
+      SAVING_STATUS = #{savingStatus},
+      PRODUCT_ID = #{productId},
+      REPRESENTATIVE_ACCOUNT_NO = #{representativeAccountNo}
+    WHERE
+      SAVING_ACCOUNT_NO = #{savingAccountNo}
+  </update>
+
+  <!-- Delete SavingProduct -->
+  <delete id="deleteSavingProduct" parameterType="String">
+    DELETE FROM TB_SAVING_PRODUCT
+    WHERE SAVING_ACCOUNT_NO = #{savingAccountNo}
+  </delete>
+
+  <!-- Select All SavingProducts -->
+  <select id="selectAllSavingProducts" resultMap="SavingProductResultMap">
+    SELECT
+      SAVING_ACCOUNT_NO,
+      USER_NO,
+      GOAL_AMOUNT,
+      CURRENT_AMOUNT,
+      START_DATE,
+      END_DATE,
+      INTEREST_RATE,
+      BONUS_INTEREST_RATE,
+      MIN_DURATION,
+      MAX_DURATION,
+      SAVING_STATUS,
+      PRODUCT_ID,
+      REPRESENTATIVE_ACCOUNT_NO
+    FROM
+      TB_SAVING_PRODUCT
+  </select>
+
+</mapper>

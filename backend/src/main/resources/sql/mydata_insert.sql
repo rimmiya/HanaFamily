@@ -45,7 +45,7 @@ INSERT INTO tb_Account (account_no, user_no, account_name, account_password, acc
 VALUES ('ACC1-1', 1, 'Checking', 1234, 10000, SYSDATE, 1, 101, 1, 50000, TO_DATE('2025-12-31', 'YYYY-MM-DD'));
 
 INSERT INTO tb_Account (account_no, user_no, account_name, account_password, account_balance, account_create_date, account_status, bank_code, account_type, account_limit, account_expire_date)
-VALUES ('ACC1-2', 1, 'Savings', 1234, 20000, SYSDATE, 1, 102, 1, 60000, TO_DATE('2025-12-31', 'YYYY-MM-DD'));
+VALUES ('ACC1-2', 2, 'Savings', 1234, 20000, SYSDATE, 1, 102, 1, 60000, TO_DATE('2025-12-31', 'YYYY-MM-DD'));
 
 INSERT INTO tb_Account (account_no, user_no, account_name, account_password, account_balance, account_create_date, account_status, bank_code, account_type, account_limit, account_expire_date)
 VALUES ('ACC1-3', 1, 'Credit', 1234, 30000, SYSDATE, 1, 103, 1, 70000, TO_DATE('2025-12-31', 'YYYY-MM-DD'));

@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.ac.kopo.hanafamily.savings.mapper.SavingsParticipationMapper">
+
+  <!-- Result Map for SavingsParticipationDTO -->
+  <resultMap id="SavingsParticipationResultMap" type="kr.ac.kopo.hanafamily.savings.dto.SavingsParticipationDTO">
+    <id property="savingAccountNo" column="SAVING_ACCOUNT_NO" />
+    <id property="userId" column="USER_ID" />
+    <result property="familyId" column="FAMILY_ID" />
+    <result property="startDate" column="START_DATE" />
+    <result property="totalAmount" column="TOTAL_AMOUNT" />
+    <result property="autoTransferDate" column="AUTO_TRANSFER_DATE" />
+    <result property="autoTransferAmount" column="AUTO_TRANSFER_AMOUNT" />
+    <result property="autoTransferSmsYn" column="AUTO_TRANSFER_SMS_YN" />
+    <result property="maturitySmsYn" column="MATURITY_SMS_YN" />
+    <result property="successfulTransfers" column="SUCCESSFUL_TRANSFERS" />
+    <result property="bonusApplied" column="BONUS_APPLIED" />
+  </resultMap>
+
+  <!-- Select Participations by Saving Account No -->
+  <select id="selectParticipationBySavingAccountNo" parameterType="String" resultMap="SavingsParticipationResultMap">
+    SELECT
+      SAVING_ACCOUNT_NO,
+      USER_ID,
+      FAMILY_ID,
+      START_DATE,
+      TOTAL_AMOUNT,
+      AUTO_TRANSFER_DATE,
+      AUTO_TRANSFER_AMOUNT,
+      AUTO_TRANSFER_SMS_YN,
+      MATURITY_SMS_YN,
+      SUCCESSFUL_TRANSFERS,
+      BONUS_APPLIED
+    FROM
+      TB_SAVINGS_PARTICIPATION
+    WHERE
+      SAVING_ACCOUNT_NO = #{savingAccountNo}
+  </select>
+
+  <!-- Select Participations by User No -->
+  <select id="selectParticipationByUserId" parameterType="Integer" resultMap="SavingsParticipationResultMap">
+    SELECT
+      SAVING_ACCOUNT_NO,
+      USER_ID,
+      FAMILY_ID,
+      START_DATE,
+      TOTAL_AMOUNT,
+      AUTO_TRANSFER_DATE,
+      AUTO_TRANSFER_AMOUNT,
+      AUTO_TRANSFER_SMS_YN,
+      MATURITY_SMS_YN,
+      SUCCESSFUL_TRANSFERS,
+      BONUS_APPLIED
+    FROM
+      TB_SAVINGS_PARTICIPATION
+    WHERE
+      USER_ID = #{userNo}
+  </select>
+
+  <!-- Insert Savings Participation -->
+  <insert id="insertSavingsParticipation" parameterType="kr.ac.kopo.hanafamily.savings.dto.SavingsParticipationDTO">
+    INSERT INTO TB_SAVINGS_PARTICIPATION (
+      SAVING_ACCOUNT_NO,
+      USER_ID,
+      FAMILY_ID,
+      START_DATE,
+      TOTAL_AMOUNT,
+      AUTO_TRANSFER_DATE,
+      AUTO_TRANSFER_AMOUNT,
+      AUTO_TRANSFER_SMS_YN,
+      MATURITY_SMS_YN,
+      SUCCESSFUL_TRANSFERS,
+      BONUS_APPLIED
+    ) VALUES (
+               #{savingAccountNo},
+               #{userId},
+               #{familyId},
+               #{startDate},
+               #{totalAmount},
+               #{autoTransferDate},
+               #{autoTransferAmount},
+               #{autoTransferSmsYn},
+               #{maturitySmsYn},
+               #{successfulTransfers},
+               #{bonusApplied}
+             )
+  </insert>
+
+  <!-- Update Savings Participation -->
+  <update id="updateSavingsParticipation" parameterType="kr.ac.kopo.hanafamily.savings.dto.SavingsParticipationDTO">
+    UPDATE
+      TB_SAVINGS_PARTICIPATION
+    SET
+      FAMILY_ID = #{familyId},
+      START_DATE = #{startDate},
+      TOTAL_AMOUNT = #{totalAmount},
+      AUTO_TRANSFER_DATE = #{autoTransferDate},
+      AUTO_TRANSFER_AMOUNT = #{autoTransferAmount},
+      AUTO_TRANSFER_SMS_YN = #{autoTransferSmsYn},
+      MATURITY_SMS_YN = #{maturitySmsYn},
+      SUCCESSFUL_TRANSFERS = #{successfulTransfers},
+      BONUS_APPLIED = #{bonusApplied}
+    WHERE
+      SAVING_ACCOUNT_NO = #{savingAccountNo} AND USER_ID = #{userId}
+  </update>
+
+  <!-- Delete Savings Participation -->
+  <delete id="deleteSavingsParticipation" parameterType="map">
+    DELETE FROM TB_SAVINGS_PARTICIPATION
+    WHERE SAVING_ACCOUNT_NO = #{savingAccountNo} AND USER_ID = #{userNo}
+  </delete>
+
+  <!-- Select All Participations -->
+  <select id="selectAllParticipations" resultMap="SavingsParticipationResultMap">
+    SELECT
+      SAVING_ACCOUNT_NO,
+      USER_ID,
+      FAMILY_ID,
+      START_DATE,
+      TOTAL_AMOUNT,
+      AUTO_TRANSFER_DATE,
+      AUTO_TRANSFER_AMOUNT,
+      AUTO_TRANSFER_SMS_YN,
+      MATURITY_SMS_YN,
+      SUCCESSFUL_TRANSFERS,
+      BONUS_APPLIED
+    FROM
+      TB_SAVINGS_PARTICIPATION
+  </select>
+
+</mapper>

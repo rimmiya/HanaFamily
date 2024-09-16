@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.ac.kopo.hanafamily.savings.mapper.SavingsInvitationMapper">
+
+  <!-- Result Map for SavingsInvitationDTO -->
+  <resultMap id="SavingsInvitationResultMap" type="kr.ac.kopo.hanafamily.savings.dto.SavingsInvitationDTO">
+    <id property="invitationId" column="INVITATION_ID" />
+    <result property="savingAccountNo" column="SAVING_ACCOUNT_NO" />
+    <result property="inviterUserId" column="INVITER_USER_NO" />
+    <result property="inviteeUserId" column="INVITEE_USER_NO" />
+    <result property="invitationDate" column="INVITATION_DATE" />
+    <result property="status" column="STATUS" />
+  </resultMap>
+
+  <!-- Insert Invitation -->
+  <insert id="insertInvitation" parameterType="kr.ac.kopo.hanafamily.savings.dto.SavingsInvitationDTO">
+    INSERT INTO TB_SAVINGS_INVITATION (
+      INVITATION_ID,
+      SAVING_ACCOUNT_NO,
+      INVITER_USER_NO,
+      INVITEE_USER_NO,
+      INVITATION_DATE,
+      STATUS
+    ) VALUES (
+               SAVINGS_INVITATION_SEQ.NEXTVAL,
+               #{savingAccountNo},
+               #{inviterUserId},
+               #{inviteeUserId},
+               #{invitationDate},
+               #{status}
+             )
+  </insert>
+
+  <!-- Select Invitation by ID -->
+  <select id="selectInvitationById" parameterType="int" resultMap="SavingsInvitationResultMap">
+    SELECT
+      INVITATION_ID,
+      SAVING_ACCOUNT_NO,
+      INVITER_USER_NO,
+      INVITEE_USER_NO,
+      INVITATION_DATE,
+      STATUS
+    FROM
+      TB_SAVINGS_INVITATION
+    WHERE
+      INVITATION_ID = #{invitationId}
+  </select>
+
+  <!-- Select Pending Invitations by Invitee User ID -->
+  <select id="selectPendingInvitationsByInviteeUserId" parameterType="int" resultMap="SavingsInvitationResultMap">
+    SELECT
+      INVITATION_ID,
+      SAVING_ACCOUNT_NO,
+      INVITER_USER_NO,
+      INVITEE_USER_NO,
+      INVITATION_DATE,
+      STATUS
+    FROM
+      TB_SAVINGS_INVITATION
+    WHERE
+      INVITEE_USER_NO = #{inviteeUserId} AND STATUS = 'PENDING'
+  </select>
+
+  <!-- Update Invitation Status -->
+  <update id="updateInvitationStatus" parameterType="map">
+    UPDATE
+      TB_SAVINGS_INVITATION
+    SET
+      STATUS = #{status}
+    WHERE
+      INVITATION_ID = #{invitationId}
+  </update>
+
+</mapper>

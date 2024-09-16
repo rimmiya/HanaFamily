@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserDTO {
-  private String userNo;
+  private Integer userNo;
   private String userName;
   private String userId;
   private String userPw;
@@ -21,7 +21,7 @@ public class UserDTO {
   private String address;
   private Date registerDt;
   private Date modifiedDt;
-  private String familyId;
+  private Integer familyId;
   private String residentId;
   private String userStatus;
   private Date userBirth;
