@@ -1,72 +1,34 @@
-import React, { useState } from "react";
-import Modal from "react-modal";
+import React, { useState, useEffect } from "react";
 import CustomProgressBar from "../Assets/Charts/CustomProgressBar";
-import "../../style/BucketListAccount.css";
 import { IoIosArrowForward } from "react-icons/io";
-
-const modalStyles = {
-  content: {
-    top: "50%",
-    left: "50%",
-    right: "auto",
-    bottom: "auto",
-    marginRight: "-50%",
-    transform: "translate(-50%, -50%)",
-    padding: "20px",
-    borderRadius: "10px",
-  },
-};
+import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux"; // familyId 가져오기 위해 사용
+import axios from "axios"; // axios를 추가
+import "../../style/BucketListAccount.css";
 
 function BucketListAccount() {
-  const [targetModalIsOpen, setTargetModalIsOpen] = useState(false);
   const [targetAccounts, setTargetAccounts] = useState([]);
-  const [newAccount, setNewAccount] = useState("");
-  const [newName, setNewName] = useState("");
-  const [newPeriod, setNewPeriod] = useState("");
-  const [newGoalAmount, setNewGoalAmount] = useState("");
+  const navigate = useNavigate(); // 페이지 이동을 위한 useNavigate 사용
+  const user = useSelector((state) => state.user.userInfo); // Redux에서 사용자 정보 가져오기
 
-  const data = [
-    {
-      type: "저축예금",
-      amount: 360580,
-    },
-    {
-      type: "하나 청년도약계좌",
-      amount: 12600000,
-    },
-  ];
+  useEffect(() => {
+    // API 호출하여 가족 적금 목록 가져오기
+    const fetchFamilySavings = async () => {
+      try {
+        const response = await axios.get(
+          "http://localhost:8080/api/savings/family-savings",
+          {
+            params: { familyId: user.familyId }, // 로그인한 유저의 familyId를 기반으로 API 호출
+          }
+        );
+        setTargetAccounts(response.data); // API로 받은 데이터를 상태로 저장
+      } catch (error) {
+        console.error("가족 적금 목록을 가져오는 중 오류 발생:", error);
+      }
+    };
 
-  const openTargetModal = () => {
-    setTargetModalIsOpen(true);
-  };
-
-  const closeTargetModal = () => {
-    setTargetModalIsOpen(false);
-    setNewAccount("");
-    setNewName("");
-    setNewPeriod("");
-    setNewGoalAmount("");
-  };
-
-  const addTargetAccount = () => {
-    const accountData = data.find((account) => account.type === newAccount);
-
-    if (accountData) {
-      const targetAccount = {
-        account: newAccount,
-        name: newName,
-        period: newPeriod,
-        goalAmount: parseInt(newGoalAmount, 10),
-        currentAmount: accountData.amount,
-      };
-      setTargetAccounts([...targetAccounts, targetAccount]);
-      closeTargetModal();
-    }
-  };
-
-  const calculateProgress = (currentAmount, goalAmount) => {
-    return (currentAmount / goalAmount) * 100;
-  };
+    fetchFamilySavings();
+  }, [user.familyId]); // familyId가 변경될 때마다 호출
 
   const calculateDDay = (period) => {
     const endDate = new Date(period);
@@ -86,20 +48,38 @@ function BucketListAccount() {
         }}
       >
         <h3 style={{ fontFamily: "CustomFont" }}>함께 적금</h3>
-        <button onClick={openTargetModal}>목표 달성 계좌 만들기</button>
-        {/* <Link to="/joint-assets/bucket-list-account">
-          <button>목표 달성 계좌 만들기</button>
-        </Link> */}
+        <button onClick={() => navigate("/togetheraccount")}>
+          목표 달성 계좌 만들기
+        </button>
       </div>
+
       <div className="target-account-content">
         {targetAccounts.length === 0 ? (
           <p style={{ textAlign: "center", color: "gray" }}>
             함께하는 가족과 적금계좌를 만들어 함께 모아보세요!
           </p>
         ) : (
-          targetAccounts.map((target, index) => (
+          targetAccounts.map((account, index) => (
             <div key={index} className="target-account-item">
-              <h4>{target.name}</h4>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                }}
+              >
+                <h4>{account.accountName}</h4> {/* 계좌 별칭 표시 */}
+                <p>{account.savingAccountNo}</p> {/* 계좌 번호 표시 */}
+                <button
+                  onClick={() =>
+                    navigate("/togetheraccountsetting", {
+                      state: { account }, // 계좌 정보를 함께 넘김
+                    })
+                  }
+                >
+                  적금 관리하기
+                </button>
+              </div>
               <div
                 style={{
                   display: "flex",
@@ -109,74 +89,26 @@ function BucketListAccount() {
               >
                 <div style={{ display: "flex", alignItems: "center" }}>
                   <p style={{ fontWeight: "600" }}>
-                    {target.currentAmount.toLocaleString()}원
+                    {account.currentAmount.toLocaleString()}원 {/* 현재 금액 */}
                   </p>
                   <p style={{ color: "gray" }}>
-                    &nbsp;/ {target.goalAmount.toLocaleString()}원
+                    &nbsp;/ {account.goalAmount.toLocaleString()}원{" "}
+                    {/* 목표 금액 */}
                   </p>
                 </div>
                 <p>
-                  ~{target.period}(D-{calculateDDay(target.period)})
+                  ~{new Date(account.endDate).toLocaleDateString()}(D-
+                  {calculateDDay(account.endDate)}) {/* D-day 계산 */}
                 </p>
               </div>
               <CustomProgressBar
-                currentAmount={target.currentAmount}
-                goalAmount={target.goalAmount}
+                currentAmount={account.currentAmount}
+                goalAmount={account.goalAmount}
               />
             </div>
           ))
         )}
       </div>
-
-      {/* 목표 추가 모달 */}
-      <Modal
-        isOpen={targetModalIsOpen}
-        onRequestClose={closeTargetModal}
-        style={modalStyles}
-        contentLabel="Target Account Modal"
-      >
-        <h2>목표 계좌 추가</h2>
-        <div>
-          <label>계좌 유형:</label>
-          <select
-            value={newAccount}
-            onChange={(e) => setNewAccount(e.target.value)}
-          >
-            <option value="">선택하세요</option>
-            {data.map((account, index) => (
-              <option key={index} value={account.type}>
-                {account.type}
-              </option>
-            ))}
-          </select>
-        </div>
-        <div>
-          <label>이름:</label>
-          <input
-            type="text"
-            value={newName}
-            onChange={(e) => setNewName(e.target.value)}
-          />
-        </div>
-        <div>
-          <label>목표 기간:</label>
-          <input
-            type="date"
-            value={newPeriod}
-            onChange={(e) => setNewPeriod(e.target.value)}
-          />
-        </div>
-        <div>
-          <label>목표 금액:</label>
-          <input
-            type="number"
-            value={newGoalAmount}
-            onChange={(e) => setNewGoalAmount(e.target.value)}
-          />
-        </div>
-        <button onClick={addTargetAccount}>추가</button>
-        <button onClick={closeTargetModal}>취소</button>
-      </Modal>
     </div>
   );
 }

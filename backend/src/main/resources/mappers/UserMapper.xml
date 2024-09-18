@@ -60,7 +60,8 @@
 
     <!-- familyMembers 매핑: 여러 개의 UserDTO를 familyMembers에 매핑 -->
     <collection property="familyMembers" ofType="kr.ac.kopo.hanafamily.user.domain.UserDTO">
-      <id property="userId" column="user_id"/>
+      <id property="userNo" column="user_no" /> <!-- userNo 매핑 -->
+      <result property="userId" column="user_id"/>
       <result property="userName" column="user_name"/>
       <result property="userPhoneNo" column="user_phone_no"/>
       <result property="userEmail" column="user_email"/>
@@ -72,6 +73,7 @@
   <select id="getFamilyMembers" parameterType="Integer" resultMap="FamilyMemberMap">
     SELECT
       family_id,
+      user_no,
       user_id,
       user_name,
       user_phone_no,
@@ -79,6 +81,16 @@
       user_status
     FROM tb_users
     WHERE family_id = #{familyId}
+  </select>
+
+  <!-- 사용자 번호 리스트로 사용자 정보를 조회하는 쿼리 -->
+  <select id="getUsersByUserNos" resultType="kr.ac.kopo.hanafamily.user.domain.UserNameDTO">
+    SELECT user_no, user_name
+    FROM tb_users
+    WHERE user_no IN
+    <foreach item="userNo" collection="list" open="(" separator="," close=")">
+      #{userNo}
+    </foreach>
   </select>
 </mapper>
 

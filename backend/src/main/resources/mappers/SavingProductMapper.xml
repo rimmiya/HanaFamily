@@ -20,6 +20,10 @@
     <result property="savingStatus" column="SAVING_STATUS" />
     <result property="productId" column="PRODUCT_ID" />
     <result property="representativeAccountNo" column="SAVING_ACCOUNT_NO" />
+    <result property="familyId" column="FAMILY_ID" />
+    <result property="accountPassword" column="ACCOUNT_PASSWORD" />
+    <result property="accountName" column="ACCOUNT_NAME" />
+    <result property="bankCode" column="BANK_CODE" />
     <!-- representativeAccountNo은 데이터베이스 컬럼에 없으므로 매핑하지 않음 -->
   </resultMap>
 
@@ -38,7 +42,11 @@
       MAX_DURATION,
       SAVING_STATUS,
       PRODUCT_ID,
-      REPRESENTATIVE_ACCOUNT_NO
+      REPRESENTATIVE_ACCOUNT_NO,
+      FAMILY_ID,
+      ACCOUNT_PASSWORD,
+      ACCOUNT_NAME,
+      BANK_CODE
     FROM
       TB_SAVING_PRODUCT
     WHERE
@@ -60,7 +68,11 @@
       MAX_DURATION,
       SAVING_STATUS,
       PRODUCT_ID,
-      REPRESENTATIVE_ACCOUNT_NO
+      REPRESENTATIVE_ACCOUNT_NO,
+      FAMILY_ID,
+      ACCOUNT_PASSWORD,
+      ACCOUNT_NAME,
+      BANK_CODE
     FROM
       TB_SAVING_PRODUCT
     WHERE
@@ -82,7 +94,11 @@
       MAX_DURATION,
       SAVING_STATUS,
       PRODUCT_ID,
-      REPRESENTATIVE_ACCOUNT_NO
+      REPRESENTATIVE_ACCOUNT_NO,
+      FAMILY_ID,
+      ACCOUNT_PASSWORD,
+      ACCOUNT_NAME,
+      BANK_CODE
     ) VALUES (
                #{savingAccountNo},
                #{userNo},
@@ -96,7 +112,11 @@
                #{maxDuration},
                #{savingStatus},
                #{productId},
-               #{representativeAccountNo}
+               #{representativeAccountNo},
+               #{familyId},
+               #{accountPassword},
+               #{accountName},
+               #{bankCode}
              )
   </insert>
 
@@ -115,7 +135,11 @@
       MAX_DURATION = #{maxDuration},
       SAVING_STATUS = #{savingStatus},
       PRODUCT_ID = #{productId},
-      REPRESENTATIVE_ACCOUNT_NO = #{representativeAccountNo}
+      REPRESENTATIVE_ACCOUNT_NO = #{representativeAccountNo},
+      FAMILY_ID = #{familyId},
+      ACCOUNT_PASSWORD = #{accountPassword},
+      ACCOUNT_NAME = #{accountName},
+      BANK_CODE = #{bankCode}
     WHERE
       SAVING_ACCOUNT_NO = #{savingAccountNo}
   </update>
@@ -141,9 +165,38 @@
       MAX_DURATION,
       SAVING_STATUS,
       PRODUCT_ID,
-      REPRESENTATIVE_ACCOUNT_NO
+      REPRESENTATIVE_ACCOUNT_NO,
+      FAMILY_ID,
+      ACCOUNT_PASSWORD,
+      ACCOUNT_NAME,
+      BANK_CODE
     FROM
       TB_SAVING_PRODUCT
+  </select>
+
+  <select id="getFamilySavingsList"  parameterType="Integer" resultMap="SavingProductResultMap">
+    SELECT
+      SAVING_ACCOUNT_NO,
+      USER_NO,
+      GOAL_AMOUNT,
+      CURRENT_AMOUNT,
+      START_DATE,
+      END_DATE,
+      INTEREST_RATE,
+      BONUS_INTEREST_RATE,
+      MIN_DURATION,
+      MAX_DURATION,
+      SAVING_STATUS,
+      PRODUCT_ID,
+      REPRESENTATIVE_ACCOUNT_NO,
+      FAMILY_ID,
+      ACCOUNT_PASSWORD,
+      ACCOUNT_NAME,
+      BANK_CODE
+    FROM
+      TB_SAVING_PRODUCT
+    WHERE
+      FAMILY_ID = #{familyId}
   </select>
 
 </mapper>

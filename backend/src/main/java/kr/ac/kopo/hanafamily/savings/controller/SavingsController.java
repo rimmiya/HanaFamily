@@ -51,4 +51,23 @@ public class SavingsController {
     return savingsService.getPendingInvitations(inviteeUserId);
   }
 
+  @GetMapping("/family-savings")
+  public List<SavingProductDTO> getFamilySavingsList(@RequestParam Integer familyId) {
+    return savingsService.getFamilySavingsList(familyId);
+  }
+
+  @GetMapping("/transactions")
+  public List<SavingsTransactionDTO> getTransactionHistory(@RequestParam String savingAccountNo) {
+    return savingsService.getTransactionHistory(savingAccountNo);
+  }
+
+  @GetMapping("/participation-details")
+  public List<SavingsParticipationDTO> getParticipationDetails(@RequestParam String savingAccountNo) {
+    return savingsService.getParticipationDetails(savingAccountNo);
+  }
+
+  @GetMapping("/saving-product")
+  public SavingProductDTO getSavingProduct(@RequestParam String savingAccountNo) {
+    return savingsService.getSavingProduct(savingAccountNo);
+  }
 }

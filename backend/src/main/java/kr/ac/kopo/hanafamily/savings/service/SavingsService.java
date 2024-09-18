@@ -5,6 +5,7 @@ import kr.ac.kopo.hanafamily.savings.dto.CreateSavingsRequestDTO;
 import kr.ac.kopo.hanafamily.savings.dto.SavingProductDTO;
 import kr.ac.kopo.hanafamily.savings.dto.SavingsInvitationDTO;
 import kr.ac.kopo.hanafamily.savings.dto.SavingsParticipationDTO;
+import kr.ac.kopo.hanafamily.savings.dto.SavingsTransactionDTO;
 
 public interface SavingsService {
   SavingProductDTO createSavingsProduct(SavingProductDTO savingProduct, List<Integer> participantUserNos, CreateSavingsRequestDTO createSavingsRequestDTO);
@@ -15,4 +16,8 @@ public interface SavingsService {
   void checkGoalAchievement(String savingAccountNo);
   void processAutomaticTermination();
   void processAutomaticTransfers();
+  List<SavingProductDTO> getFamilySavingsList(Integer familyId);
+  List<SavingsTransactionDTO> getTransactionHistory (String savingAccountNo);
+  List<SavingsParticipationDTO> getParticipationDetails(String savingAccountNo);
+  SavingProductDTO getSavingProduct(String savingAccountNo);
 }

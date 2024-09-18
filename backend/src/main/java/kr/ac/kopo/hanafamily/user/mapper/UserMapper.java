@@ -1,8 +1,10 @@
 package kr.ac.kopo.hanafamily.user.mapper;
 
+import java.util.List;
 import kr.ac.kopo.hanafamily.invitation.dto.FamilyDTO;
 import kr.ac.kopo.hanafamily.user.domain.FamilyMemberDTO;
 import kr.ac.kopo.hanafamily.user.domain.UserDTO;
+import kr.ac.kopo.hanafamily.user.domain.UserNameDTO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 //import org.springframework.data.repository.query.Param;
@@ -39,4 +41,5 @@ public interface UserMapper {
   void insertFamily(FamilyDTO family);
 
   FamilyMemberDTO getFamilyMembers(@Param("familyId") Integer familyId);
+  List<UserNameDTO> getUsersByUserNos(List<Integer> userNos);
 }

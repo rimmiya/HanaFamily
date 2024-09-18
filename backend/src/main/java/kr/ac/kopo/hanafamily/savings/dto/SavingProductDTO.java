@@ -23,4 +23,8 @@ public class SavingProductDTO {
   private String savingStatus; // SAVING_STATUS
   private Integer productId; // PRODUCT_ID
   private String representativeAccountNo; // 대표자 계좌번호
+  private Integer familyId; // 가족 ID
+  private Integer accountPassword; // 계좌 비밀번호
+  private String accountName; // 계좌 이름
+  private Integer bankCode; // 은행 코드
 }

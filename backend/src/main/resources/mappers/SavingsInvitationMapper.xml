@@ -48,7 +48,6 @@
     WHERE
       INVITATION_ID = #{invitationId}
   </select>
-
   <!-- Select Pending Invitations by Invitee User ID -->
   <select id="selectPendingInvitationsByInviteeUserId" parameterType="int" resultMap="SavingsInvitationResultMap">
     SELECT

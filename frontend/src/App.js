@@ -17,6 +17,8 @@ import InviteFailed from "./components/JointAssets/InviteFailed";
 import TogetherAccount from "./pages/TogetherAccount/TogetherAccount";
 import TogetherAccountJoin from "./pages/TogetherAccount/TogetherAccountJoin";
 import ConfirmationAccount from "./pages/TogetherAccount/ConfirmationAccount";
+import TogetherAccountSetting from "./pages/TogetherAccount/TogetherAccountSetting";
+import AccountBook from "./pages/AccountBook/AccountBook";
 
 function App() {
   return (
@@ -38,6 +40,10 @@ function App() {
         <Route path="/togetheraccount" element={<TogetherAccount />} />
         <Route path="/togetheraccountjoin" element={<TogetherAccountJoin />} />
         <Route path="/confirmationaccount" element={<ConfirmationAccount />} />
+        <Route
+          path="/togetheraccountsetting"
+          element={<TogetherAccountSetting />}
+        />
         <Route path="/auth" element={<Auth />} />
       </Routes>
     </div>

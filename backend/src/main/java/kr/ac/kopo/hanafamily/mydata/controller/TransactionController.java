@@ -4,6 +4,7 @@ import kr.ac.kopo.hanafamily.mydata.dto.MydataDTO;
 import kr.ac.kopo.hanafamily.mydata.dto.TransactionRequestDTO;
 import kr.ac.kopo.hanafamily.mydata.dto.TransactionRequestWrapperDTO;
 import kr.ac.kopo.hanafamily.mydata.dto.TransactionResponseDTO;
+import kr.ac.kopo.hanafamily.mydata.mapper.MyDataMapper;
 import kr.ac.kopo.hanafamily.mydata.service.MyDataService;
 import kr.ac.kopo.hanafamily.mydata.service.TransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,9 @@ public class TransactionController {
   @Autowired
   private MyDataService myDataService;
 
+  @Autowired
+  private MyDataMapper myDataMapper;
+
   @RequestMapping("/request")
   public TransactionResponseDTO requestTransaction(@RequestBody TransactionRequestWrapperDTO transactionRequestWrapperDTO) {
 
@@ -32,7 +36,7 @@ public class TransactionController {
     TransactionResponseDTO response = transactionService.getTransactionList(requestData);
 
     myDataService.saveTransactionData(response);
-
+    myDataMapper.updateMyDataConnectionStatus(myDataDTO.getUserNo());
     return response;
   }
 

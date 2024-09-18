@@ -6,6 +6,7 @@ import kr.ac.kopo.hanafamily.mydata.dto.BankStatementDTO;
 import kr.ac.kopo.hanafamily.mydata.dto.CardDTO;
 import kr.ac.kopo.hanafamily.mydata.dto.InsuranceDTO;
 import kr.ac.kopo.hanafamily.mydata.dto.LoanDTO;
+import kr.ac.kopo.hanafamily.mydata.dto.MyDataStatusDTO;
 import kr.ac.kopo.hanafamily.mydata.dto.SecurityDTO;
 import kr.ac.kopo.hanafamily.mydata.dto.StockDTO;
 import kr.ac.kopo.hanafamily.mydata.dto.TransactionDTO;
@@ -29,4 +30,8 @@ public interface MyDataMapper {
   void insertCardStatement(@Param("userNo") Integer userNo, @Param("cardStatement") TransactionDTO cardStatement);
 
   void insertStockStatement(@Param("userNo") Integer userNo, @Param("stockStatement") StockDTO stockStatement);
+
+  void updateMyDataConnectionStatus(@Param("userNo") Integer userNo);
+
+  MyDataStatusDTO selectMyDataConnection(@Param("userNo") Integer userNo);
 }

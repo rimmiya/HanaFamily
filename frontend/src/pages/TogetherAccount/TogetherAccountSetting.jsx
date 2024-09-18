@@ -1,18 +1,18 @@
 import React from "react";
 import Header from "../../components/common/Header";
 import TogetherAccountTitle from "../../components/TogetherAccount/TogetherAccountTitle";
-import TogetherAccountMain from "../../components/TogetherAccount/TogetherAccountMain";
+import TogetherAccountSettingContent from "../../components/TogetherAccount/TogetherAccountSettingContent";
 import Footer from "../../components/common/Footer";
 
-function TogetherAccount() {
+function TogetherAccountSetting() {
   return (
     <div style={{ background: "#f1f1f1" }}>
       <Header></Header>
       <TogetherAccountTitle></TogetherAccountTitle>
-      <TogetherAccountMain></TogetherAccountMain>
+      <TogetherAccountSettingContent></TogetherAccountSettingContent>
       <Footer></Footer>
     </div>
   );
 }
 
-export default TogetherAccount;
+export default TogetherAccountSetting;

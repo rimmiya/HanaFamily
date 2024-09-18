@@ -53,4 +53,17 @@
     VALUES (#{stockStatement.stockId}, #{stockStatement.stockType}, #{stockStatement.stockCount}, #{stockStatement.stockAmount}, #{stockStatement.stockDate}, #{stockStatement.stockState}, #{userNo}, #{stockStatement.stockCode}, #{stockStatement.stockName}, #{stockStatement.stockBalance}, #{stockStatement.securityAccount}, #{stockStatement.securityCode})
   </insert>
 
+  <!-- 마이데이터 연결 여부 업데이트 -->
+  <insert id = "updateMyDataConnection" parameterType="kr.ac.kopo.hanafamily.mydata.dto.MyDataStatusDTO">
+    INSERT INTO tb_MyData (user_no, mydata_status)
+    SET mydata_status = 1
+    WHERE user_no = #{userNo}
+  </insert>
+
+  <!-- 마이데이터 연결 여부 조회 -->
+  <select id = "selectMyDataConnection" parameterType="int" resultType="int">
+    SELECT mydata_status
+    FROM tb_MyData
+    WHERE user_no = #{userNo}
+  </select>
 </mapper>

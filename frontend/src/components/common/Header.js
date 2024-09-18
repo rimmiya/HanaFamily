@@ -2,6 +2,7 @@ import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../../store.js";
+import InvitationNotifications from "./InvitationNotifications.js";
 import "../../style/Header.css";
 
 function Header() {
@@ -68,6 +69,7 @@ function Header() {
             {user ? (
               <>
                 <span>{user.userName}</span>
+                <InvitationNotifications />
                 <button onClick={handleLogout} className="btn-link">
                   로그아웃
                 </button>

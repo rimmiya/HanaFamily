@@ -1,7 +1,7 @@
 package kr.ac.kopo.hanafamily.savings.mapper;
 
-import kr.ac.kopo.hanafamily.savings.dto.SavingsInvitationDTO;
 import java.util.List;
+import kr.ac.kopo.hanafamily.savings.dto.SavingsInvitationDTO;
 import org.apache.ibatis.annotations.Mapper;
 
 @Mapper

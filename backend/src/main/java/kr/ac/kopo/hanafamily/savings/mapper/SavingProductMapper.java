@@ -14,4 +14,6 @@ public interface SavingProductMapper {
 
   // selectAllSavingProducts
   List<SavingProductDTO> selectAllSavingProducts();
+
+  List<SavingProductDTO> getFamilySavingsList(Integer familyId);
 }

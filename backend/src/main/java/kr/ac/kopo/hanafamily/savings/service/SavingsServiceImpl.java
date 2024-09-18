@@ -397,4 +397,25 @@ public class SavingsServiceImpl implements SavingsService {
       }
     }
   }
+
+  // 가족의 함께 적금 리스트 조회
+  @Override
+  public List<SavingProductDTO> getFamilySavingsList(Integer familyId) {
+    return savingProductMapper.getFamilySavingsList(familyId);
+  }
+
+  @Override
+  public List<SavingsTransactionDTO> getTransactionHistory (String savingAccountNo) {
+    return savingsTransactionMapper.selectTransactionsBySavingAccountNo(savingAccountNo);
+  }
+
+  @Override
+  public List<SavingsParticipationDTO> getParticipationDetails(String savingAccountNo) {
+    return savingsParticipationMapper.selectParticipationBySavingAccountNo(savingAccountNo);
+  }
+
+  @Override
+  public SavingProductDTO getSavingProduct(String savingAccountNo) {
+    return savingProductMapper.selectSavingProductByAccountNo(savingAccountNo);
+  }
 }

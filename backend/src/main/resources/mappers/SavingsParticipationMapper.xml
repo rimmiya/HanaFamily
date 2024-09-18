@@ -18,6 +18,7 @@
     <result property="maturitySmsYn" column="MATURITY_SMS_YN" />
     <result property="successfulTransfers" column="SUCCESSFUL_TRANSFERS" />
     <result property="bonusApplied" column="BONUS_APPLIED" />
+    <result property="userAccountNo" column="USER_ACCOUNT_NO" />
   </resultMap>
 
   <!-- Select Participations by Saving Account No -->
@@ -33,7 +34,8 @@
       AUTO_TRANSFER_SMS_YN,
       MATURITY_SMS_YN,
       SUCCESSFUL_TRANSFERS,
-      BONUS_APPLIED
+      BONUS_APPLIED,
+      USER_ACCOUNT_NO
     FROM
       TB_SAVINGS_PARTICIPATION
     WHERE
@@ -53,7 +55,8 @@
       AUTO_TRANSFER_SMS_YN,
       MATURITY_SMS_YN,
       SUCCESSFUL_TRANSFERS,
-      BONUS_APPLIED
+      BONUS_APPLIED,
+      USER_ACCOUNT_NO
     FROM
       TB_SAVINGS_PARTICIPATION
     WHERE
@@ -73,7 +76,8 @@
       AUTO_TRANSFER_SMS_YN,
       MATURITY_SMS_YN,
       SUCCESSFUL_TRANSFERS,
-      BONUS_APPLIED
+      BONUS_APPLIED,
+      USER_ACCOUNT_NO
     ) VALUES (
                #{savingAccountNo},
                #{userId},
@@ -85,7 +89,8 @@
                #{autoTransferSmsYn},
                #{maturitySmsYn},
                #{successfulTransfers},
-               #{bonusApplied}
+               #{bonusApplied},
+               #{userAccountNo}
              )
   </insert>
 
@@ -102,7 +107,8 @@
       AUTO_TRANSFER_SMS_YN = #{autoTransferSmsYn},
       MATURITY_SMS_YN = #{maturitySmsYn},
       SUCCESSFUL_TRANSFERS = #{successfulTransfers},
-      BONUS_APPLIED = #{bonusApplied}
+      BONUS_APPLIED = #{bonusApplied},
+      USER_ACCOUNT_NO = #{userAccountNo}
     WHERE
       SAVING_ACCOUNT_NO = #{savingAccountNo} AND USER_ID = #{userId}
   </update>
@@ -126,7 +132,8 @@
       AUTO_TRANSFER_SMS_YN,
       MATURITY_SMS_YN,
       SUCCESSFUL_TRANSFERS,
-      BONUS_APPLIED
+      BONUS_APPLIED,
+      USER_ACCOUNT_NO
     FROM
       TB_SAVINGS_PARTICIPATION
   </select>
