@@ -44,4 +44,10 @@ public class FamilyService {
 
     return familyMemberDTO;
   }
+
+  public FamilyMemberDTO getFamilyMembersWithoutMe(Integer familyId, Integer userNo) {
+    FamilyMemberDTO familyMemberDTO = userMapper.getFamilyMembersWithoutMe(familyId, userNo);
+
+    return familyMemberDTO;
+  }
 }

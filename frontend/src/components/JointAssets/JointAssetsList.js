@@ -297,7 +297,7 @@ function JointAssetsList() {
               value={inviteePhone}
               onChange={handlePhoneChange}
             />
-            <Select
+            {/* <Select
               value={relationship}
               onChange={handleRelationshipChange}
               displayEmpty
@@ -310,7 +310,7 @@ function JointAssetsList() {
               <MenuItem value="parent">부모님</MenuItem>
               <MenuItem value="sibling">형제/자매</MenuItem>
               <MenuItem value="child">자녀</MenuItem>
-            </Select>
+            </Select> */}
           </Box>
           <Box
             sx={{

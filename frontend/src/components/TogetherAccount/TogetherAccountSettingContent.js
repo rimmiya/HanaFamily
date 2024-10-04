@@ -21,7 +21,8 @@ function TogetherAccountSettingContent() {
   const location = useLocation(); // 전달된 계좌 정보를 가져옴
   const account = location.state?.account || {}; // 전달된 계좌 정보가 없을 때 빈 객체 사용
   const [userAccountNo, setUserAccountNo] = useState(""); // 로그인된 유저의 계좌번호
-
+  const [userAccountInfo, setUserAccountInfo] = useState({}); // 로그인된 유저의 계좌 정보
+  const [userAccountList, setUserAccountList] = useState([]); // 로그인된 유저의 계좌 목록
   const [participationDetails, setParticipationDetails] = useState([]); // 가족 납입 현황
   const [transactionHistory, setTransactionHistory] = useState([]); // 거래 내역
   const [monthlyTotalDeposit, setMonthlyTotalDeposit] = useState(0); // 이번 달 총 납입 금액
@@ -55,6 +56,43 @@ function TogetherAccountSettingContent() {
       }
     };
 
+    // 거래 내역 API 호출
+    const fetchTransactionHistory = async () => {
+      try {
+        const response = await axios.get(
+          "http://localhost:8080/api/savings/transactions",
+          { params: { savingAccountNo: account.savingAccountNo } }
+        );
+        setTransactionHistory(response.data);
+      } catch (error) {
+        console.error("거래 내역을 가져오는 중 오류 발생:", error);
+      }
+    };
+
+    const fetchAccounts = async () => {
+      try {
+        const response = await axios.get(
+          "http://localhost:8080/api/savings/account/account-info",
+          { params: { accountNo: userAccountNo } }
+        );
+        setUserAccountInfo(response.data);
+      } catch (error) {
+        console.error("계좌 정보를 가져오는 중 오류 발생:", error);
+      }
+    };
+
+    const fetchAccountsList = async () => {
+      try {
+        const response = await axios.get(
+          "http://localhost:8080/api/savings/account/list",
+          { params: { userNo: loggedInUserId } }
+        );
+        setUserAccountList(response.data);
+      } catch (error) {
+        console.error("계좌 목록을 가져오는 중 오류 발생:", error);
+      }
+    };
+
     // 가족 납입 현황 API 호출
     const fetchParticipationDetails = async () => {
       try {
@@ -63,7 +101,6 @@ function TogetherAccountSettingContent() {
           { params: { savingAccountNo: account.savingAccountNo } }
         );
         const participationDetails = response.data;
-        console.log("가족 납입 현황:", participationDetails);
         setParticipationDetails(participationDetails);
 
         // 로그인된 유저의 계좌번호를 찾음
@@ -90,23 +127,12 @@ function TogetherAccountSettingContent() {
       }
     };
 
-    // 거래 내역 API 호출
-    const fetchTransactionHistory = async () => {
-      try {
-        const response = await axios.get(
-          "http://localhost:8080/api/savings/transactions",
-          { params: { savingAccountNo: account.savingAccountNo } }
-        );
-        setTransactionHistory(response.data);
-      } catch (error) {
-        console.error("거래 내역을 가져오는 중 오류 발생:", error);
-      }
-    };
-
     updateAccount();
     fetchParticipationDetails();
     fetchTransactionHistory();
-  }, [account.savingAccountNo]);
+    fetchAccountsList();
+    fetchAccounts();
+  }, []);
 
   console.log("userNames:", userNames);
   console.log("memberDetails:", participationDetails);
@@ -136,7 +162,7 @@ function TogetherAccountSettingContent() {
       (acc, transaction) => acc + transaction.amount,
       0
     );
-
+    console.log("totalDeposit:", totalDeposit);
     return {
       userId: member.userId,
       totalDeposit,
@@ -199,16 +225,42 @@ function TogetherAccountSettingContent() {
     setIsAddDepositModalVisible(false);
   };
 
-  const handleSubmit = () => {
-    form
-      .validateFields()
-      .then((values) => {
-        console.log("Updated Values:", values);
-        setIsModalVisible(false);
-      })
-      .catch((info) => {
-        console.log("Validate Failed:", info);
-      });
+  const handleSubmit = async () => {
+    try {
+      // Form에서 유저가 입력한 값을 가져옴
+      const values = await form.validateFields();
+
+      // participationDetails에서 로그인한 유저의 기존 데이터를 찾음
+      const currentUserParticipation = participationDetails.find(
+        (member) => member.userId === loggedInUserId
+      );
+
+      if (!currentUserParticipation) {
+        throw new Error("현재 사용자의 참여 데이터를 찾을 수 없습니다.");
+      }
+
+      // 수정할 데이터 구성
+      const updatedData = {
+        familyId: currentUserParticipation.familyId,
+        autoTransferDate: values.transferDate, // 수정할 자동이체 날짜
+        autoTransferAmount: Number(values.amount), // 수정할 자동이체 금액 (숫자로 변환)
+        userAccountNo: values.accountNumber, // 수정할 계좌번호
+        savingAccountNo: account.savingAccountNo, // 계좌 번호
+        userId: loggedInUserId, // 현재 로그인한 유저 ID
+      };
+
+      console.log("수정할 데이터:", updatedData);
+      // POST 요청으로 백엔드에 수정된 데이터 전송
+      const response = await axios.post(
+        "http://localhost:8080/api/savings/update-auto-transfer",
+        updatedData
+      );
+
+      console.log("자동이체 정보 변경 완료:", response.data);
+      setIsModalVisible(false);
+    } catch (error) {
+      console.error("자동이체 정보 변경 중 오류 발생:", error);
+    }
   };
 
   const handleAddDepositSubmit = () => {
@@ -226,22 +278,20 @@ function TogetherAccountSettingContent() {
 
   const handleConfirmOk = async () => {
     try {
-      // Confirmed Data에서 필요한 정보 가져오기
       const depositData = {
-        savingAccountNo: account.savingAccountNo, // 계좌 번호
-        userNo: loggedInUserId, // 로그인된 사용자 ID
-        amount: confirmData.additionalAmount, // 추가 납입 금액
+        savingAccountNo: account.savingAccountNo,
+        userNo: loggedInUserId,
+        amount: confirmData.additionalAmount,
       };
 
-      // 백엔드로 POST 요청 전송
       const response = await axios.post(
-        "http://localhost:8080/api/savings/deposit", // 백엔드에 연결할 API 엔드포인트
+        "http://localhost:8080/api/savings/deposit",
         depositData
       );
 
       console.log("추가 납입 완료");
 
-      // 추가 납입 후, 갱신된 계좌 정보를 다시 가져와서 상태 업데이트
+      // 추가 납입 후, 갱신된 데이터를 다시 가져와서 상태 업데이트
       const updatedAccountResponse = await axios.get(
         "http://localhost:8080/api/savings/saving-product",
         { params: { savingAccountNo: account.savingAccountNo } }
@@ -251,7 +301,20 @@ function TogetherAccountSettingContent() {
       // account 상태 업데이트
       location.state.account.currentAmount = updatedAccount.currentAmount;
 
-      // 모달 닫기 및 후처리
+      // 거래 내역 갱신
+      const updatedTransactionHistory = await axios.get(
+        "http://localhost:8080/api/savings/transactions",
+        { params: { savingAccountNo: account.savingAccountNo } }
+      );
+      setTransactionHistory(updatedTransactionHistory.data);
+
+      // 가족 납입 현황 갱신
+      const updatedParticipationDetails = await axios.get(
+        "http://localhost:8080/api/savings/participation-details",
+        { params: { savingAccountNo: account.savingAccountNo } }
+      );
+      setParticipationDetails(updatedParticipationDetails.data);
+
       setIsConfirmModalVisible(false);
     } catch (error) {
       console.error("추가 납입 중 오류 발생:", error);
@@ -268,7 +331,7 @@ function TogetherAccountSettingContent() {
 
   const settings = {
     dots: true,
-    infinite: true,
+    infinite: false,
     speed: 500,
     slidesToShow: 1,
     slidesToScroll: 1,
@@ -445,7 +508,7 @@ function TogetherAccountSettingContent() {
             <Slider {...settings}>
               {familyDepositsThisMonth.map((member, index) => (
                 <div
-                  key={index}
+                  key={member.userId} // key를 고유한 userId로 설정
                   style={{
                     display: "flex",
                     gap: "10px",
@@ -455,14 +518,15 @@ function TogetherAccountSettingContent() {
                   <div
                     style={{
                       borderRadius: "10px",
-                      background: colors[index % colors.length],
+                      background: colors[index % colors.length], // userId를 기반으로 색상 변경
                       width: "30px",
                       height: "30px",
                     }}
                   ></div>
                   <div>
-                    {userNames[member.userId - 1]?.userName || "이름 없음"}
-                  </div>{" "}
+                    {userNames[member.userId]?.userName || "이름 없음"}{" "}
+                    {/* userId로 이름을 찾음 */}
+                  </div>
                   <div>
                     이번 달 납입 금액: {member.totalDeposit.toLocaleString()}원
                   </div>
@@ -503,9 +567,13 @@ function TogetherAccountSettingContent() {
             name="accountNumber"
             rules={[{ required: true, message: "계좌번호를 선택하세요." }]}
           >
-            <Select placeholder={userAccountNo}>
-              <Option value="1234-5678-1234">1234-5678-1234</Option>
-              <Option value="9876-5432-1111">9876-5432-1111</Option>
+            <Select placeholder="계좌 번호">
+              {/* userAccountList에서 계좌번호 옵션을 생성 */}
+              {userAccountList.map((account) => (
+                <Option key={account.accountNo} value={account.accountNo}>
+                  {account.accountNo}
+                </Option>
+              ))}
             </Select>
           </Form.Item>
 
@@ -544,11 +612,21 @@ function TogetherAccountSettingContent() {
       >
         <Form form={addDepositForm} layout="vertical">
           <Form.Item label="계좌번호">
-            <span>{userAccountNo}</span>
+            <span>{userAccountInfo.accountNo}</span>
           </Form.Item>
           <Form.Item label="이번 달 추가 가능 납입 금액">
-            <span>{1000000 - totalFamilyDepositThisMonth} 원</span>
+            <span>
+              {(1000000 - totalFamilyDepositThisMonth).toLocaleString()} 원
+            </span>
           </Form.Item>
+          <span>계좌 잔액</span>
+          <span>
+            {userAccountInfo.accountBalance !== undefined &&
+            userAccountInfo.accountBalance !== null
+              ? userAccountInfo.accountBalance.toLocaleString()
+              : "0"}{" "}
+            원
+          </span>
           <Form.Item
             label="추가 납입 금액"
             name="additionalAmount"
@@ -574,8 +652,14 @@ function TogetherAccountSettingContent() {
         onOk={handleConfirmOk}
       >
         <p>추가 납입 금액: {confirmData.additionalAmount} 원</p>
-        <p>계좌 번호: {userAccountNo}</p>
-        <p>계좌 잔액: {account.currentAmount.toLocaleString()} 원</p>
+        <p>계좌 번호: {userAccountInfo.accountNo}</p>
+        <p>
+          추가 납입 후 계좌 잔액:{" "}
+          {(
+            userAccountInfo.accountBalance - confirmData.additionalAmount
+          ).toLocaleString()}{" "}
+          원
+        </p>
       </Modal>
     </div>
   );

@@ -11,7 +11,7 @@ function AssetsMainTitle() {
   return (
     <div className="assets-main-menu-container">
       <div className="assets-menu-content">
-        <Link to="/assetsmain" className="assets-menu">
+        <Link to="/jointassets" className="assets-menu">
           <LightbulbOutlinedIcon></LightbulbOutlinedIcon>
           <p>자산</p>
         </Link>
@@ -20,10 +20,10 @@ function AssetsMainTitle() {
           <p>계좌</p>
         </Link>
 
-        <Link to="/assetssecurities" className="assets-menu">
+        {/* <Link to="/assetssecurities" className="assets-menu">
           <LineChartOutlined style={{ fontSize: "24px" }} />
           <p>투자</p>
-        </Link>
+        </Link> */}
 
         <Link to="/assetsloan" className="assets-menu">
           <PaidOutlinedIcon></PaidOutlinedIcon>

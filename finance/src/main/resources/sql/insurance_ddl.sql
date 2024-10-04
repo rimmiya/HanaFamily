@@ -1,0 +1,61 @@
+create table INSURANCE.TB_USERS
+(
+    USER_NO          NUMBER        not null
+        primary key,
+    USER_NAME        VARCHAR2(100) not null,
+    USER_ID          VARCHAR2(50)  not null,
+    USER_PW          VARCHAR2(100) not null,
+    USER_GENDER      VARCHAR2(10),
+    USER_EMAIL       VARCHAR2(100),
+    USER_PHONE_NO    VARCHAR2(20),
+    USER_ADDRESS     VARCHAR2(200),
+    USER_RESIDENT_ID VARCHAR2(14),
+    USER_STATUS      VARCHAR2(20),
+    USER_BIRTH       DATE,
+    USER_REGISTER_DT DATE default SYSDATE,
+    USER_MODIFIED_DT DATE,
+    FAMILY_ID        NUMBER
+)
+    /
+
+create trigger INSURANCE.TRG_TB_MEMBERS_USER_NO
+    before insert
+    on INSURANCE.TB_USERS
+    for each row
+BEGIN
+    IF :NEW.user_no IS NULL THEN
+    SELECT user_no_seq.NEXTVAL INTO :NEW.user_no FROM dual;
+END IF;
+END;
+/
+create table INSURANCE.TB_INSURANCE
+(
+    INSURANCE_ID              VARCHAR2(20) not null
+        primary key,
+    INSURANCE_TYPE            VARCHAR2(50),
+    INSURANCE_AMOUNT          NUMBER,
+    INSURANCE_START_DATE      DATE,
+    INSURANCE_END_DATE        DATE,
+    INSURANCE_TERM            NUMBER,
+    INSURANCE_STATE           NUMBER,
+    INSURANCE_RENEWAL         VARCHAR2(20),
+    INSURANCE_PAYMENT_TYPE    VARCHAR2(20),
+    INSURANCE_PAYMENT_CYCLE   VARCHAR2(20),
+    INSURANCE_PAYMENT_TOTAL   NUMBER,
+    INSURANCE_PAYMENT_DATE    DATE,
+    USER_NO                   NUMBER
+        constraint INSURANCE_FK
+            references INSURANCE.TB_USERS,
+    INSURANCE_CODE            VARCHAR2(50),
+    INSURANCE_NAME            VARCHAR2(100),
+    INSURANCE_ACCOUNT         VARCHAR2(20),
+    INSURANCE_COMPANY         VARCHAR2(50),
+    INSURANCE_MONTHLY_PAYMENT NUMBER
+)
+    /
+
+CREATE SEQUENCE INSURANCE.user_no_seq
+    START WITH 1
+    INCREMENT BY 1
+    NOCACHE
+    NOCYCLE;

@@ -92,5 +92,19 @@
       #{userNo}
     </foreach>
   </select>
+
+  <select id="getFamilyMembersWithoutMe" parameterType="Integer" resultMap="FamilyMemberMap">
+    SELECT
+      family_id,
+      user_no,
+      user_id,
+      user_name,
+      user_phone_no,
+      user_email,
+      user_status
+    FROM tb_users
+    WHERE family_id = #{familyId}
+      AND user_no != #{userNo}
+  </select>
 </mapper>
 

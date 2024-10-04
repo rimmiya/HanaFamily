@@ -1,0 +1,215 @@
+CREATE TABLE TB_BUDGET (
+                           BUDGET_ID          NUMBER          PRIMARY KEY,           -- 예산 ID (기본 키)
+                           USER_NO            NUMBER          NOT NULL,              -- 사용자 번호 (외래 키)
+                           CATEGORY_ID        NUMBER          NOT NULL,              -- 예산 카테고리 (외래 키: 예산 항목)
+                           BUDGET_AMOUNT      NUMBER          NOT NULL,              -- 예산 금액
+                           ACTUAL_AMOUNT      NUMBER          DEFAULT 0,             -- 실제 사용 금액
+                           START_DATE         DATE            NOT NULL,              -- 예산 시작일
+                           END_DATE           DATE            NOT NULL,              -- 예산 종료일
+                           BUDGET_STATUS      VARCHAR2(20)    DEFAULT 'ACTIVE',      -- 예산 상태 (ACTIVE, EXCEEDED, COMPLETED 등)
+                           CREATED_AT         DATE            DEFAULT SYSDATE,       -- 생성일
+                           UPDATED_AT         DATE            DEFAULT SYSDATE        -- 수정일
+);
+
+-- 시퀀스 생성 (BUDGET_ID 자동 생성)
+CREATE SEQUENCE BUDGET_SEQ
+    START WITH 1
+    INCREMENT BY 1
+    NOCACHE;
+
+-- 트리거로 BUDGET_ID 자동 생성
+CREATE OR REPLACE TRIGGER TRG_BUDGET_ID
+    BEFORE INSERT ON TB_BUDGET
+    FOR EACH ROW
+    WHEN (NEW.BUDGET_ID IS NULL)
+BEGIN
+    SELECT BUDGET_SEQ.NEXTVAL INTO :NEW.BUDGET_ID FROM dual;
+END;
+/
+
+
+CREATE TABLE TB_CATEGORY (
+                             CATEGORY_ID        NUMBER          PRIMARY KEY,           -- 카테고리 ID (기본 키)
+                             CATEGORY_NAME      VARCHAR2(100)   NOT NULL,              -- 카테고리 이름 (예: 식비, 교통비 등)
+                             CATEGORY_TYPE      VARCHAR2(50)    NOT NULL,              -- 카테고리 타입 (수입, 지출 등)
+                             CREATED_AT         DATE            DEFAULT SYSDATE,       -- 생성일
+                             UPDATED_AT         DATE            DEFAULT SYSDATE        -- 수정일
+);
+
+-- 시퀀스 생성 (CATEGORY_ID 자동 생성)
+CREATE SEQUENCE CATEGORY_SEQ
+    START WITH 1
+    INCREMENT BY 1
+    NOCACHE;
+
+-- 트리거로 CATEGORY_ID 자동 생성
+CREATE OR REPLACE TRIGGER TRG_CATEGORY_ID
+    BEFORE INSERT ON TB_CATEGORY
+    FOR EACH ROW
+    WHEN (NEW.CATEGORY_ID IS NULL)
+BEGIN
+    SELECT CATEGORY_SEQ.NEXTVAL INTO :NEW.CATEGORY_ID FROM dual;
+END;
+/
+
+CREATE TABLE TB_SCHEDULE (
+                             SCHEDULE_ID        NUMBER          PRIMARY KEY,          -- 일정 ID (기본 키)
+                             USER_NO            NUMBER          NOT NULL,             -- 사용자 번호 (외래 키)
+                             TITLE              VARCHAR2(255)   NOT NULL,             -- 일정 제목
+                             DESCRIPTION        VARCHAR2(1000),                       -- 일정 설명
+                             START_DATE         DATE            NOT NULL,             -- 일정 시작 날짜
+                             END_DATE           DATE,                                 -- 일정 종료 날짜 (선택 사항)
+                             START_TIME         VARCHAR2(10),                         -- 시작 시간 (HH24:MI 형식)
+                             END_TIME           VARCHAR2(10),                         -- 종료 시간 (HH24:MI 형식)
+                             LOCATION           VARCHAR2(255),                        -- 일정 장소 (선택 사항)
+                             SCHEDULE_STATUS    VARCHAR2(20)    DEFAULT 'PLANNED',    -- 일정 상태 (PLANNED, COMPLETED, CANCELLED 등)
+                             REPEAT_TYPE        VARCHAR2(20),                         -- 반복 일정 타입 (NONE, DAILY, WEEKLY, MONTHLY 등)
+                             CREATED_AT         DATE            DEFAULT SYSDATE,      -- 일정 생성일
+                             UPDATED_AT         DATE            DEFAULT SYSDATE       -- 일정 수정일
+);
+
+-- 시퀀스 생성 (SCHEDULE_ID 자동 생성)
+CREATE SEQUENCE SCHEDULE_SEQ
+    START WITH 1
+    INCREMENT BY 1
+    NOCACHE;
+
+-- 트리거로 SCHEDULE_ID 자동 생성
+CREATE OR REPLACE TRIGGER TRG_SCHEDULE_ID
+    BEFORE INSERT ON TB_SCHEDULE
+    FOR EACH ROW
+    WHEN (NEW.SCHEDULE_ID IS NULL)
+BEGIN
+    SELECT SCHEDULE_SEQ.NEXTVAL INTO :NEW.SCHEDULE_ID FROM dual;
+END;
+/
+
+
+CREATE TABLE TB_SCHEDULE_REMINDER (
+                                      REMINDER_ID        NUMBER          PRIMARY KEY,          -- 알림 ID (기본 키)
+                                      SCHEDULE_ID        NUMBER          NOT NULL,             -- 일정 ID (외래 키)
+                                      REMINDER_TIME      DATE            NOT NULL,             -- 알림 시간 (일정 시간 전에 알림을 보내기 위한 시간)
+                                      REMINDER_TYPE      VARCHAR2(20),                         -- 알림 타입 (EMAIL, PUSH, SMS 등)
+                                      CREATED_AT         DATE            DEFAULT SYSDATE,      -- 알림 생성일
+                                      UPDATED_AT         DATE            DEFAULT SYSDATE       -- 알림 수정일
+);
+
+-- 시퀀스 생성 (REMINDER_ID 자동 생성)
+CREATE SEQUENCE REMINDER_SEQ
+    START WITH 1
+    INCREMENT BY 1
+    NOCACHE;
+
+-- 트리거로 REMINDER_ID 자동 생성
+CREATE OR REPLACE TRIGGER TRG_REMINDER_ID
+    BEFORE INSERT ON TB_SCHEDULE_REMINDER
+    FOR EACH ROW
+    WHEN (NEW.REMINDER_ID IS NULL)
+BEGIN
+    SELECT REMINDER_SEQ.NEXTVAL INTO :NEW.REMINDER_ID FROM dual;
+END;
+/
+
+ALTER TABLE TB_SCHEDULE
+    ADD FAMILY_ID NUMBER;
+
+ALTER TABLE TB_SCHEDULE
+    ADD CONSTRAINT FK_SCHEDULE_FAMILY FOREIGN KEY (FAMILY_ID) REFERENCES TB_FAMILY(FAMILY_ID);
+
+ALTER TABLE TB_BUDGET
+    MODIFY START_DATE TIMESTAMP;
+
+ALTER TABLE TB_BUDGET
+    MODIFY END_DATE TIMESTAMP;
+
+ALTER TABLE TB_BUDGET
+    MODIFY CREATED_AT TIMESTAMP DEFAULT SYSTIMESTAMP;
+
+ALTER TABLE TB_BUDGET
+    MODIFY UPDATED_AT TIMESTAMP DEFAULT SYSTIMESTAMP;
+
+ALTER TABLE TB_CATEGORY
+    MODIFY CREATED_AT TIMESTAMP DEFAULT SYSTIMESTAMP;
+
+ALTER TABLE TB_CATEGORY
+    MODIFY UPDATED_AT TIMESTAMP DEFAULT SYSTIMESTAMP;
+
+ALTER TABLE TB_SCHEDULE
+    MODIFY START_DATE TIMESTAMP;
+
+ALTER TABLE TB_SCHEDULE
+    MODIFY END_DATE TIMESTAMP;
+
+ALTER TABLE TB_SCHEDULE
+    MODIFY CREATED_AT TIMESTAMP DEFAULT SYSTIMESTAMP;
+
+ALTER TABLE TB_SCHEDULE
+    MODIFY UPDATED_AT TIMESTAMP DEFAULT SYSTIMESTAMP;
+
+ALTER TABLE TB_SCHEDULE_REMINDER
+    MODIFY REMINDER_TIME TIMESTAMP;
+
+ALTER TABLE TB_SCHEDULE_REMINDER
+    MODIFY CREATED_AT TIMESTAMP DEFAULT SYSTIMESTAMP;
+
+ALTER TABLE TB_SCHEDULE_REMINDER
+    MODIFY UPDATED_AT TIMESTAMP DEFAULT SYSTIMESTAMP;
+
+
+-- 카테고리 데이터 삽입
+INSERT INTO TB_CATEGORY (CATEGORY_ID, CATEGORY_NAME, CATEGORY_TYPE)
+VALUES (CATEGORY_SEQ.NEXTVAL, '식사', '지출');
+
+INSERT INTO TB_CATEGORY (CATEGORY_ID, CATEGORY_NAME, CATEGORY_TYPE)
+VALUES (CATEGORY_SEQ.NEXTVAL, '카페/간식', '지출');
+
+INSERT INTO TB_CATEGORY (CATEGORY_ID, CATEGORY_NAME, CATEGORY_TYPE)
+VALUES (CATEGORY_SEQ.NEXTVAL, '의료/건강', '지출');
+
+INSERT INTO TB_CATEGORY (CATEGORY_ID, CATEGORY_NAME, CATEGORY_TYPE)
+VALUES (CATEGORY_SEQ.NEXTVAL, '술/유흥', '지출');
+
+INSERT INTO TB_CATEGORY (CATEGORY_ID, CATEGORY_NAME, CATEGORY_TYPE)
+VALUES (CATEGORY_SEQ.NEXTVAL, '의복/미용', '지출');
+
+INSERT INTO TB_CATEGORY (CATEGORY_ID, CATEGORY_NAME, CATEGORY_TYPE)
+VALUES (CATEGORY_SEQ.NEXTVAL, '자동차', '지출');
+
+INSERT INTO TB_CATEGORY (CATEGORY_ID, CATEGORY_NAME, CATEGORY_TYPE)
+VALUES (CATEGORY_SEQ.NEXTVAL, '교통', '지출');
+
+INSERT INTO TB_CATEGORY (CATEGORY_ID, CATEGORY_NAME, CATEGORY_TYPE)
+VALUES (CATEGORY_SEQ.NEXTVAL, '주거/통신', '지출');
+
+INSERT INTO TB_CATEGORY (CATEGORY_ID, CATEGORY_NAME, CATEGORY_TYPE)
+VALUES (CATEGORY_SEQ.NEXTVAL, '생활', '지출');
+
+INSERT INTO TB_CATEGORY (CATEGORY_ID, CATEGORY_NAME, CATEGORY_TYPE)
+VALUES (CATEGORY_SEQ.NEXTVAL, '문화/여가', '지출');
+
+INSERT INTO TB_CATEGORY (CATEGORY_ID, CATEGORY_NAME, CATEGORY_TYPE)
+VALUES (CATEGORY_SEQ.NEXTVAL, '여행/숙박', '지출');
+
+INSERT INTO TB_CATEGORY (CATEGORY_ID, CATEGORY_NAME, CATEGORY_TYPE)
+VALUES (CATEGORY_SEQ.NEXTVAL, '교육', '지출');
+
+INSERT INTO TB_CATEGORY (CATEGORY_ID, CATEGORY_NAME, CATEGORY_TYPE)
+VALUES (CATEGORY_SEQ.NEXTVAL, '육아', '지출');
+
+INSERT INTO TB_CATEGORY (CATEGORY_ID, CATEGORY_NAME, CATEGORY_TYPE)
+VALUES (CATEGORY_SEQ.NEXTVAL, '기타', '지출');
+
+INSERT INTO TB_CATEGORY (CATEGORY_ID, CATEGORY_NAME, CATEGORY_TYPE)
+VALUES (CATEGORY_SEQ.NEXTVAL, '경조사', '지출');
+
+ALTER TABLE TB_BUDGET RENAME COLUMN FAMILY_ID TO FAMILY_ID;
+ALTER TABLE TB_BUDGET
+    ADD CONSTRAINT FK_BUDGET_FAMILY
+        FOREIGN KEY (FAMILY_ID)
+            REFERENCES TB_FAMILY (FAMILY_ID);
+
+ALTER TABLE TB_BUDGET
+    DROP
+    CONSTRAINT FK_BUDGET_FAMILY;
+
+

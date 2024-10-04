@@ -3,22 +3,77 @@
   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="kr.ac.kopo.hanafamily.consumption.mapper.TransactionMapper">
+<mapper namespace="kr.ac.kopo.hanafamily.consumption.mapper.ConsumptionTransactionMapper">
+
+  <resultMap id="TransactionResultMap" type="kr.ac.kopo.hanafamily.mydata.dto.TransactionDTO">
+    <id property="transactionId" column="TRANSACTION_ID" />
+    <result property="cardNo" column="CARD_NO" />
+    <result property="transactionAmount" column="TRANSACTION_AMOUNT" />
+    <result property="transactionDate" column="TRANSACTION_DATE" />
+    <result property="transactionType" column="TRANSACTION_TYPE" />
+    <result property="accountBalance" column="TRANSACTION_ACCOUNT_BALANCE" />
+    <result property="userNo" column="USER_NO" />
+    <result property="beforeBalance" column="TRANSACTION_BEFORE_BALANCE" />
+    <result property="location" column="TRANSACTION_LOCATION" />
+    <result property="category" column="TRANSACTION_CATEGORY" />
+    <result property="transactionStatus" column="TRANSACTION_STATUS" />
+  </resultMap>
+
+  <resultMap id="LoanMap" type="kr.ac.kopo.hanafamily.mydata.dto.LoanDTO">
+    <id property="loanId" column="LOAN_ID"/>
+    <result property="loanType" column="LOAN_TYPE"/>
+    <result property="loanAmount" column="LOAN_AMOUNT"/>
+    <result property="loanDate" column="LOAN_DATE"/>
+    <result property="loanState" column="LOAN_STATE"/>
+    <result property="loanTerm" column="LOAN_TERM"/>
+    <result property="userNo" column="USER_NO"/>
+    <result property="loanCode" column="LOAN_CODE"/>
+    <result property="loanEndDate" column="LOAN_END_DATE"/>
+    <result property="loanName" column="LOAN_NAME"/>
+    <result property="loanRate" column="LOAN_RATE"/>
+    <result property="loanBalance" column="LOAN_BALANCE"/>
+    <result property="loanInterest" column="LOAN_INTEREST"/>
+    <result property="loanAccount" column="LOAN_ACCOUNT"/>
+    <result property="loanBank" column="LOAN_BANK"/>
+    <result property="loanRepaymentDate" column="LOAN_REPAYMENT_DATE"/>
+    <result property="loanMonthlyRepayment" column="LOAN_MONTHLY_REPAYMENT"/>
+  </resultMap>
+
+  <resultMap id="InsuranceResultMap" type="kr.ac.kopo.hanafamily.mydata.dto.InsuranceDTO">
+    <id property="insuranceId" column="INSURANCE_ID"/>
+    <result property="insuranceType" column="INSURANCE_TYPE"/>
+    <result property="insuranceAmount" column="INSURANCE_AMOUNT"/>
+    <result property="insuranceStartDate" column="INSURANCE_START_DATE"/>
+    <result property="insuranceEndDate" column="INSURANCE_END_DATE"/>
+    <result property="insuranceTerm" column="INSURANCE_TERM"/>
+    <result property="insuranceState" column="INSURANCE_STATE"/>
+    <result property="insuranceRenewal" column="INSURANCE_RENEWAL"/>
+    <result property="insurancePaymentType" column="INSURANCE_PAYMENT_TYPE"/>
+    <result property="insurancePaymentCycle" column="INSURANCE_PAYMENT_CYCLE"/>
+    <result property="insurancePaymentTotal" column="INSURANCE_PAYMENT_TOTAL"/>
+    <result property="insurancePaymentDate" column="INSURANCE_PAYMENT_DATE"/>
+    <result property="userNo" column="USER_NO"/>
+    <result property="insuranceCode" column="INSURANCE_CODE"/>
+    <result property="insuranceName" column="INSURANCE_NAME"/>
+    <result property="insuranceAccount" column="INSURANCE_ACCOUNT"/>
+    <result property="insuranceCompany" column="INSURANCE_COMPANY"/>
+    <result property="insuranceMonthlyPayment" column="INSURANCE_MONTHLY_PAYMENT"/>
+  </resultMap>
 
   <!-- 특정 가족의 거래 내역 조회 -->
-  <select id="getTransactionsByFamilyId" parameterType="int" resultType="kr.ac.kopo.hanafamily.mydata.dto.TransactionDTO">
+  <select id="getTransactionsByFamilyId" parameterType="int" resultMap="TransactionResultMap">
     SELECT
-      t.TRANSACTION_ID,
-      t.CARD_NO,
-      t.TRANSACTION_AMOUNT,
-      t.TRANSACTION_DATE,
-      t.TRANSACTION_TYPE,
-      t.TRANSACTION_ACCOUNT_BALANCE,
-      t.USER_NO,
-      t.TRANSACTION_BEFORE_BALANCE,
-      t.TRANSACTION_LOCATION,
-      t.TRANSACTION_CATEGORY,
-      t.TRANSACTION_STATUS
+      T.TRANSACTION_ID,
+      T.CARD_NO,
+      T.TRANSACTION_AMOUNT,
+      T.TRANSACTION_DATE,
+      T.TRANSACTION_TYPE,
+      T.TRANSACTION_ACCOUNT_BALANCE,
+      T.USER_NO,
+      T.TRANSACTION_BEFORE_BALANCE,
+      T.TRANSACTION_LOCATION,
+      T.TRANSACTION_CATEGORY,
+      T.TRANSACTION_STATUS
     FROM
       TB_TRANSACTION t
         INNER JOIN
@@ -27,6 +82,61 @@
       u.FAMILY_ID = #{familyId}
     ORDER BY
       t.TRANSACTION_DATE DESC
+  </select>
+
+  <select id="getLoanByFamilyId" parameterType="int" resultMap="LoanMap">
+    SELECT
+      L.LOAN_ID,
+      L.LOAN_TYPE,
+      L.LOAN_AMOUNT,
+      L.LOAN_DATE,
+      L.LOAN_STATE,
+      L.LOAN_TERM,
+      L.USER_NO,
+      L.LOAN_CODE,
+      L.LOAN_END_DATE,
+      L.LOAN_NAME,
+      L.LOAN_RATE,
+      L.LOAN_BALANCE,
+      L.LOAN_INTEREST,
+      L.LOAN_ACCOUNT,
+      L.LOAN_BANK,
+      L.LOAN_REPAYMENT_DATE,
+      L.LOAN_MONTHLY_REPAYMENT
+    FROM
+      TB_LOAN L
+        INNER JOIN
+      TB_USERS U ON L.USER_NO = U.USER_NO
+    WHERE
+      U.FAMILY_ID = #{familyId}
+  </select>
+
+  <select id="getInsuranceByFamilyId" parameterType="int" resultMap="InsuranceResultMap">
+    SELECT
+      I.INSURANCE_ID,
+      I.INSURANCE_TYPE,
+      I.INSURANCE_AMOUNT,
+      I.INSURANCE_START_DATE,
+      I.INSURANCE_END_DATE,
+      I.INSURANCE_TERM,
+      I.INSURANCE_STATE,
+      I.INSURANCE_RENEWAL,
+      I.INSURANCE_PAYMENT_TYPE,
+      I.INSURANCE_PAYMENT_CYCLE,
+      I.INSURANCE_PAYMENT_TOTAL,
+      I.INSURANCE_PAYMENT_DATE,
+      I.USER_NO,
+      I.INSURANCE_CODE,
+      I.INSURANCE_NAME,
+      I.INSURANCE_ACCOUNT,
+      I.INSURANCE_COMPANY,
+      I.INSURANCE_MONTHLY_PAYMENT
+    FROM
+      TB_INSURANCE I
+        INNER JOIN
+      TB_USERS U ON I.USER_NO = U.USER_NO
+    WHERE
+      U.FAMILY_ID = #{familyId}
   </select>
 
 </mapper>

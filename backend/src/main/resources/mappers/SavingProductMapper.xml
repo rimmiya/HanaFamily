@@ -19,7 +19,7 @@
     <result property="maxDuration" column="MAX_DURATION" />
     <result property="savingStatus" column="SAVING_STATUS" />
     <result property="productId" column="PRODUCT_ID" />
-    <result property="representativeAccountNo" column="SAVING_ACCOUNT_NO" />
+    <result property="representativeAccountNo" column="REPRESENTATIVE_ACCOUNT_NO" />
     <result property="familyId" column="FAMILY_ID" />
     <result property="accountPassword" column="ACCOUNT_PASSWORD" />
     <result property="accountName" column="ACCOUNT_NAME" />
@@ -104,12 +104,12 @@
                #{userNo},
                #{goalAmount},
                #{currentAmount},
-               #{startDate},
-               #{endDate},
+                #{startDate},
+                #{endDate},
                #{interestRate},
-               #{bonusInterestRate},
-               #{minDuration},
-               #{maxDuration},
+               0,
+               6,
+               12,
                #{savingStatus},
                #{productId},
                #{representativeAccountNo},
@@ -198,5 +198,20 @@
     WHERE
       FAMILY_ID = #{familyId}
   </select>
+
+  <!-- SavingProductDTO를 TB_SAVINGS_TRANSACTION에 삽입 -->
+  <insert id="insertSavingProductIntoTransaction">
+    INSERT INTO TB_SAVINGS_TRANSACTION (
+    SAVING_ACCOUNT_NO, USER_NO, AMOUNT, AFTER_AMOUNT, TRANSACTION_DATE, TRANSACTION_TYPE
+    )
+    VALUES (
+    #{savingProduct.savingAccountNo},
+    #{savingProduct.userNo},
+    #{amount},    <!-- goalAmount를 amount로 사용 -->
+    #{savingProduct.currentAmount}, <!-- currentAmount를 afterAmount로 사용 -->
+    #{savingProduct.startDate},     <!-- startDate를 transactionDate로 사용 -->
+    'DEPOSIT'        <!-- TRANSACTION_TYPE은 고정으로 DEPOSIT 사용 -->
+    )
+  </insert>
 
 </mapper>

@@ -9,7 +9,7 @@
     FROM tb_loan
     WHERE
       USER_NO = #{userNo}
-      AND loan_id = #{loanCode}
+      AND loan_bank = #{loanBank}
   </select>
 
 </mapper>

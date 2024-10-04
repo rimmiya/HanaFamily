@@ -153,7 +153,6 @@ function FamilyJoinAuthPage({ inviteKey }) {
                   |{" "}
                   <span onClick={() => setActiveTab("register")}>회원가입</span>
                 </p>
-                <button className="submit-button">로그인</button>
               </div>
             </div>
           </div>

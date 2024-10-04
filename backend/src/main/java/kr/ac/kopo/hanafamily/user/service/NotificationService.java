@@ -2,8 +2,8 @@ package kr.ac.kopo.hanafamily.user.service;
 
 import java.util.ArrayList;
 import java.util.List;
-import kr.ac.kopo.hanafamily.mydata.dto.MyDataStatusDTO;
 import kr.ac.kopo.hanafamily.mydata.mapper.MyDataMapper;
+import kr.ac.kopo.hanafamily.savings.dto.SavingProductDTO;
 import kr.ac.kopo.hanafamily.savings.dto.SavingsInvitationDTO;
 import kr.ac.kopo.hanafamily.savings.mapper.SavingsInvitationMapper;
 import kr.ac.kopo.hanafamily.user.domain.NotificationDTO;
@@ -23,8 +23,8 @@ public class NotificationService {
     List<NotificationDTO> notifications = new ArrayList<>();
 
     // tb_mydata에서 유저 정보가 없거나 status가 0인 경우 알림 추가
-    MyDataStatusDTO myData = myDataMapper.selectMyDataConnection(userNo);
-    if (myData == null || myData.getMyDataStatus() == 0) {
+    Integer myData = myDataMapper.selectMyDataConnectionStatus(userNo);
+    if (myData == null) {
       notifications.add(new NotificationDTO("자산 연결", "자산을 연결해 주세요.", "family_invitation", null, null));
     }
 
@@ -33,7 +33,10 @@ public class NotificationService {
     for (SavingsInvitationDTO invitation : pendingInvitations) {
       notifications.add(new NotificationDTO("적금 초대", "함께 적금 초대를 수락해 주세요.", "savings_invitation", invitation.getInvitationId(), invitation.getSavingAccountNo()));
     }
-
+    List<SavingProductDTO> familySavingsList = savingsInvitationMapper.selectFamilySavingsList(userNo);
+    for (SavingProductDTO savingProduct : familySavingsList) {
+      notifications.add(new NotificationDTO("적금 만기 알림", "함께 적금 적금이 만료되었습니다. 확인해 주세요.", "savings_terminate", null, savingProduct.getSavingAccountNo()));
+    }
     return notifications;
   }
 }

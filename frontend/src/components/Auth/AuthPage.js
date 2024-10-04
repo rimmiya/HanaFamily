@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios"; // Axios 라이브러리 임포트
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { setLoginSuccess } from "../../store.js";
+import Modal from "@mui/material/Modal"; // MUI Modal import
+import Box from "@mui/material/Box"; // Modal Content Box
 import AuthTabs from "./AuthTabs"; // 탭 컴포넌트 불러오기
 import "../../style/AuthPage.css"; // 필요한 스타일 추가
 
@@ -12,13 +14,43 @@ function AuthPage() {
   const initialTab = queryParams.get("tab") || "login";
   const [activeTab, setActiveTab] = useState(initialTab);
 
+  // 로그인 상태
   const [userId, setUserId] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false); // 로더 상태 추가
 
+  // 회원가입 상태
+  const [regUserId, setRegUserId] = useState("");
+  const [isIdAvailable, setIsIdAvailable] = useState(null);
+  const [idCheckMessage, setIdCheckMessage] = useState("");
+  const [idButtonDisabled, setIdButtonDisabled] = useState(false);
+
+  const [regPassword, setRegPassword] = useState("");
+  const [regPasswordConfirm, setRegPasswordConfirm] = useState("");
+  const [passwordMatchMessage, setPasswordMatchMessage] = useState("");
+
+  const [residentNumber, setResidentNumber] = useState("");
+
+  const [phone, setPhone] = useState({ part1: "", part2: "", part3: "" });
+  const [isSmsSent, setIsSmsSent] = useState(false);
+  const [verificationCode, setVerificationCode] = useState("");
+  const [isVerified, setIsVerified] = useState(false);
+  const [smsSentMessage, setSmsSentMessage] = useState("");
+  const [verificationResultMessage, setVerificationResultMessage] =
+    useState("");
+  const [verificationButtonDisabled, setVerificationButtonDisabled] =
+    useState(false);
+
+  const [zoneCode, setZoneCode] = useState(""); // 우편번호
+  const [roadAddress, setRoadAddress] = useState(""); // 도로명 주소
+  const [detailAddress, setDetailAddress] = useState(""); // 상세주소
+
+  const [showModal, setShowModal] = useState(false);
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
+  // 로그인 처리 함수
   const handleLogin = async (e) => {
     setIsLoading(true); // 로그인 시도시 로더 활성화
     e.preventDefault();
@@ -46,6 +78,101 @@ function AuthPage() {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  // 아이디 중복확인 함수
+  const handleIdCheck = async () => {
+    try {
+      // const response = await axios.post(
+      //   "http://localhost:8080/api/user/checkId",
+      //   {
+      //     userId: regUserId,
+      //   }
+      // );
+      // if (response.data.available) {
+      setIsIdAvailable(true);
+      setIdCheckMessage("사용가능한 아이디 입니다.");
+      setIdButtonDisabled(true);
+      // } else {
+      //   setIsIdAvailable(false);
+      //   setIdCheckMessage("이미 사용중인 아이디 입니다.");
+      // }
+    } catch (error) {
+      console.error("아이디 중복확인 실패:", error);
+    }
+  };
+
+  // 비밀번호 확인 로직
+  useEffect(() => {
+    if (regPassword && regPasswordConfirm) {
+      if (regPassword === regPasswordConfirm) {
+        setPasswordMatchMessage("비밀번호가 일치합니다.");
+      } else {
+        setPasswordMatchMessage("비밀번호가 일치하지 않습니다.");
+      }
+    } else {
+      setPasswordMatchMessage("");
+    }
+  }, [regPassword, regPasswordConfirm]);
+
+  // SMS 인증번호 발송 함수
+  const handleSendSms = () => {
+    // 실제 구현에서는 서버 API를 호출하여 SMS 발송
+    try {
+      const response = axios.post("http://localhost:8080/api/user/sms/send", {
+        phone: `${phone.part1}-${phone.part2}-${phone.part3}`,
+      });
+    } catch (error) {
+      console.error("SMS 발송 실패:", error);
+    }
+
+    setIsSmsSent(true);
+    setSmsSentMessage("인증코드 SMS를 발송했습니다.");
+  };
+
+  // 인증번호 확인 함수
+  const handleVerifyCode = () => {
+    // 실제 구현에서는 서버와 통신하여 인증번호 검증
+    if (verificationCode === "9216") {
+      setIsVerified(true);
+      setVerificationResultMessage("인증되었습니다.");
+      setVerificationButtonDisabled(true);
+    } else {
+      setIsVerified(false);
+      setVerificationResultMessage("인증번호가 일치하지 않습니다.");
+    }
+  };
+
+  // 카카오 주소 검색 API 호출 함수
+  const handleAddressSearch = () => {
+    if (!window.daum) {
+      const script = document.createElement("script");
+      script.src =
+        "//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js";
+      script.onload = openDaumPostcode;
+      document.head.appendChild(script);
+    } else {
+      openDaumPostcode();
+    }
+  };
+
+  const openDaumPostcode = () => {
+    new window.daum.Postcode({
+      oncomplete: function (data) {
+        setZoneCode(data.zonecode); // 우편번호 저장
+        setRoadAddress(data.address); // 도로명 주소 저장
+      },
+    }).open();
+  };
+
+  // 회원가입 처리 함수
+  const handleRegister = () => {
+    // 실제 구현에서는 회원가입 로직 추가
+    setShowModal(true);
+    setTimeout(() => {
+      setShowModal(false);
+      setActiveTab("login");
+    }, 2000);
   };
 
   useEffect(() => {
@@ -89,7 +216,6 @@ function AuthPage() {
                   |{" "}
                   <span onClick={() => setActiveTab("register")}>회원가입</span>
                 </p>
-                <button className="submit-button">로그인</button>
               </div>
             </div>
           </div>
@@ -125,11 +251,24 @@ function AuthPage() {
                     className="input_common"
                     placeholder="아이디"
                     required
+                    value={regUserId}
+                    onChange={(e) => setRegUserId(e.target.value)}
+                    disabled={idButtonDisabled}
                   />
-                  <button className="confirm-button" required>
+                  <button
+                    className="confirm-button"
+                    onClick={handleIdCheck}
+                    disabled={idButtonDisabled}
+                    style={{ backgroundColor: idButtonDisabled ? "grey" : "" }}
+                  >
                     중복확인
                   </button>
                 </div>
+                {idCheckMessage && (
+                  <p style={{ color: isIdAvailable ? "green" : "red" }}>
+                    {idCheckMessage}
+                  </p>
+                )}
                 <p>비밀번호 *</p>
                 <div className="input-box">
                   <input
@@ -137,6 +276,8 @@ function AuthPage() {
                     className="input_common"
                     placeholder="비밀번호"
                     required
+                    value={regPassword}
+                    onChange={(e) => setRegPassword(e.target.value)}
                   />
                 </div>
                 <p>비밀번호 확인 *</p>
@@ -146,8 +287,22 @@ function AuthPage() {
                     className="input_common"
                     placeholder="비밀번호 확인"
                     required
+                    value={regPasswordConfirm}
+                    onChange={(e) => setRegPasswordConfirm(e.target.value)}
                   />
                 </div>
+                {passwordMatchMessage && (
+                  <p
+                    style={{
+                      color:
+                        passwordMatchMessage === "비밀번호가 일치합니다."
+                          ? "green"
+                          : "red",
+                    }}
+                  >
+                    {passwordMatchMessage}
+                  </p>
+                )}
                 <p>이름 *</p>
                 <div className="input-box">
                   <input
@@ -155,173 +310,72 @@ function AuthPage() {
                     className="input_common"
                     placeholder="이름"
                     required
+                    onChange={(e) => setResidentNumber(e.target.value)}
                   />
                 </div>
-                <p>생년월일 *</p>
-                <div className="birth-box">
-                  <select
-                    name="c_birth_year"
-                    className="select_common"
+                <p>주민등록번호 *</p>
+                <div className="input-box">
+                  <input
+                    type="text"
+                    className="input_common"
+                    style={{ width: "calc(30% - 10px)" }}
+                    placeholder="주민등록번호"
                     required
-                  >
-                    <option value="">년도</option>
-                    <option value="2024">2024</option>
-                    <option value="2023">2023</option>
-                    <option value="2022">2022</option>
-                    <option value="2021">2021</option>
-                    <option value="2020">2020</option>
-                    <option value="2019">2019</option>
-                    <option value="2018">2018</option>
-                    <option value="2017">2017</option>
-                    <option value="2016">2016</option>
-                    <option value="2015">2015</option>
-                    <option value="2014">2014</option>
-                    <option value="2013">2013</option>
-                    <option value="2012">2012</option>
-                    <option value="2011">2011</option>
-                    <option value="2010">2010</option>
-                    <option value="2009">2009</option>
-                    <option value="2008">2008</option>
-                    <option value="2007">2007</option>
-                    <option value="2006">2006</option>
-                    <option value="2005">2005</option>
-                    <option value="2004">2004</option>
-                    <option value="2003">2003</option>
-                    <option value="2002">2002</option>
-                    <option value="2001">2001</option>
-                    <option value="2000">2000</option>
-                    <option value="1999">1999</option>
-                    <option value="1998">1998</option>
-                    <option value="1997">1997</option>
-                    <option value="1996">1996</option>
-                    <option value="1995">1995</option>
-                    <option value="1994">1994</option>
-                    <option value="1993">1993</option>
-                    <option value="1992">1992</option>
-                    <option value="1991">1991</option>
-                    <option value="1990">1990</option>
-                    <option value="1989">1989</option>
-                    <option value="1988">1988</option>
-                    <option value="1987">1987</option>
-                    <option value="1986">1986</option>
-                    <option value="1985">1985</option>
-                    <option value="1984">1984</option>
-                    <option value="1983">1983</option>
-                    <option value="1982">1982</option>
-                    <option value="1981">1981</option>
-                    <option value="1980">1980</option>
-                    <option value="1979">1979</option>
-                    <option value="1978">1978</option>
-                    <option value="1977">1977</option>
-                    <option value="1976">1976</option>
-                    <option value="1975">1975</option>
-                    <option value="1974">1974</option>
-                    <option value="1973">1973</option>
-                    <option value="1972">1972</option>
-                    <option value="1971">1971</option>
-                    <option value="1970">1970</option>
-                    <option value="1969">1969</option>
-                    <option value="1968">1968</option>
-                    <option value="1967">1967</option>
-                    <option value="1966">1966</option>
-                    <option value="1965">1965</option>
-                    <option value="1964">1964</option>
-                    <option value="1963">1963</option>
-                    <option value="1962">1962</option>
-                    <option value="1961">1961</option>
-                    <option value="1960">1960</option>
-                    <option value="1959">1959</option>
-                    <option value="1958">1958</option>
-                    <option value="1957">1957</option>
-                    <option value="1956">1956</option>
-                    <option value="1955">1955</option>
-                    <option value="1954">1954</option>
-                    <option value="1953">1953</option>
-                    <option value="1952">1952</option>
-                    <option value="1951">1951</option>
-                    <option value="1950">1950</option>
-                    <option value="1949">1949</option>
-                    <option value="1948">1948</option>
-                    <option value="1947">1947</option>
-                    <option value="1946">1946</option>
-                    <option value="1945">1945</option>
-                    <option value="1944">1944</option>
-                    <option value="1943">1943</option>
-                    <option value="1942">1942</option>
-                    <option value="1941">1941</option>
-                    <option value="1940">1940</option>
-                    <option value="1939">1939</option>
-                    <option value="1938">1938</option>
-                    <option value="1937">1937</option>
-                    <option value="1936">1936</option>
-                    <option value="1935">1935</option>
-                  </select>{" "}
-                  <p>년</p>
-                  <select
-                    name="c_birth_month"
-                    className="select_common"
+                    onChange={(e) => setResidentNumber(e.target.value)}
+                  />
+                  <p>&nbsp;-&nbsp;</p>
+                  <input
+                    type="password"
+                    className="input_common"
+                    style={{ width: "calc(30% - 10px)" }}
+                    placeholder="주민등록번호"
                     required
-                  >
-                    <option value="">월</option>
-                    <option value="01">1</option>
-                    <option value="02">2</option>
-                    <option value="03">3</option>
-                    <option value="04">4</option>
-                    <option value="05">5</option>
-                    <option value="06">6</option>
-                    <option value="07">7</option>
-                    <option value="08">8</option>
-                    <option value="09">9</option>
-                    <option value="10">10</option>
-                    <option value="11">11</option>
-                    <option value="12">12</option>
-                  </select>{" "}
-                  <p>월</p>
-                  <select name="c_birth_day" className="select_common" required>
-                    <option value="">일</option>
-                    <option value="01">1</option>
-                    <option value="02">2</option>
-                    <option value="03">3</option>
-                    <option value="04">4</option>
-                    <option value="05">5</option>
-                    <option value="06">6</option>
-                    <option value="07">7</option>
-                    <option value="08">8</option>
-                    <option value="09">9</option>
-                    <option value="10">10</option>
-                    <option value="11">11</option>
-                    <option value="12">12</option>
-                    <option value="13">13</option>
-                    <option value="14">14</option>
-                    <option value="15">15</option>
-                    <option value="16">16</option>
-                    <option value="17">17</option>
-                    <option value="18">18</option>
-                    <option value="19">19</option>
-                    <option value="20">20</option>
-                    <option value="21">21</option>
-                    <option value="22">22</option>
-                    <option value="23">23</option>
-                    <option value="24">24</option>
-                    <option value="25">25</option>
-                    <option value="26">26</option>
-                    <option value="27">27</option>
-                    <option value="28">28</option>
-                    <option value="29">29</option>
-                    <option value="30">30</option>
-                    <option value="31">31</option>
-                  </select>{" "}
-                  <p>일</p>
+                    onChange={(e) => setResidentNumber(e.target.value)}
+                  />
                 </div>
+                {/* 나머지 회원가입 폼 필드 */}
                 <p>휴대전화번호 *</p>
                 <div className="phone-box">
-                  <input type="phone1" placeholder="" required />
+                  <input
+                    type="text"
+                    placeholder=""
+                    required
+                    value={phone.part1}
+                    onChange={(e) =>
+                      setPhone({ ...phone, part1: e.target.value })
+                    }
+                  />
                   <p>-</p>
-                  <input type="phone2" placeholder="" required />
+                  <input
+                    type="text"
+                    placeholder=""
+                    required
+                    value={phone.part2}
+                    onChange={(e) =>
+                      setPhone({ ...phone, part2: e.target.value })
+                    }
+                  />
                   <p>-</p>
-                  <input type="phone3" placeholder="" required />
-                  <button className="confirm-button">인증번호 받기</button>
+                  <input
+                    type="text"
+                    placeholder=""
+                    required
+                    value={phone.part3}
+                    onChange={(e) =>
+                      setPhone({ ...phone, part3: e.target.value })
+                    }
+                  />
+                  <button
+                    className="confirm-button"
+                    onClick={handleSendSms}
+                    style={{ backgroundColor: isSmsSent ? "grey" : "" }}
+                  >
+                    인증번호 받기
+                  </button>
                 </div>
+                {smsSentMessage && (
+                  <p style={{ color: "green" }}>{smsSentMessage}</p>
+                )}
                 <p>인증번호 *</p>
                 <div className="input-box">
                   <input
@@ -329,52 +383,105 @@ function AuthPage() {
                     className="input_common"
                     placeholder="인증번호"
                     required
+                    value={verificationCode}
+                    onChange={(e) => setVerificationCode(e.target.value)}
+                    disabled={verificationButtonDisabled}
                   />
-                  <button className="confirm-button">인증번호 확인</button>
+                  <button
+                    className="confirm-button"
+                    onClick={handleVerifyCode}
+                    disabled={verificationButtonDisabled}
+                    style={{
+                      backgroundColor: verificationButtonDisabled ? "grey" : "",
+                    }}
+                  >
+                    인증번호 확인
+                  </button>
                 </div>
+                {verificationResultMessage && (
+                  <p style={{ color: isVerified ? "green" : "red" }}>
+                    {verificationResultMessage}
+                  </p>
+                )}
                 <p>이메일 *</p>
-                <div className="email-box">
-                  <input type="email" placeholder="이메일" required />
-                  <p>@</p>
-                  <input type="email" placeholder="이메일" required />
-                  <select name="email" className="select_common" required>
-                    <option value="">직접입력</option>
+                <div className="input-box">
+                  <input
+                    type="text"
+                    className="input_common"
+                    style={{ width: "calc(30% - 10px)" }}
+                    placeholder="이메일"
+                    required
+                    onChange={(e) => setResidentNumber(e.target.value)}
+                  />
+                  <p>&nbsp;@&nbsp;</p>
+                  <select className="input_common">
                     <option value="naver.com">naver.com</option>
                     <option value="daum.net">daum.net</option>
                     <option value="gmail.com">gmail.com</option>
                     <option value="nate.com">nate.com</option>
                     <option value="hotmail.com">hotmail.com</option>
                     <option value="yahoo.com">yahoo.com</option>
-                    <option value="hanmail.net">hanmail.net</option>
-                    <option value="empas.com">empas.com</option>
-                    <option value="dreamwiz.com">dreamwiz.com</option>
-                    <option value="korea.com">korea.com</option>
-                    <option value="lycos.co.kr">lycos.co.kr</option>
-                    <option value="paran.com">paran.com</option>
-                    <option value="freechal.com">freechal.com</option>
-                    <option value="hanmir.com">hanmir.com</option>
-                    <option value="hitel.net">hitel.net</option>
-                    <option value="chol.com">chol.com</option>
-                    <option value="netian.com">netian.com</option>
-                    <option value="hanafos.com">hanafos.com</option>
-                    <option value="kornet.net">kornet.net</option>
+                    <option value="직접입력">직접입력</option>
                   </select>
                 </div>
                 <p>주소 *</p>
                 <div className="address-box1">
-                  <input type="text" required />
-                  <button className="address-button">주소 검색</button>
+                  <input type="text" value={zoneCode} readOnly required />
+                  <button
+                    className="confirm-button"
+                    onClick={handleAddressSearch}
+                  >
+                    주소 검색
+                  </button>
                 </div>
                 <div className="address-box2">
-                  <input type="text" placeholder="상세주소" required />
-                  <input type="text" placeholder="상세주소" required />
+                  <input type="text" value={roadAddress} readOnly required />
+                </div>
+                <div className="address-box2">
+                  <input
+                    type="text"
+                    placeholder="상세주소"
+                    required
+                    value={detailAddress}
+                    onChange={(e) => setDetailAddress(e.target.value)}
+                  />
                 </div>
                 <div className="agree-box">
                   <button className="cancel-button">취소</button>
-                  <button className="register-button">회원가입</button>
+                  <button className="register-button" onClick={handleRegister}>
+                    회원가입
+                  </button>
                 </div>
               </div>
             </div>
+            {/* 회원가입 완료 모달 (Material-UI) */}
+            <Modal
+              open={showModal}
+              onClose={() => setShowModal(false)} // 모달 외부 클릭 시 닫힘
+              aria-labelledby="회원 가입 완료"
+              aria-describedby="회원 가입이 성공적으로 완료되었습니다."
+            >
+              <Box
+                sx={{
+                  position: "absolute",
+                  top: "50%",
+                  left: "50%",
+                  transform: "translate(-50%, -50%)",
+                  width: 400,
+                  bgcolor: "background.paper",
+                  boxShadow: 24,
+                  p: 4,
+                  textAlign: "center",
+                  borderRadius: 2,
+                }}
+              >
+                <h2 id="회원 가입 완료">회원 가입 완료</h2>
+                <p id="회원 가입이 성공적으로 완료되었습니다.">
+                  회원 가입이 완료되었습니다! <br /> 잠시 후 로그인 페이지로
+                  이동합니다.
+                </p>
+              </Box>
+            </Modal>
           </div>
         );
       default:

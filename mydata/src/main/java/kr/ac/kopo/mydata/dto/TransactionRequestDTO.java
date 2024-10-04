@@ -12,6 +12,6 @@ public class TransactionRequestDTO {
   private Integer userNo;
   private List<String> accountNo;
   private List<String> cardNo;
-//  private List<String> loanNo;
+  private List<String> loanId;
   private List<String> securityAccount;
 }

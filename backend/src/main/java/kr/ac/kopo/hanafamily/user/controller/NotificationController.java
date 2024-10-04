@@ -17,6 +17,12 @@ public class NotificationController {
   @Autowired
   private NotificationService notificationService;
 
+//  @GetMapping("/user")
+//  public ResponseEntity<List<NotificationDTO>> getUserNotifications(@RequestParam Integer userNo) {
+//    List<NotificationDTO> notifications = notificationService.getUserNotifications(userNo);
+//    return ResponseEntity.ok(notifications);
+//  }
+
   @GetMapping("/user")
   public ResponseEntity<List<NotificationDTO>> getUserNotifications(@RequestParam Integer userNo) {
     List<NotificationDTO> notifications = notificationService.getUserNotifications(userNo);

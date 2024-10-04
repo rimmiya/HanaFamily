@@ -1,14 +1,49 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useSelector } from "react-redux";
+import axios from "axios";
 
 function JointAssetsMainContent() {
   const [isHidden, setIsHidden] = useState(false);
+  const user = useSelector((state) => state.user.userInfo);
+  const [totalAssets, setTotalAssets] = useState(0);
 
   // 금액 숨기기 토글
   const toggleAmount = () => {
     setIsHidden(!isHidden);
   };
 
-  const totalAssets = 200000000000;
+  useEffect(() => {
+    fetchAccountBalance(); // 컴포넌트 마운트 시 가족 자산 불러오기
+  }, []);
+
+  // 가족 자산 가져오기
+  const fetchAccountBalance = async () => {
+    if (!user.familyId) {
+      try {
+        const response = await axios.get(
+          "http://localhost:8080/api/family/no-members",
+          {
+            params: { userNo: user.userNo },
+          }
+        );
+        setTotalAssets(response.data);
+      } catch (error) {
+        console.error("개인 계좌 총합 가져오는 중 오류 발생:", error);
+      }
+    } else {
+      try {
+        const response = await axios.get(
+          "http://localhost:8080/api/family/account-balance",
+          {
+            params: { familyId: user.familyId },
+          }
+        );
+        setTotalAssets(response.data);
+      } catch (error) {
+        console.error("가족 자산을 가져오는 중 오류 발생:", error);
+      }
+    }
+  };
 
   return (
     <div
@@ -32,8 +67,10 @@ function JointAssetsMainContent() {
           // marginBottom: "15px",
         }}
       >
-        <h3 style={{ margin: "0", fontFamily: "CustomFont" }}>우리 자산</h3>
-        <button
+        <h3 style={{ margin: "0", fontFamily: "CustomFont" }}>
+          우리 가족 자산
+        </h3>
+        {/* <button
           onClick={toggleAmount}
           className="change-joint-assets-amount"
           style={{
@@ -46,7 +83,7 @@ function JointAssetsMainContent() {
           }}
         >
           {isHidden ? "보이기" : "숨기기"}
-        </button>
+        </button> */}
       </div>
       <div
         className="joint-assets-total-amount"
@@ -59,7 +96,7 @@ function JointAssetsMainContent() {
           fontFamily: "CustomFont",
         }}
       >
-        {isHidden ? "???원" : totalAssets.toLocaleString() + " 원"}
+        {totalAssets.toLocaleString() + " 원"}
       </div>
     </div>
   );

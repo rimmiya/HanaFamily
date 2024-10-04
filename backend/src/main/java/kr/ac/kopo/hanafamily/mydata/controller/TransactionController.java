@@ -25,6 +25,7 @@ public class TransactionController {
   @Autowired
   private MyDataMapper myDataMapper;
 
+  // 거래내역 조회 API
   @RequestMapping("/request")
   public TransactionResponseDTO requestTransaction(@RequestBody TransactionRequestWrapperDTO transactionRequestWrapperDTO) {
 
@@ -36,7 +37,7 @@ public class TransactionController {
     TransactionResponseDTO response = transactionService.getTransactionList(requestData);
 
     myDataService.saveTransactionData(response);
-    myDataMapper.updateMyDataConnectionStatus(myDataDTO.getUserNo());
+    myDataService.updateMyDataConnectionStatus(myDataDTO.getUserNo());
     return response;
   }
 

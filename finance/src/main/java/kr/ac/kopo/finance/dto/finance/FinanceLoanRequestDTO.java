@@ -9,5 +9,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class FinanceLoanRequestDTO {
   private Integer userNo;
-  private String loanCode;
+  private String loanBank;
 }

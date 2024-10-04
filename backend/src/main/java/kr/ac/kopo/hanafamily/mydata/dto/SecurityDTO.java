@@ -1,5 +1,6 @@
 package kr.ac.kopo.hanafamily.mydata.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import java.util.Date;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -14,6 +15,7 @@ public class SecurityDTO {
   private String securityName;         // 증권 이름
   private Integer securityBalance;     // 증권 잔액
   private String securityType;         // 증권 유형
+  @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
   private Date securityDate;           // 증권 날짜
   private Integer securityState;       // 증권 상태
   private Integer userNo;              // 사용자 번호 (외래키)

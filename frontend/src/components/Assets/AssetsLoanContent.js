@@ -1,60 +1,100 @@
-import React from "react";
-import { ProgressBar } from "react-bootstrap";
+import React, { useEffect, useState } from "react";
+import ProgressBar from "react-bootstrap/ProgressBar";
+import axios from "axios";
+import { useSelector } from "react-redux";
 import "../../style/AssetsLoanContent.css";
 
-const loansData = [
-  {
-    bank: "국민은행 주택담보대출",
-    amount: 200000000, // 2억
-    principal: 380000000, // 3.8억
-    interestRate: 4.1,
-    repaymentMethod: "원리금 균등분할상환",
-    paymentDate: 11,
-    maturityDate: "2037-3-15",
-    autoDebitAccount: "국민은행 123456789012",
-    logo: "/images/tesla-logo.png",
-  },
-  {
-    bank: "현대카드 장기카드대출",
-    amount: 5000000, // 500만
-    principal: 5000000, // 500만
-    interestRate: 11.2,
-    repaymentMethod: "만기일시상환",
-    paymentDate: null,
-    maturityDate: "2022-11-11",
-    logo: "/images/tesla-logo.png",
-  },
-];
-
 const AssetsLoanContent = () => {
-  // 전체 원금의 합계 계산
-  const totalPrincipal = loansData.reduce(
-    (total, loan) => total + loan.principal,
-    0
-  );
+  const [loansData, setLoansData] = useState([]); // 대출 정보
+  const [totalPrincipal, setTotalPrincipal] = useState(0); // 총 원금
+  const [totalLoanAmount, setTotalLoanAmount] = useState(0); // 총 대출 금액
+  const [repaymentAmount, setRepaymentAmount] = useState(0); // 상환된 금액
+  const user = useSelector((state) => state.user.userInfo);
 
-  // 상환된 금액의 합계 계산 (principal - amount)
-  const repaymentAmount = loansData.reduce(
-    (total, loan) => total + (loan.principal - loan.amount),
-    0
-  );
+  // 코드와 이름 매핑 객체
+  const bankCodeMapping = {
+    130: "하나은행",
+    110: "신한은행",
+    100: "국민은행",
+    120: "우리은행",
+    140: "IBK기업은행",
+    150: "농협은행",
+    160: "외환은행",
+    170: "SC제일은행",
+    180: "씨티은행",
+    190: "대구은행",
+    200: "부산은행",
+  };
+
+  useEffect(() => {
+    fetchLoanData(); // 컴포넌트 마운트 시 대출 정보 불러오기
+  }, []);
+
+  // familyId가 있을 때와 없을 때 각각 다른 API를 호출하여 데이터 불러오기
+  const fetchLoanData = async () => {
+    try {
+      let response;
+      if (!user.familyId) {
+        // familyId가 없을 때 개인 자산 API 호출
+        response = await axios.get(
+          "http://localhost:8080/api/mydata/loan/personal-list",
+          {
+            params: { userNo: user.userNo },
+          }
+        );
+      } else {
+        // familyId가 있을 때 가족 자산 API 호출
+        response = await axios.get(
+          "http://localhost:8080/api/mydata/loan/family-list",
+          {
+            params: { familyId: user.familyId },
+          }
+        );
+      }
+
+      if (response.data) {
+        setLoansData(response.data);
+
+        // 총 원금 계산
+        const totalPrincipal = response.data.reduce(
+          (sum, loan) => sum + loan.loanAmount,
+          0
+        );
+        setTotalPrincipal(totalPrincipal);
+
+        // 상환된 금액 계산 (loanBalance - loanAmount)
+        const totalRepayment = response.data.reduce(
+          (sum, loan) => sum + (loan.loanAmount - loan.loanBalance),
+          0
+        );
+        setRepaymentAmount(totalRepayment);
+
+        // 대출 금액 합계 계산
+        const totalLoanAmount = response.data.reduce(
+          (sum, loan) => sum + loan.loanBalance,
+          0
+        );
+        setTotalLoanAmount(totalLoanAmount);
+      } else {
+        console.error("API에서 데이터가 없습니다.");
+      }
+    } catch (error) {
+      console.error("대출 데이터를 불러오는 중 오류 발생:", error);
+    }
+  };
 
   // 상환 비율 계산 (백분율)
-  const repaymentRate = ((repaymentAmount / totalPrincipal) * 100).toFixed(2);
-
-  // 대출 금액 합계 계산
-  const totalLoanAmount = loansData.reduce(
-    (total, loan) => total + loan.amount,
-    0
-  );
+  const repaymentRate = totalPrincipal
+    ? ((repaymentAmount / totalPrincipal) * 100).toFixed(2)
+    : 0;
 
   const formatDate = (dateString) => {
-    // 년, 월, 일로 나누기
     const [year, month, day] = dateString.split("-");
     return `${year}년 ${month}월 ${day}일`;
   };
 
   const hanalogo = `${process.env.PUBLIC_URL}/img/img-hana-symbol.png`;
+
   return (
     <div className="assets-loan-container">
       <div className="assets-loan-content">
@@ -102,9 +142,8 @@ const AssetsLoanContent = () => {
                       }}
                     >
                       <img
-                        // src={loansData.logo}
                         src={hanalogo}
-                        alt={`${loansData.name} logo`}
+                        alt={`${loan.loanName} logo`}
                         style={{
                           width: "100%",
                           height: "auto",
@@ -112,41 +151,39 @@ const AssetsLoanContent = () => {
                         }}
                       />
                     </div>
-                    <h3>{loan.bank}</h3>
+                    <h3>{loan.loanName}</h3>
                   </div>
                   <h3 style={{ fontWeight: "600" }}>
-                    {loan.amount.toLocaleString()}원
+                    {loan.loanBalance.toLocaleString()}원
                   </h3>
                 </div>
                 <div className="loan-details">
                   <div className="loan-detail-item">
                     <p>대출 원금</p>
-                    <p>{loan.principal.toLocaleString()}원</p>
+                    <p>{loan.loanAmount.toLocaleString()}원</p>
                   </div>
                   <div className="loan-detail-item">
                     <p>적용 금리</p>
-                    <p>{loan.interestRate}%</p>
+                    <p>{loan.loanRate.toFixed(2)}%</p>
                   </div>
                   <div className="loan-detail-item">
                     <p>상환방법</p>
-                    <p>{loan.repaymentMethod}</p>
+                    <p>{loan.loanType}</p>
                   </div>
                   <div className="loan-detail-item">
                     <p>상환일</p>
-                    <p>
-                      {loan.paymentDate
-                        ? `${loan.paymentDate}일`
-                        : "상환일 없음"}
-                    </p>
+                    <p>{loan.loanRepaymentDate}일</p>
                   </div>
                   <div className="loan-detail-item">
                     <p>만기일</p>
-                    <p>{formatDate(loan.maturityDate)}</p>
+                    <p>{formatDate(loan.loanEndDate)}</p>
                   </div>
-                  {loan.autoDebitAccount && (
+                  {loan.loanAccount && (
                     <div className="loan-detail-item">
-                      <p>자동이체 계좌</p>
-                      <p>{loan.autoDebitAccount}</p>
+                      <p>자동 이체 계좌</p>
+                      <p>
+                        {bankCodeMapping[loan.loanBank]} {loan.loanAccount}
+                      </p>
                     </div>
                   )}
                 </div>

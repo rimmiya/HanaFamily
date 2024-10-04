@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.ac.kopo.hanafamily.budget.mapper.ScheduleMapper">
+
+  <!-- 일정 추가 -->
+  <insert id="insertSchedule" parameterType="kr.ac.kopo.hanafamily.budget.dto.ScheduleDTO">
+    INSERT INTO TB_SCHEDULE (
+      SCHEDULE_ID,
+      TITLE,
+      DESCRIPTION,
+      USER_NO,
+      START_DATE,
+      END_DATE,
+      SCHEDULE_STATUS,
+      FAMILY_ID,
+      BUDGET,
+      CATEGORY_ID
+    )
+    VALUES (
+             SCHEDULE_SEQ.NEXTVAL,
+             #{title},
+             #{description, jdbcType=VARCHAR},
+              #{userNo, jdbcType=INTEGER},
+             #{startDate},
+             NVL(#{endDate, jdbcType=DATE}, #{startDate}),  -- END_DATE가 없으면 START_DATE로 설정
+             #{scheduleStatus, jdbcType=VARCHAR},
+             #{familyId},
+              #{budget, jdbcType=INTEGER},
+              #{categoryId}
+           )
+  </insert>
+
+  <!-- 일정 수정 -->
+  <update id="updateSchedule">
+    UPDATE TB_SCHEDULE
+    SET TITLE = #{title}, START_DATE = #{startDate}, END_DATE = NVL(#{endDate, jdbcType=DATE}, #{startDate}), FAMILY_ID = #{familyId}, BUDGET = #{budget, jdbcType=INTEGER}, CATEGORY_ID = #{categoryId}
+    WHERE SCHEDULE_ID = #{scheduleId}
+  </update>
+
+  <!-- 일정 삭제 -->
+  <delete id="deleteSchedule">
+    DELETE FROM TB_SCHEDULE
+    WHERE SCHEDULE_ID = #{scheduleId}
+  </delete>
+
+  <!-- 가족 일정 조회 -->
+  <select id="getSchedulesByFamilyId" resultType="kr.ac.kopo.hanafamily.budget.dto.ScheduleDTO">
+    SELECT * FROM TB_SCHEDULE WHERE FAMILY_ID = #{familyId}
+  </select>
+
+</mapper>

@@ -1,6 +1,7 @@
-package kr.ac.kopo.hanafamily.mydata.dto;
+package kr.ac.kopo.finance.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import java.math.BigDecimal;
 import java.util.Date;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -10,7 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class BankStatementDTO {
-  private Integer transactionNo;
+  private BigDecimal transactionNo;
   private String accountNo;
   private Integer transactionAmount;
   @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")

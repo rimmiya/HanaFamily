@@ -8,6 +8,7 @@ import kr.ac.kopo.hanafamily.savings.dto.CreateSavingsRequestDTO;
 import kr.ac.kopo.hanafamily.savings.dto.SavingProductDTO;
 import kr.ac.kopo.hanafamily.savings.dto.SavingsInvitationDTO;
 import kr.ac.kopo.hanafamily.savings.dto.SavingsParticipationDTO;
+import kr.ac.kopo.hanafamily.savings.dto.SavingsParticipationWithNameDTO;
 import kr.ac.kopo.hanafamily.savings.dto.SavingsTransactionDTO;
 import kr.ac.kopo.hanafamily.savings.mapper.SavingProductMapper;
 import kr.ac.kopo.hanafamily.savings.mapper.SavingsInvitationMapper;
@@ -50,11 +51,11 @@ public class SavingsServiceImpl implements SavingsService {
   @Transactional
   public SavingProductDTO createSavingsProduct(SavingProductDTO savingProduct, List<Integer> inviteeUserIds, CreateSavingsRequestDTO createSavingsRequestDTO) {
     // 시작일 설정
-    savingProduct.setStartDate(new Date());
+//    savingProduct.setStartDate(new Date());
     // 현재 금액 초기화
-    savingProduct.setCurrentAmount(0);
+//    savingProduct.setCurrentAmount(0);
     // 상태 설정
-    savingProduct.setSavingStatus("ACTIVE");
+//    savingProduct.setSavingStatus("ACTIVE");
 
     // 적금 상품 등록
     savingProductMapper.insertSavingProduct(savingProduct);
@@ -75,7 +76,7 @@ public class SavingsServiceImpl implements SavingsService {
     representativeParticipation.setAutoTransferSmsYn(createSavingsRequestDTO.getAutoTransferSmsYn());
     representativeParticipation.setMaturitySmsYn(createSavingsRequestDTO.getMaturitySmsYn());
     representativeParticipation.setSuccessfulTransfers(0);
-    representativeParticipation.setBonusApplied(false);
+    representativeParticipation.setBonusApplied("N");
     representativeParticipation.setUserAccountNo(createSavingsRequestDTO.getUserAccountNo());
     savingsParticipationMapper.insertSavingsParticipation(representativeParticipation);
 
@@ -93,8 +94,8 @@ public class SavingsServiceImpl implements SavingsService {
       savingsInvitationMapper.insertInvitation(invitation);
 
       // 초대 알림 발송 (NotificationService 필요)
-      // notificationService.sendInvitation(inviteeUserId, invitation);
-      // 초대 알림 발송
+//      notificationService.sendInvitation(inviteeUserId, invitation);
+//       초대 알림 발송
       UserDTO invitee = userMapper.selectUserByNo(inviteeUserId);
       if (invitee != null && invitee.getUserPhoneNo() != null && !invitee.getUserPhoneNo().isEmpty()) {
         String message = String.format("안녕하세요 %s님, %s님의 함께 적금에 초대되었습니다. 링크를 통해 초대를 수락해 주세요. ", invitee.getUserName(), userMapper.selectUserByNo(inviteeUserId).getUserName());
@@ -132,7 +133,7 @@ public class SavingsServiceImpl implements SavingsService {
     participation.setAutoTransferSmsYn(participationDetails.getAutoTransferSmsYn());
     participation.setMaturitySmsYn(participationDetails.getMaturitySmsYn());
     participation.setSuccessfulTransfers(0);
-    participation.setBonusApplied(false);
+    participation.setBonusApplied("N");
     participation.setUserAccountNo(participationDetails.getUserAccountNo());
     savingsParticipationMapper.insertSavingsParticipation(participation);
 
@@ -230,18 +231,19 @@ public class SavingsServiceImpl implements SavingsService {
     }
 
     // 현재 금액 업데이트
-    savingProduct.setCurrentAmount(newCurrentAmount);
-    savingProductMapper.updateSavingProduct(savingProduct);
+//    savingProduct.setCurrentAmount(newCurrentAmount);
+//    savingProductMapper.updateSavingProduct(savingProduct);
 
+    accountService.transferFromUserAccountToSavings(savingsParticipationMapper.selectParticipationBySavingAccountNoAndUserNo(savingAccountNo, userNo).getUserAccountNo(), savingAccountNo, amount);
     // 거래 내역 추가
-    SavingsTransactionDTO transaction = new SavingsTransactionDTO();
-    transaction.setSavingAccountNo(savingAccountNo);
-    transaction.setUserNo(userNo);
-    transaction.setAmount(amount);
-    transaction.setAfterAmount(newCurrentAmount);
-    transaction.setTransactionDate(new Date());
-    transaction.setTransactionType("DEPOSIT");
-    savingsTransactionMapper.insertSavingsTransaction(transaction);
+//    SavingsTransactionDTO transaction = new SavingsTransactionDTO();
+//    transaction.setSavingAccountNo(savingAccountNo);
+//    transaction.setUserNo(userNo);
+//    transaction.setAmount(amount);
+//    transaction.setAfterAmount(newCurrentAmount);
+//    transaction.setTransactionDate(new Date());
+//    transaction.setTransactionType("DEPOSIT");
+//    savingsTransactionMapper.insertSavingsTransaction(transaction);
 
     // 목표 달성 여부 확인
     checkGoalAchievement(savingAccountNo);
@@ -255,7 +257,7 @@ public class SavingsServiceImpl implements SavingsService {
     minMaintenanceDate.add(Calendar.MONTH, savingProduct.getMinDuration());
 
     // 참여자의 시작일로부터 최소 유지 기간이 지났는지 확인
-    if (new Date().after(minMaintenanceDate.getTime()) && !participation.isBonusApplied()) {
+    if (new Date().after(minMaintenanceDate.getTime()) && (participation.getBonusApplied().equals("N") || participation.getBonusApplied() == null)) {
       // 최소 유지 기간 동안 매월 자동이체를 성공적으로 했는지 확인
       if (participation.getSuccessfulTransfers() >= savingProduct.getMinDuration()) {
         // 우대 이율 적용
@@ -268,7 +270,7 @@ public class SavingsServiceImpl implements SavingsService {
         savingProductMapper.updateSavingProduct(savingProduct);
 
         // 우대 이율 적용 여부 업데이트
-        participation.setBonusApplied(true);
+        participation.setBonusApplied("Y");
         savingsParticipationMapper.updateSavingsParticipation(participation);
       }
     }
@@ -349,7 +351,7 @@ public class SavingsServiceImpl implements SavingsService {
         if (participation.getAutoTransferDate() == todayDate) {
           try {
             deposit(participation.getSavingAccountNo(), participation.getUserId(), participation.getAutoTransferAmount());
-
+            accountService.transferFromUserAccountToSavings(participation.getUserAccountNo(), participation.getSavingAccountNo(), participation.getAutoTransferAmount());
             // 성공적인 자동이체 횟수 증가
             participation.setSuccessfulTransfers(participation.getSuccessfulTransfers() + 1);
             savingsParticipationMapper.updateSavingsParticipation(participation);
@@ -415,7 +417,23 @@ public class SavingsServiceImpl implements SavingsService {
   }
 
   @Override
+  public SavingsParticipationDTO getParticipationDetails(String savingAccountNo, Integer userNo) {
+    return savingsParticipationMapper.selectParticipationBySavingAccountNoAndUserNo(savingAccountNo, userNo);
+  }
+
+  @Override
   public SavingProductDTO getSavingProduct(String savingAccountNo) {
     return savingProductMapper.selectSavingProductByAccountNo(savingAccountNo);
+  }
+
+  @Override
+  @Transactional
+  public void changeParticipation(SavingsParticipationDTO savingsParticipationDTO) {
+    savingsParticipationMapper.updateParticipationInfo(savingsParticipationDTO);
+  }
+
+  @Override
+  public List<SavingsParticipationWithNameDTO> selectParticipationWithNameBySavingAccountNo(String savingAccountNo) {
+    return savingsParticipationMapper.selectParticipationWithNameBySavingAccountNo(savingAccountNo);
   }
 }

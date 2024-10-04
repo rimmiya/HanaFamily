@@ -16,6 +16,7 @@ import kr.ac.kopo.mydata.dto.finance.FinanceBankRequestDTO;
 import kr.ac.kopo.mydata.dto.finance.FinanceBankStatementDTO;
 import kr.ac.kopo.mydata.dto.finance.FinanceCardRequestDTO;
 import kr.ac.kopo.mydata.dto.finance.FinanceInsuranceRequestDTO;
+import kr.ac.kopo.mydata.dto.finance.FinanceLoanDTO;
 import kr.ac.kopo.mydata.dto.finance.FinanceLoanRequestDTO;
 import kr.ac.kopo.mydata.dto.finance.FinanceSecurityRequestDTO;
 import kr.ac.kopo.mydata.dto.finance.FinanceStockDTO;
@@ -43,6 +44,9 @@ public class TransactionService {
 
   @Value("${security.transaction.url}")
   private String securityTransactionUrl;
+
+  @Value("http://localhost:8080/api/finance/get-user-transaction/loan")
+  private String loanTransactionUrl;
 
   public List<BankStatementDTO> getBankTransactionData(Integer userNo, List<String> accountNoList) {
 
@@ -97,6 +101,23 @@ public class TransactionService {
         }
     );
     return stockList;
+  }
+
+  public List<LoanDTO> getLoanTransactionData(Integer userNo, List<String> loanIdList) {
+
+    List<LoanDTO> loanList = new ArrayList<>();
+    // 사용자의 대출 코드로 사용자의 대출 정보를 가져옴
+    loanIdList.forEach(
+        loanId -> {
+          HttpEntity<FinanceLoanDTO> request = new HttpEntity<>(new FinanceLoanDTO(
+              userNo, loanId));
+          ResponseEntity<List<LoanDTO>> response = restTemplate.exchange(
+              loanTransactionUrl, HttpMethod.POST, request, new ParameterizedTypeReference<List<LoanDTO>>() {}
+          );
+          loanList.addAll(response.getBody());
+        }
+    );
+    return loanList;
   }
 
 }

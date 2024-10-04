@@ -1,5 +1,6 @@
 package kr.ac.kopo.hanafamily.savings.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import java.math.BigDecimal;
 import java.util.Date;
 import lombok.AllArgsConstructor;
@@ -14,7 +15,9 @@ public class SavingProductDTO {
   private Integer userNo; // USER_NO
   private Integer goalAmount; // GOAL_AMOUNT
   private Integer currentAmount; // CURRENT_AMOUNT
+  @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
   private Date startDate; // START_DATE
+  @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
   private Date endDate; // END_DATE
   private BigDecimal interestRate; // INTEREST_RATE
   private BigDecimal bonusInterestRate; // BONUS_INTEREST_RATE
@@ -24,7 +27,7 @@ public class SavingProductDTO {
   private Integer productId; // PRODUCT_ID
   private String representativeAccountNo; // 대표자 계좌번호
   private Integer familyId; // 가족 ID
-  private Integer accountPassword; // 계좌 비밀번호
+  private String accountPassword; // 계좌 비밀번호
   private String accountName; // 계좌 이름
   private Integer bankCode; // 은행 코드
 }

@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.ac.kopo.hanafamily.mydata.mapper.LoanMapper">
+
+  <resultMap id="LoanResultWithNameMap" type="kr.ac.kopo.hanafamily.mydata.dto.LoanWithNameDTO">
+    <id property="loanId" column="LOAN_ID" />
+    <result property="loanType" column="LOAN_TYPE" />
+    <result property="loanAmount" column="LOAN_AMOUNT" />
+    <result property="loanDate" column="LOAN_DATE" />
+    <result property="loanState" column="LOAN_STATE" />
+    <result property="loanTerm" column="LOAN_TERM" />
+    <result property="userNo" column="USER_NO" />
+    <result property="loanCode" column="LOAN_CODE" />
+    <result property="loanEndDate" column="LOAN_END_DATE" />
+    <result property="loanName" column="LOAN_NAME" />
+    <result property="loanRate" column="LOAN_RATE" />
+    <result property="loanBalance" column="LOAN_BALANCE" />
+    <result property="loanInterest" column="LOAN_INTEREST" />
+    <result property="loanAccount" column="LOAN_ACCOUNT" />
+    <result property="loanBank" column="LOAN_BANK" />
+    <result property="loanRepaymentDate" column="LOAN_REPAYMENT_DATE" />
+    <result property="loanMonthlyRepayment" column="LOAN_MONTHLY_REPAYMENT" />
+    <result property="userName" column="USER_NAME" />
+  </resultMap>
+
+  <select id="getLoanWithNamePersonalData" resultMap="LoanResultWithNameMap">
+    SELECT
+      L.LOAN_ID,
+      L.LOAN_TYPE,
+      L.LOAN_AMOUNT,
+      L.LOAN_DATE,
+      L.LOAN_STATE,
+      L.LOAN_TERM,
+      L.USER_NO,
+      L.LOAN_CODE,
+      L.LOAN_END_DATE,
+      L.LOAN_NAME,
+      L.LOAN_RATE,
+      L.LOAN_BALANCE,
+      L.LOAN_INTEREST,
+      L.LOAN_ACCOUNT,
+      L.LOAN_BANK,
+      L.LOAN_REPAYMENT_DATE,
+      L.LOAN_MONTHLY_REPAYMENT,
+      U.USER_NAME
+    FROM
+      TB_LOAN L
+      JOIN TB_USERS U
+      ON L.USER_NO = U.USER_NO
+    WHERE
+      L.USER_NO = #{userNo}
+  </select>
+
+  <select id="getLoanWithNameFamilyData" resultMap="LoanResultWithNameMap">
+    SELECT
+      L.LOAN_ID,
+      L.LOAN_TYPE,
+      L.LOAN_AMOUNT,
+      L.LOAN_DATE,
+      L.LOAN_STATE,
+      L.LOAN_TERM,
+      L.USER_NO,
+      L.LOAN_CODE,
+      L.LOAN_END_DATE,
+      L.LOAN_NAME,
+      L.LOAN_RATE,
+      L.LOAN_BALANCE,
+      L.LOAN_INTEREST,
+      L.LOAN_ACCOUNT,
+      L.LOAN_BANK,
+      L.LOAN_REPAYMENT_DATE,
+      L.LOAN_MONTHLY_REPAYMENT,
+      U.USER_NAME
+    FROM
+      TB_LOAN L
+      JOIN TB_USERS U
+      ON L.USER_NO = U.USER_NO
+    WHERE
+      U.FAMILY_ID = #{familyId}
+  </select>
+</mapper>

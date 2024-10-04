@@ -1,20 +1,73 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { useSelector } from "react-redux";
 
-function FamilyInsurance({ data }) {
+function FamilyInsurance() {
+  const user = useSelector((state) => state.user.userInfo);
+  const [insuranceData, setInsuranceData] = useState([]);
+
+  useEffect(() => {
+    fetchFamilyInsurance();
+  }, []);
+
+  // familyId가 있을 때와 없을 때 각각 다른 API를 호출하여 데이터 불러오기
+  const fetchFamilyInsurance = async () => {
+    try {
+      let response;
+      if (user.familyId) {
+        response = await axios.get(
+          "http://localhost:8080/api/mydata/insurance/family-list",
+          {
+            params: { familyId: user.familyId },
+          }
+        );
+      } else {
+        response = await axios.get(
+          "http://localhost:8080/api/mydata/insurance/personal-list",
+          {
+            params: { userNo: user.userNo },
+          }
+        );
+      }
+      setInsuranceData(response.data);
+
+      console.log("가족 보험 현황:", response.data);
+    } catch (error) {
+      console.error("가족 보험 현황을 가져오는 중 오류 발생:", error);
+    }
+  };
+
   return (
     <div style={styles.container}>
       <h3 style={styles.title}>가족 보험 현황</h3>
       <div style={styles.insuranceDetails}>
-        {data.map((insurance, index) => (
+        {insuranceData.map((insurance, index) => (
           <div key={index} style={styles.insuranceItem}>
             <div style={styles.insuranceName}>
-              {insurance.type}{" "}
-              <span style={styles.insuranceRate}>{insurance.name}</span>
+              {insurance.insuranceType}{" "}
+              <span style={styles.insuranceRate}>
+                {insurance.insuranceName}
+              </span>
             </div>
-            <div style={styles.loanPerson}>피보험자: {insurance.person}</div>
+            <div style={styles.loanPerson}>피보험자: {insurance.userName}</div>
             <div style={{ display: "flex", justifyContent: "space-between" }}>
               <div>월 보험료</div>
-              <div>{insurance.premium.toLocaleString()}원</div>
+              <div>
+                {insurance.insuranceMonthlyPayment
+                  ? `${insurance.insuranceMonthlyPayment.toLocaleString()}원`
+                  : "데이터 없음"}
+              </div>
+            </div>
+            <div style={{ display: "flex", justifyContent: "space-between" }}>
+              <div>보험 기간</div>
+              <div>
+                {new Date(insurance.insuranceStartDate).toLocaleDateString()} ~{" "}
+                {new Date(insurance.insuranceEndDate).toLocaleDateString()}
+              </div>
+            </div>
+            <div style={{ display: "flex", justifyContent: "space-between" }}>
+              <div>보험 금액</div>
+              <div>{insurance.insuranceAmount.toLocaleString()}원</div>
             </div>
           </div>
         ))}

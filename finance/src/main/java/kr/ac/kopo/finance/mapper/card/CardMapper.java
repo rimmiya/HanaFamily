@@ -1,7 +1,6 @@
 package kr.ac.kopo.finance.mapper.card;
 
 import java.util.List;
-import kr.ac.kopo.finance.dto.AccountDTO;
 import kr.ac.kopo.finance.dto.CardDTO;
 import kr.ac.kopo.finance.dto.TransactionDTO;
 import org.apache.ibatis.annotations.Mapper;

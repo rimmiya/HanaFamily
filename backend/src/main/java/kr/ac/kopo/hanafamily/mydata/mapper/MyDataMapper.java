@@ -33,5 +33,13 @@ public interface MyDataMapper {
 
   void updateMyDataConnectionStatus(@Param("userNo") Integer userNo);
 
-  MyDataStatusDTO selectMyDataConnection(@Param("userNo") Integer userNo);
+  MyDataStatusDTO selectMyDataStatus(@Param("userNo") Integer userNo);
+
+  void insertMyDataStatus(@Param("userNo") Integer userNo);
+
+  void updateMyDataStatus(@Param("userNo") Integer userNo);
+
+  Integer selectMyDataConnectionStatus(@Param("userNo") Integer userNo);
+
+//  MyDataStatusDTO selectMyDataConnection(@Param("userNo") Integer userNo);
 }

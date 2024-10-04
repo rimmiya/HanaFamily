@@ -1,91 +1,44 @@
-import React from "react";
-import "../../style/AssetsInsuranceContent.css";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import ProgressBar from "react-bootstrap/ProgressBar";
 import { IoIosArrowForward } from "react-icons/io";
+import { useSelector } from "react-redux";
+import "../../style/AssetsInsuranceContent.css";
 
-const insuranceList = [
-  {
-    id: 1,
-    insuranceName: "무배당하이플랜종합보험",
-    insuranceCompany: "삼성화재",
-    insuranceId: "L2098H5020102020000",
-    insuredPerson: "홍길동",
-    monthlyPremium: 20360,
-    startDate: "2020-03-30",
-    endDate: "2040-03-30",
-    logo: "/images/tesla-logo.png",
-  },
-  {
-    id: 2,
-    insuranceName: "차량손해보험",
-    insuranceCompany: "DB손해보험",
-    insuranceId: "D1098H5020102020001",
-    insuredPerson: "김철수",
-    monthlyPremium: 15000,
-    startDate: "2021-01-01",
-    endDate: "2031-01-01",
-    logo: "/images/tesla-logo.png",
-  },
-  {
-    id: 3,
-    insuranceName: "화재종합보험",
-    insuranceCompany: "한화손해보험",
-    insuranceId: "H1098H5020102020002",
-    insuredPerson: "이영희",
-    monthlyPremium: 30000,
-    startDate: "2022-05-15",
-    endDate: "2042-05-15",
-    logo: "/images/tesla-logo.png",
-  },
-  {
-    id: 4,
-    insuranceName: "생명보험",
-    insuranceCompany: "메리츠화재",
-    insuranceId: "M2098H5020102020003",
-    insuredPerson: "박영수",
-    monthlyPremium: 45000,
-    startDate: "2019-11-20",
-    endDate: "2039-11-20",
-    logo: "/images/tesla-logo.png",
-  },
-  {
-    id: 4,
-    insuranceName: "생명보험",
-    insuranceCompany: "메리츠화재",
-    insuranceId: "M2098H5020102020003",
-    insuredPerson: "박영수",
-    monthlyPremium: 45000,
-    startDate: "2019-11-20",
-    endDate: "2039-11-20",
-    logo: "/images/tesla-logo.png",
-  },
-  {
-    id: 4,
-    insuranceName: "생명보험",
-    insuranceCompany: "메리츠화재",
-    insuranceId: "M2098H5020102020003",
-    insuredPerson: "박영수",
-    monthlyPremium: 45000,
-    startDate: "2019-11-20",
-    endDate: "2039-11-20",
-    logo: "/images/tesla-logo.png",
-  },
-  {
-    id: 4,
-    insuranceName: "생명보험",
-    insuranceCompany: "메리츠화재",
-    insuranceId: "M2098H5020102020003",
-    insuredPerson: "박영수",
-    monthlyPremium: 45000,
-    startDate: "2019-11-20",
-    endDate: "2039-11-20",
-    logo: "/images/tesla-logo.png",
-  },
-  // 더 많은 보험 항목 추가 가능
-];
-
-const hanalogo = `${process.env.PUBLIC_URL}/img/img-hana-symbol.png`;
 function AssetsInsuranceContent() {
+  const [insuranceList, setInsuranceList] = useState([]);
+  const user = useSelector((state) => state.user.userInfo);
+
+  useEffect(() => {
+    fetchInsuranceData();
+  }, []);
+
+  const fetchInsuranceData = async () => {
+    try {
+      let response;
+      if (user.familyId) {
+        // 가족 보험 API 호출
+        response = await axios.get(
+          "http://localhost:8080/api/mydata/insurance/family-list",
+          {
+            params: { familyId: user.familyId },
+          }
+        );
+      } else {
+        // 개인 보험 API 호출
+        response = await axios.get(
+          "http://localhost:8080/api/mydata/insurance/personal-list",
+          {
+            params: { userNo: user.userNo },
+          }
+        );
+      }
+      setInsuranceList(response.data);
+    } catch (error) {
+      console.error("보험 데이터를 불러오는 중 오류 발생:", error);
+    }
+  };
+
   const calculateProgress = (startDate, endDate) => {
     const start = new Date(startDate);
     const end = new Date(endDate);
@@ -96,9 +49,12 @@ function AssetsInsuranceContent() {
   };
 
   const totalInsurancePremium = insuranceList.reduce(
-    (total, insurance) => total + insurance.monthlyPremium,
+    (total, insurance) => total + (insurance.insuranceMonthlyPayment || 0),
     0
   );
+
+  const hanalogo = `${process.env.PUBLIC_URL}/img/img-hana-symbol.png`;
+
   return (
     <div className="assets-insurance-container">
       <div className="assets-insurance-content">
@@ -117,7 +73,7 @@ function AssetsInsuranceContent() {
             </h2>
           </div>
           <div>
-            <p>총 보혐료 합계</p>
+            <p>총 보험료 합계</p>
             <h2>{`${totalInsurancePremium.toLocaleString()}`}원</h2>
           </div>
         </div>
@@ -140,7 +96,6 @@ function AssetsInsuranceContent() {
                   }}
                 >
                   <img
-                    //   src={require("../../assets/images/hanalogo.png").default}
                     src={hanalogo}
                     alt={`${insurance.insuranceCompany} logo`}
                     style={{
@@ -159,28 +114,41 @@ function AssetsInsuranceContent() {
                   style={{ display: "flex", justifyContent: "space-between" }}
                 >
                   <p>피보험자</p>
-                  <p>{insurance.insuredPerson}</p>
+                  <p>{insurance.userName}</p>
                 </div>
                 <div
                   style={{ display: "flex", justifyContent: "space-between" }}
                 >
                   <p>월 납입 보험료</p>
                   <h3 style={{ fontWeight: "600" }}>
-                    {insurance.monthlyPremium.toLocaleString()}원
+                    {insurance.insuranceMonthlyPayment
+                      ? insurance.insuranceMonthlyPayment.toLocaleString()
+                      : "데이터 없음"}
+                    원
                   </h3>
                 </div>
                 <div className="insurance-item-details-date">
                   <ProgressBar
                     now={`${calculateProgress(
-                      insurance.startDate,
-                      insurance.endDate
+                      insurance.insuranceStartDate,
+                      insurance.insuranceEndDate
                     )}`}
                   />
                   <div
                     style={{ display: "flex", justifyContent: "space-between" }}
                   >
-                    <p>가입일: {insurance.startDate}</p>
-                    <p>만기일: {insurance.endDate}</p>
+                    <p>
+                      가입일:{" "}
+                      {new Date(
+                        insurance.insuranceStartDate
+                      ).toLocaleDateString()}
+                    </p>
+                    <p>
+                      만기일:{" "}
+                      {new Date(
+                        insurance.insuranceEndDate
+                      ).toLocaleDateString()}
+                    </p>
                   </div>
                 </div>
               </div>

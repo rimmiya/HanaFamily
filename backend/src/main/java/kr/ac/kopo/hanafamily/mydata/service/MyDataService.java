@@ -6,6 +6,7 @@ import kr.ac.kopo.hanafamily.mydata.dto.CardDTO;
 import kr.ac.kopo.hanafamily.mydata.dto.InsuranceDTO;
 import kr.ac.kopo.hanafamily.mydata.dto.LoanDTO;
 import kr.ac.kopo.hanafamily.mydata.dto.MyDataRequestDTO;
+import kr.ac.kopo.hanafamily.mydata.dto.MyDataStatusDTO;
 import kr.ac.kopo.hanafamily.mydata.dto.MydataDTO;
 import kr.ac.kopo.hanafamily.mydata.dto.SecurityDTO;
 import kr.ac.kopo.hanafamily.mydata.dto.TransactionRequestDTO;
@@ -80,8 +81,7 @@ public class MyDataService {
         // accountNo를 가진 계좌에 대한 정보를 myDataDTO에서 가져와서 저장
         AccountDTO accountDTO = findAccountByAccountNo(myDataDTO.getAccount(), accountNo);
 
-        myDataMapper.insertMyDataAccounts(requestData.getUserNo(),
-            accountDTO);
+        myDataMapper.insertMyDataAccounts(requestData.getUserNo(), accountDTO);
       });
     }
     if (requestData.getCardNo() != null) {
@@ -129,5 +129,23 @@ public class MyDataService {
       transactionResponseDTO.getStockStatement().forEach(stockDTO -> myDataMapper.insertStockStatement(transactionResponseDTO.getUserNo(), stockDTO));
     }
 
+  }
+
+  public Integer getMyDataConnectionStatus(Integer userNo) {
+    Integer status = myDataMapper.selectMyDataConnectionStatus(userNo);
+    return (status != null) ? status : 0;
+  }
+
+  public void updateMyDataConnectionStatus(Integer userNo) {
+    // 특정 user_no로 MyData 조회
+    MyDataStatusDTO existingData = myDataMapper.selectMyDataStatus(userNo);
+
+    if (existingData != null) {
+      // 데이터가 존재하면 업데이트 수행
+      myDataMapper.updateMyDataStatus(userNo);
+    } else {
+      // 데이터가 존재하지 않으면 삽입 수행
+      myDataMapper.insertMyDataStatus(userNo);
+    }
   }
 }

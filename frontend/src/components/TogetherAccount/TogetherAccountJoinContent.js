@@ -35,7 +35,7 @@ function TogetherAccountJoinContent() {
   const [useDifferentPassword, setUseDifferentPassword] = useState(false); // 신규 비밀번호 사용 여부
   const [newPassword, setNewPassword] = useState(""); // 신규 비밀번호 상태 관리
   const [confirmPassword, setConfirmPassword] = useState(""); // 비밀번호 확인 상태 관리
-  const [productType, setProductType] = useState("369 정기예금"); // 상품종류
+  const [productType, setProductType] = useState("함께 적금"); // 상품종류
   const [term, setTerm] = useState("12개월"); // 가입기간
   const [interestMethod, setInterestMethod] = useState("만기일시지급식"); // 이자지급방식
   const [maturityOption, setMaturityOption] = useState("만기시 자동해지"); // 만기해지구분
@@ -43,6 +43,9 @@ function TogetherAccountJoinContent() {
   const [accountAlias, setAccountAlias] = useState(""); // 적금 별명 관리
   const [autoTransferDate, setAutoTransferDate] = useState(""); // 자동이체일 설정
   const [representativeAccountNo, setRepresentativeAccountNo] = useState(""); // 대표 계좌 저장
+  const [accountList, setAccountList] = useState([]); // 계좌 목록 저장
+  const [selectedAccount, setSelectedAccount] = useState(null); // 선택된 계좌 정보 저장
+  const [goalAmount, setGoalAmount] = useState(""); // 목표 금액 상태 관리
 
   const navigate = useNavigate(); // 페이지 이동을 위한 useNavigate
 
@@ -54,18 +57,21 @@ function TogetherAccountJoinContent() {
   // 가족 구성원 선택 시 체크박스 상태 업데이트
   const handleFamilyMemberChange = (checkedValues) => {
     const selectedMembers = familyMembers
-      .filter((member) => checkedValues.includes(member.value)) // 선택된 구성원 필터링
-      .map((member) => ({ userNo: member.value, userName: member.label })); // userNo와 userName 저장
-    setSelectedFamilyMembers(selectedMembers);
+      .filter((member) => checkedValues.includes(member.value))
+      .map((member) => ({ userNo: member.value, userName: member.label }));
+    setSelectedFamilyMembers(selectedMembers); // userNo와 userName 객체로 저장
   };
 
   const handleAccountChange = (value) => {
     // 계좌에 따라 대표자 계좌와 사용자 계좌 설정
-    if (value === "111-1111-1111") {
-      setRepresentativeAccountNo("111-1111-1111"); // 영하나플러스통장일 경우 대표자 계좌
-    } else if (value === "222-2222-2222") {
-      setRepresentativeAccountNo("222-2222-2222"); // 다른 계좌일 경우
-    }
+    // if (value === "111-1111-1111") {
+    //   setRepresentativeAccountNo("111-1111-1111"); // 영하나플러스통장일 경우 대표자 계좌
+    // } else if (value === "222-2222-2222") {
+    //   setRepresentativeAccountNo("222-2222-2222"); // 다른 계좌일 경우
+    // }
+    const selected = accountList.find((account) => account.accountNo === value);
+    setSelectedAccount(selected); // 선택된 계좌 정보를 상태로 저장
+    setRepresentativeAccountNo(selected.accountNo);
   };
 
   // 확인 버튼 클릭 시 페이지 이동
@@ -82,10 +88,12 @@ function TogetherAccountJoinContent() {
         maturityOption,
         smsOption,
         checkedList,
+        goalAmount, // 목표 금액 전달
         accountAlias, // 적금 별명 전달
         autoTransferDate, // 자동이체일 전달
         selectedFamilyMembers, // 선택한 가족 구성원 전달
         representativeAccountNo, // 대표 계좌번호 전달
+        selectedAccount, // 선택된 계좌 정보 전달
       },
     });
   };
@@ -94,9 +102,9 @@ function TogetherAccountJoinContent() {
   const fetchFamilyMembers = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:8080/api/family/members",
+        "http://localhost:8080/api/family/members/without-me",
         {
-          params: { familyId: user.familyId }, // user.familyId로 API 호출
+          params: { familyId: user.familyId, userNo: user.userNo }, // user.familyId로 API 호출
         }
       );
       console.log("가족 구성원 목록:", response.data);
@@ -115,6 +123,23 @@ function TogetherAccountJoinContent() {
   useEffect(() => {
     fetchFamilyMembers();
   }, []);
+
+  useEffect(() => {
+    const fetchAccounts = async () => {
+      try {
+        const response = await axios.get(
+          "http://localhost:8080/api/savings/account/list",
+          {
+            params: { userNo: user.userNo }, // 현재 사용자 번호로 API 호출
+          }
+        );
+        setAccountList(response.data); // 계좌 목록 상태에 저장
+      } catch (error) {
+        console.error("계좌 목록을 불러오는 중 오류 발생:", error);
+      }
+    };
+    fetchAccounts();
+  }, [user.userNo]);
 
   return (
     <div style={styles.container}>
@@ -145,20 +170,25 @@ function TogetherAccountJoinContent() {
               }}
             >
               <Select
-                defaultValue="111-1111-1111[영하나플러스통장]"
+                placeholder="계좌를 선택하세요"
                 style={{ width: "40%" }}
-                onChange={handleAccountChange}
+                onChange={handleAccountChange} // 변경된 핸들러 사용
               >
-                <Option value="111-1111-1111">
-                  111-1111-1111[영하나플러스통장]
-                </Option>
-                <Option value="222-2222-2222">111-1111-1111[다른계좌]</Option>
+                {accountList.map((account) => (
+                  <Option key={account.accountNo} value={account.accountNo}>
+                    {account.accountNo} [{account.accountName}]
+                  </Option>
+                ))}
               </Select>
               <div style={styles.balanceInfo}>
-                <span>현재 잔액: 75,181원</span>
-                <span style={{ color: "#008485" }}>
-                  출금 가능 금액: 75,181원
-                </span>
+                {selectedAccount && (
+                  <>
+                    <span>계좌 이름: {selectedAccount.accountName}</span>
+                    <span style={{ color: "#008485" }}>
+                      잔액: {selectedAccount.accountBalance.toLocaleString()} 원
+                    </span>
+                  </>
+                )}
               </div>
             </div>
 
@@ -177,10 +207,11 @@ function TogetherAccountJoinContent() {
                 placeholder="비밀번호 4자리를 입력하세요."
                 maxLength={4}
                 style={{ width: "40%" }}
+                onChange={(e) => setNewPassword(e.target.value)}
               />
             </div>
 
-            <div style={styles.formItem}>이메일주소</div>
+            {/* <div style={styles.formItem}>이메일주소</div>
             <div
               style={{
                 padding: "10px",
@@ -193,7 +224,7 @@ function TogetherAccountJoinContent() {
                 disabled
                 value="********@naver.com"
               />
-            </div>
+            </div> */}
           </form>
         </div>
 
@@ -208,6 +239,27 @@ function TogetherAccountJoinContent() {
               borderTop: "2px solid #d9d9d9",
             }}
           >
+            {" "}
+            {/* 적금 별명 */}
+            <div style={styles.formItem}>
+              적금 별명
+              <span style={styles.required}>*</span>
+            </div>
+            <div
+              style={{
+                padding: "10px",
+                borderBottom: "1px solid #d9d9d9",
+                height: "100%",
+                alignContent: "center",
+              }}
+            >
+              <Input
+                value={accountAlias}
+                onChange={(e) => setAccountAlias(e.target.value)}
+                placeholder="별명을 입력하세요"
+                style={{ width: "40%" }}
+              />
+            </div>
             {/* 신규금액 */}
             <div style={styles.formItem}>
               신규금액
@@ -251,30 +303,26 @@ function TogetherAccountJoinContent() {
                 value={`${amount.toLocaleString()} 원`}
                 readOnly
               />
-              <Checkbox style={{ marginTop: "10px" }}>하나머니로 납부</Checkbox>
+              {/* <Checkbox style={{ marginTop: "10px" }}>하나머니로 납부</Checkbox> */}
             </div>
-
-            {/* 적금 별명 */}
+            {/* 목표 금액 추가 */}
             <div style={styles.formItem}>
-              적금 별명
-              <span style={styles.required}>*</span>
+              목표 금액 <span style={styles.required}>*</span>
             </div>
             <div
               style={{
                 padding: "10px",
                 borderBottom: "1px solid #d9d9d9",
                 height: "100%",
-                alignContent: "center",
               }}
             >
               <Input
-                value={accountAlias}
-                onChange={(e) => setAccountAlias(e.target.value)}
-                placeholder="별명을 입력하세요"
+                value={goalAmount}
+                onChange={(e) => setGoalAmount(e.target.value)}
+                placeholder="목표 금액을 입력하세요"
                 style={{ width: "40%" }}
               />
             </div>
-
             {/* 자동이체일 */}
             <div style={styles.formItem}>
               자동이체일
@@ -299,7 +347,6 @@ function TogetherAccountJoinContent() {
                 ))}
               </Select>
             </div>
-
             {/* 가입 기간 */}
             <div style={styles.formItem}>
               가입 기간
@@ -318,7 +365,6 @@ function TogetherAccountJoinContent() {
                 <Option value="6개월">6개월</Option>
               </Select>
             </div>
-
             {/* 이자 지급 방식 */}
             <div style={styles.formItem}>
               이자 지급 방식
@@ -341,7 +387,6 @@ function TogetherAccountJoinContent() {
                 <Option value="분기별 지급">분기별 지급</Option>
               </Select>
             </div>
-
             {/* 만기 해지 구분 */}
             <div style={styles.formItem}>
               만기 해지 구분
@@ -363,7 +408,6 @@ function TogetherAccountJoinContent() {
                 <Radio value="만기시 자동해지">만기시 자동해지</Radio>
               </Radio.Group>
             </div>
-
             {/* 예/적금 만기 SMS 통보 */}
             <div style={styles.formItem}>
               예/적금 만기 SMS 통보
@@ -389,12 +433,10 @@ function TogetherAccountJoinContent() {
         </div>
         {/* 가족 선택 섹션 */}
         <div style={styles.productInfoSection}>
-          <h4>가족 선택</h4>
+          <h4>함께 할 가족 구성원</h4>
           <Checkbox.Group
-            options={
-              familyMembers && Array.isArray(familyMembers) ? familyMembers : []
-            } // 가족 구성원이 유효한 배열인지 확인
-            value={selectedFamilyMembers} // 선택된 가족 구성원
+            options={familyMembers} // familyMembers 배열 사용
+            value={selectedFamilyMembers.map((member) => member.userNo)} // 선택된 userNo 배열로 관리
             onChange={handleFamilyMemberChange} // 선택 상태 업데이트
           />
         </div>

@@ -41,5 +41,7 @@ public interface UserMapper {
   void insertFamily(FamilyDTO family);
 
   FamilyMemberDTO getFamilyMembers(@Param("familyId") Integer familyId);
+
+  FamilyMemberDTO getFamilyMembersWithoutMe(@Param("familyId") Integer familyId, @Param("userNo") Integer userNo);
   List<UserNameDTO> getUsersByUserNos(List<Integer> userNos);
 }

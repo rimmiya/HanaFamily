@@ -21,6 +21,22 @@
     <result property="userAccountNo" column="USER_ACCOUNT_NO" />
   </resultMap>
 
+  <resultMap id="SavingParticipationWithNameResultMap" type="kr.ac.kopo.hanafamily.savings.dto.SavingsParticipationWithNameDTO">
+    <id property="savingAccountNo" column="SAVING_ACCOUNT_NO" />
+    <id property="userId" column="USER_ID" />
+    <result property="familyId" column="FAMILY_ID" />
+    <result property="startDate" column="START_DATE" />
+    <result property="totalAmount" column="TOTAL_AMOUNT" />
+    <result property="autoTransferDate" column="AUTO_TRANSFER_DATE" />
+    <result property="autoTransferAmount" column="AUTO_TRANSFER_AMOUNT" />
+    <result property="autoTransferSmsYn" column="AUTO_TRANSFER_SMS_YN" />
+    <result property="maturitySmsYn" column="MATURITY_SMS_YN" />
+    <result property="successfulTransfers" column="SUCCESSFUL_TRANSFERS" />
+    <result property="bonusApplied" column="BONUS_APPLIED" />
+    <result property="userAccountNo" column="USER_ACCOUNT_NO" />
+    <result property="userName" column="USER_NAME" />
+  </resultMap>
+
   <!-- Select Participations by Saving Account No -->
   <select id="selectParticipationBySavingAccountNo" parameterType="String" resultMap="SavingsParticipationResultMap">
     SELECT
@@ -40,6 +56,26 @@
       TB_SAVINGS_PARTICIPATION
     WHERE
       SAVING_ACCOUNT_NO = #{savingAccountNo}
+  </select>
+
+  <select id="selectParticipationBySavingAccountNoAndUserNo" resultMap="SavingsParticipationResultMap">
+    SELECT
+      SAVING_ACCOUNT_NO,
+      USER_ID,
+      FAMILY_ID,
+      START_DATE,
+      TOTAL_AMOUNT,
+      AUTO_TRANSFER_DATE,
+      AUTO_TRANSFER_AMOUNT,
+      AUTO_TRANSFER_SMS_YN,
+      MATURITY_SMS_YN,
+      SUCCESSFUL_TRANSFERS,
+      BONUS_APPLIED,
+      USER_ACCOUNT_NO
+    FROM
+      TB_SAVINGS_PARTICIPATION
+    WHERE
+      SAVING_ACCOUNT_NO = #{savingAccountNo} AND USER_ID = #{userNo}
   </select>
 
   <!-- Select Participations by User No -->
@@ -113,6 +149,17 @@
       SAVING_ACCOUNT_NO = #{savingAccountNo} AND USER_ID = #{userId}
   </update>
 
+  <update id="updateParticipationInfo" parameterType="kr.ac.kopo.hanafamily.savings.dto.SavingsParticipationDTO">
+    UPDATE
+      TB_SAVINGS_PARTICIPATION
+    SET
+      AUTO_TRANSFER_DATE = #{autoTransferDate},
+      AUTO_TRANSFER_AMOUNT = #{autoTransferAmount},
+      USER_ACCOUNT_NO = #{userAccountNo}
+    WHERE
+      SAVING_ACCOUNT_NO = #{savingAccountNo} AND USER_ID = #{userId}
+  </update>
+
   <!-- Delete Savings Participation -->
   <delete id="deleteSavingsParticipation" parameterType="map">
     DELETE FROM TB_SAVINGS_PARTICIPATION
@@ -136,6 +183,29 @@
       USER_ACCOUNT_NO
     FROM
       TB_SAVINGS_PARTICIPATION
+  </select>
+
+  <select id="selectParticipationWithNameBySavingAccountNo" resultMap="SavingParticipationWithNameResultMap">
+    SELECT
+      SP.SAVING_ACCOUNT_NO,
+      SP.USER_ID,
+      SP.FAMILY_ID,
+      SP.START_DATE,
+      SP.TOTAL_AMOUNT,
+      SP.AUTO_TRANSFER_DATE,
+      SP.AUTO_TRANSFER_AMOUNT,
+      SP.AUTO_TRANSFER_SMS_YN,
+      SP.MATURITY_SMS_YN,
+      SP.SUCCESSFUL_TRANSFERS,
+      SP.BONUS_APPLIED,
+      SP.USER_ACCOUNT_NO,
+      U.USER_NAME
+    FROM
+      TB_SAVINGS_PARTICIPATION SP
+      JOIN TB_USERS U
+      ON SP.USER_ID = U.USER_NO
+    WHERE
+      SP.SAVING_ACCOUNT_NO = #{savingAccountNo}
   </select>
 
 </mapper>

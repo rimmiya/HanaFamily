@@ -32,6 +32,14 @@ export const userSlice = createSlice({
       localStorage.removeItem("userInfo");
       localStorage.removeItem("token");
     },
+    // 가족 ID를 설정하는 액션
+    setFamilyId: (state, action) => {
+      if (state.userInfo) {
+        state.userInfo.familyId = action.payload;
+        // 업데이트된 userInfo를 로컬스토리지에 저장
+        localStorage.setItem("userInfo", JSON.stringify(state.userInfo));
+      }
+    },
   },
 });
 

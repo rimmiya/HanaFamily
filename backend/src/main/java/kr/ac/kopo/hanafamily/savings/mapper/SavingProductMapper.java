@@ -1,8 +1,9 @@
 package kr.ac.kopo.hanafamily.savings.mapper;
 
-import kr.ac.kopo.hanafamily.savings.dto.SavingProductDTO;
 import java.util.List;
+import kr.ac.kopo.hanafamily.savings.dto.SavingProductDTO;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 @Mapper
 public interface SavingProductMapper {
@@ -16,4 +17,8 @@ public interface SavingProductMapper {
   List<SavingProductDTO> selectAllSavingProducts();
 
   List<SavingProductDTO> getFamilySavingsList(Integer familyId);
+
+  void insertSavingProductIntoTransaction(@Param("amount") Integer amount, @Param("savingProduct") SavingProductDTO savingProduct);
+
+
 }

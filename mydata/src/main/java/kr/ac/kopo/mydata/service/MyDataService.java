@@ -80,14 +80,14 @@ public class MyDataService {
     return cardList;
   }
 
-  public List<LoanDTO> getLoanData(Integer userNo, List<String> loanCodeList) {
+  public List<LoanDTO> getLoanData(Integer userNo, List<String> loanBankList) {
 
     List<LoanDTO> loanList = new ArrayList<>();
     // 사용자의 대출 정보로 사용자의 대출 정보를 가져옴
-    loanCodeList.forEach(
-        loanCode -> {
+    loanBankList.forEach(
+        loanBank -> {
           HttpEntity<FinanceLoanRequestDTO> request = new HttpEntity<>(new FinanceLoanRequestDTO(
-              userNo, loanCode));
+              userNo, loanBank));
           ResponseEntity<List<LoanDTO>> response = restTemplate.exchange(
               loanDataUrl, HttpMethod.POST, request, new ParameterizedTypeReference<List<LoanDTO>>() {}
           );

@@ -1,37 +1,139 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { useSelector } from "react-redux";
 import { PieChart, Pie, Cell, ResponsiveContainer, Sector } from "recharts";
 
-function FamilyAssetsStatus({ data, totalAmount }) {
+function FamilyAssetsStatus() {
   const [activeIndex, setActiveIndex] = useState(null);
-  const [hoveredEntry, setHoveredEntry] = useState(null); // Hover된 자산 데이터 저장
+  const [hoveredEntry, setHoveredEntry] = useState(null);
   const COLORS = ["#7173f4", "#489cd5", "#30b4c1", "#18ceae"];
-
-  // 자산 중에서 가장 큰 값을 찾음
-  const largestAsset = data.reduce((prev, current) => {
-    return current.value > prev.value ? current : prev;
-  });
+  const [totalAssets, setTotalAssets] = useState(0);
+  const [assetsData, setAssetsData] = useState([]);
+  const [largestAsset, setLargestAsset] = useState(null); // 가장 큰 자산 저장
+  const user = useSelector((state) => state.user.userInfo);
+  const [totalAmount, setTotalAmount] = useState(0); // 총 자산 금액
+  const [familyAssetsDetail, setFamilyAssetsDetail] = useState([]);
 
   const onPieEnter = (_, index) => {
     setActiveIndex(index);
-    setHoveredEntry(data[index]); // Pie 차트에 호버 시 해당 항목 저장
+    setHoveredEntry(assetsData[index]);
   };
 
   const onPieLeave = () => {
     setActiveIndex(null);
-    setHoveredEntry(null); // Pie 차트에서 마우스를 뗄 때 데이터 초기화
+    setHoveredEntry(null);
   };
 
   const onLabelHover = (index) => {
-    setHoveredEntry(data[index]); // 레전드에 호버 시 해당 항목 저장
+    setHoveredEntry(assetsData[index]);
     setActiveIndex(index);
   };
 
   const onLabelLeave = () => {
-    setHoveredEntry(null); // 레전드에서 마우스를 뗄 때 데이터 초기화
+    setHoveredEntry(null);
     setActiveIndex(null);
   };
 
-  // 활성화된 섹터를 렌더링
+  useEffect(() => {
+    fetchAccountBalance();
+  }, []);
+
+  const fetchAccountBalance = async () => {
+    try {
+      if (!user.familyId) {
+        // familyId가 없을 때 (개인 자산 조회)
+        const totalresponse = await axios.get(
+          "http://localhost:8080/api/family/no-members",
+          {
+            params: { userNo: user.userNo },
+          }
+        );
+        const responseList = await axios.get(
+          "http://localhost:8080/api/savings/account/personal-list",
+          {
+            params: { userNo: user.userNo },
+          }
+        );
+
+        setTotalAssets(totalresponse.data); // 총 자산 설정
+        processAssetsData(responseList.data); // 파이차트용 데이터 처리
+      } else {
+        // familyId가 있을 때 (가족 자산 조회)
+        const totalresponse = await axios.get(
+          "http://localhost:8080/api/family/account-balance",
+          {
+            params: { familyId: user.familyId },
+          }
+        );
+
+        const responseList = await axios.get(
+          "http://localhost:8080/api/savings/account/family-list",
+          {
+            params: { familyId: user.familyId },
+          }
+        );
+
+        setTotalAssets(totalresponse.data); // 총 자산 설정
+        processAssetsData(responseList.data); // 파이차트용 데이터 처리
+      }
+    } catch (error) {
+      console.error("자산 데이터를 불러오는 중 오류 발생:", error);
+    }
+  };
+
+  // 자산 데이터를 파싱하여 파이차트 및 상세 정보 구성
+  const processAssetsData = (data) => {
+    const categories = {
+      적금: { total: 0, people: {} },
+      예금: { total: 0, people: {} },
+      입출금: { total: 0, people: {} },
+      기타: { total: 0, people: {} },
+    };
+
+    data.forEach((account) => {
+      const { accountType, accountBalance, userName } = account;
+
+      const categoryKey =
+        accountType === 1
+          ? "적금"
+          : accountType === 2
+          ? "예금"
+          : accountType === 3
+          ? "입출금"
+          : "기타";
+
+      categories[categoryKey].total += accountBalance;
+      if (categories[categoryKey].people[userName]) {
+        categories[categoryKey].people[userName] += accountBalance;
+      } else {
+        categories[categoryKey].people[userName] = accountBalance;
+      }
+    });
+
+    // 카테고리를 파이차트 형식에 맞게 변환
+    const formattedData = Object.keys(categories).map((key) => ({
+      name: key,
+      value: categories[key].total,
+      people: categories[key].people, // 가족 구성원별 자산 정보
+    }));
+
+    // 총 자산 계산
+    const total = formattedData.reduce((sum, entry) => sum + entry.value, 0);
+
+    setAssetsData(formattedData);
+    setTotalAmount(total);
+
+    // 가장 큰 자산을 계산
+    const largest = formattedData.reduce(
+      (prev, current) => {
+        return current.value > prev.value ? current : prev;
+      },
+      { name: "", value: 0 }
+    );
+
+    setLargestAsset(largest);
+  };
+
   const renderActiveShape = (props) => {
     const {
       cx,
@@ -94,16 +196,18 @@ function FamilyAssetsStatus({ data, totalAmount }) {
         <h3 style={{ fontFamily: "CustomFont" }}>가족자산현황</h3>
       </div>
       {/* 가장 많은 자산에 대한 메시지 표시 */}
-      <div style={styles.largestAssetMessage}>
-        우리가족은 {largestAsset.name} 자산이 가장 많아요!
-      </div>
+      {largestAsset && (
+        <div style={styles.largestAssetMessage}>
+          우리가족은 {largestAsset.name} 자산이 가장 많아요!
+        </div>
+      )}
       <div style={styles.chartContainer}>
         <ResponsiveContainer width="50%" height={250}>
           <PieChart>
             <Pie
               activeIndex={activeIndex}
               activeShape={renderActiveShape}
-              data={data}
+              data={assetsData}
               cx="50%"
               cy="50%"
               innerRadius={80}
@@ -113,7 +217,7 @@ function FamilyAssetsStatus({ data, totalAmount }) {
               onMouseEnter={onPieEnter}
               onMouseLeave={onPieLeave}
             >
-              {data.map((entry, index) => (
+              {assetsData.map((entry, index) => (
                 <Cell
                   key={`cell-${index}`}
                   fill={COLORS[index % COLORS.length]}
@@ -124,7 +228,6 @@ function FamilyAssetsStatus({ data, totalAmount }) {
                 />
               ))}
             </Pie>
-            {/* 차트 중앙에 총 자산 금액을 표시 */}
             {activeIndex === null && (
               <>
                 <text
@@ -143,15 +246,15 @@ function FamilyAssetsStatus({ data, totalAmount }) {
                   dominantBaseline="middle"
                   style={{ fontSize: "18px", fontWeight: "bold", fill: "#333" }}
                 >
-                  {totalAmount.toLocaleString()}원
+                  {totalAssets.toLocaleString()}원
                 </text>
               </>
             )}
           </PieChart>
         </ResponsiveContainer>
-        {/* Legend - 2개씩 정렬 */}
+        {/* Legend - 자산 항목과 가족 구성원의 자산 비율 표시 */}
         <div style={styles.details}>
-          {data.map((entry, index) => (
+          {assetsData.map((entry, index) => (
             <div
               key={`detail-${index}`}
               style={{
@@ -162,7 +265,6 @@ function FamilyAssetsStatus({ data, totalAmount }) {
                     : "#666",
                 fontWeight: activeIndex === index ? "bold" : "normal",
                 cursor: "pointer",
-                // width: "48%", // 2개씩 정렬하기 위해 각 항목의 너비를 48%로 설정
               }}
               onMouseEnter={() => onLabelHover(index)}
               onMouseLeave={onLabelLeave}
@@ -180,14 +282,19 @@ function FamilyAssetsStatus({ data, totalAmount }) {
                   {entry.name}&nbsp;
                   {((entry.value / totalAmount) * 100).toFixed(2)} %
                 </p>
-                {/* Hover 시 구성원 정보를 표시 */}
+                {/* Hover 시 구성원들의 자산 금액과 비율을 표시 */}
                 {hoveredEntry === entry && (
                   <div>
-                    {entry.people.map((person, i) => (
-                      <p key={i} style={styles.detailValue}>
-                        {person.name}: {person.amount.toLocaleString()}원
-                      </p>
-                    ))}
+                    {Object.entries(entry.people).map(([name, amount], i) => {
+                      const percentage = ((amount / entry.value) * 100).toFixed(
+                        2
+                      ); // 구성원의 자산 비율 계산
+                      return (
+                        <p key={i} style={styles.detailValue}>
+                          {name}: {amount.toLocaleString()}원 ({percentage}%)
+                        </p>
+                      );
+                    })}
                   </div>
                 )}
               </div>
@@ -224,12 +331,12 @@ const styles = {
   detailItem: {
     display: "flex",
     alignItems: "flex-start",
-    marginBottom: "10px",
+    // marginBottom: "10px",
   },
   labelColor: {
     width: "20px",
     height: "20px",
-    marginTop: "5px",
+    marginTop: "3px",
     marginRight: "10px",
     borderRadius: "5px",
   },
@@ -239,14 +346,10 @@ const styles = {
   },
   detailValue: {
     margin: 0,
-    color: "black",
-    marginLeft: "30px",
+    color: "#555",
   },
   largestAssetMessage: {
-    // marginTop: "20px",
-    // textAlign: "center",
     fontSize: "20px",
-    // fontWeight: "bold",
     color: "#333",
   },
 };

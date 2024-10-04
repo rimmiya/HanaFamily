@@ -1,6 +1,7 @@
 import React from "react";
 import { background } from "@chakra-ui/react";
 import { Link } from "react-router-dom";
+import InterestCalculator from "./InterestCalculator";
 
 function TogetherAccountDetails() {
   const periodeImg = `${process.env.PUBLIC_URL}/img/calendar-gif.gif`;
@@ -70,6 +71,7 @@ function TogetherAccountDetails() {
           </p>
         </Link>
       </div>
+      <InterestCalculator />
       <div style={style.content2}>
         <div
           style={{

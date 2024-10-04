@@ -2,6 +2,7 @@ package kr.ac.kopo.mydata.controller;
 
 import java.util.List;
 import kr.ac.kopo.mydata.dto.BankStatementDTO;
+import kr.ac.kopo.mydata.dto.LoanDTO;
 import kr.ac.kopo.mydata.dto.StockDTO;
 import kr.ac.kopo.mydata.dto.TransactionDTO;
 import kr.ac.kopo.mydata.dto.TransactionRequestDTO;
@@ -28,11 +29,13 @@ public class TransactionController {
 
     List<BankStatementDTO> bankStatementList = transactionService.getBankTransactionData(requestData.getUserNo(), requestData.getAccountNo());
     List<TransactionDTO> transactionList = transactionService.getCardTransactionData(requestData.getUserNo(), requestData.getCardNo());
+//    List<LoanDTO> loanList = transactionService.getLoanTransactionData(requestData.getUserNo(), requestData.getLoanId());
     List<StockDTO> stockList = transactionService.getSecurityTransactionData(requestData.getUserNo(), requestData.getSecurityAccount());
 
     response.setUserNo(requestData.getUserNo());
     response.setBankStatement(bankStatementList);
     response.setCardStatement(transactionList);
+//    response.setLoanStatement(loanList);
     response.setStockStatement(stockList);
 
       return response;

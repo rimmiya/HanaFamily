@@ -18,6 +18,6 @@ public class TransactionDTO {
   private Integer userNo;
   private Integer beforeBalance;
   private String location;
-  private String category;
+  private Integer category;
   private Integer transactionStatus;
 }

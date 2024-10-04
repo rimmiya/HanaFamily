@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.ac.kopo.hanafamily.budget.mapper.BudgetMapper">
+
+  <!-- BudgetDTO의 필드를 매핑하는 resultMap -->
+  <resultMap id="BudgetCategoryResultMap" type="kr.ac.kopo.hanafamily.budget.dto.BudgetDTO">
+    <id property="budgetId" column="BUDGET_ID"/>
+    <result property="familyId" column="FAMILY_ID"/>
+    <result property="categoryId" column="CATEGORY_ID"/>
+    <result property="budgetAmount" column="BUDGET_AMOUNT"/>
+    <result property="actualAmount" column="ACTUAL_AMOUNT"/>
+    <result property="eventAmount" column="EVENT_AMOUNT"/>
+    <result property="startDate" column="START_DATE"/>
+    <result property="endDate" column="END_DATE"/>
+    <result property="budgetStatus" column="BUDGET_STATUS"/>
+    <result property="createdAt" column="CREATED_AT"/>
+    <result property="updatedAt" column="UPDATED_AT"/>
+    <result property="categoryName" column="CATEGORY_NAME"/>
+  </resultMap>
+
+  <!-- TransactionDTO의 필드를 매핑하는 resultMap -->
+  <resultMap id="TransactionResultMap" type="kr.ac.kopo.hanafamily.mydata.dto.TransactionDTO">
+    <id property="transactionId" column="TRANSACTION_ID" />
+    <result property="cardNo" column="CARD_NO" />
+    <result property="transactionAmount" column="TRANSACTION_AMOUNT" />
+    <result property="transactionDate" column="TRANSACTION_DATE" />
+    <result property="transactionType" column="TRANSACTION_TYPE" />
+    <result property="accountBalance" column="TRANSACTION_ACCOUNT_BALANCE" />
+    <result property="userNo" column="USER_NO" />
+    <result property="beforeBalance" column="TRANSACTION_BEFORE_BALANCE" />
+    <result property="location" column="TRANSACTION_LOCATION" />
+    <result property="category" column="TRANSACTION_CATEGORY" />
+    <result property="transactionStatus" column="TRANSACTION_STATUS" />
+  </resultMap>
+
+  <!-- 가족별 예산 합계 조회 (월별) -->
+  <select id="getFamilyBudgetSumByMonth" resultType="int">
+    SELECT SUM(BUDGET_AMOUNT)
+    FROM TB_BUDGET
+    WHERE FAMILY_ID = #{familyId}
+      AND EXTRACT(MONTH FROM START_DATE) = #{month}
+  </select>
+
+  <!-- 가족별 카테고리별 예산 조회 (월별) -->
+  <select id="getBudgetByCategoryAndMonth" resultMap="BudgetCategoryResultMap">
+    SELECT
+      B.BUDGET_ID,
+      B.FAMILY_ID,
+      B.CATEGORY_ID,
+      B.BUDGET_AMOUNT,
+      B.ACTUAL_AMOUNT,
+      B.EVENT_AMOUNT,
+      B.START_DATE,
+      B.END_DATE,
+      B.BUDGET_STATUS,
+      B.CREATED_AT,
+      B.UPDATED_AT,
+      C.CATEGORY_NAME
+    FROM
+      TB_BUDGET B
+        JOIN TB_CATEGORY C ON B.CATEGORY_ID = C.CATEGORY_ID
+    WHERE
+      B.FAMILY_ID = #{familyId}
+      AND EXTRACT(MONTH FROM B.START_DATE) = #{month}
+  </select>
+
+  <!-- 가족별 카테고리별 거래 내역 조회 (월별) -->
+  <select id="getTransactionsByCategoryAndMonth" resultMap="TransactionResultMap">
+    SELECT
+      T.TRANSACTION_ID,
+      T.CARD_NO,
+      T.TRANSACTION_AMOUNT,
+      T.TRANSACTION_DATE,
+      T.TRANSACTION_TYPE,
+      T.TRANSACTION_ACCOUNT_BALANCE,
+      T.USER_NO,
+      T.TRANSACTION_BEFORE_BALANCE,
+      T.TRANSACTION_LOCATION,
+      T.TRANSACTION_CATEGORY,
+      T.TRANSACTION_STATUS
+    FROM
+      TB_TRANSACTION T
+        JOIN TB_USERS U ON T.USER_NO = U.USER_NO
+    WHERE
+      U.FAMILY_ID = #{familyId}
+      AND T.TRANSACTION_CATEGORY = #{categoryId}
+      AND EXTRACT(MONTH FROM T.TRANSACTION_DATE) = #{month}
+  </select>
+
+  <!-- 예산 업데이트 (월별) -->
+  <update id="updateBudgetByMonth" parameterType="kr.ac.kopo.hanafamily.budget.dto.BudgetDTO">
+    UPDATE TB_BUDGET
+    SET BUDGET_AMOUNT = #{budgetDTO.budgetAmount},
+        UPDATED_AT = SYSTIMESTAMP
+    WHERE BUDGET_ID = #{budgetDTO.budgetId}
+      AND FAMILY_ID = #{familyId}
+      AND EXTRACT(MONTH FROM START_DATE) = #{month}
+  </update>
+
+  <!-- 거래 내역 카테고리 업데이트 (월별) -->
+  <update id="updateTransactionCategoryByMonth" parameterType="kr.ac.kopo.hanafamily.mydata.dto.TransactionDTO">
+    UPDATE TB_TRANSACTION T
+    SET TRANSACTION_CATEGORY = #{transactionDTO.category}
+    WHERE TRANSACTION_ID = #{transactionDTO.transactionId}
+      AND EXISTS (
+      SELECT 1
+      FROM TB_USERS U
+      WHERE U.USER_NO = T.USER_NO
+        AND U.FAMILY_ID = #{familyId}
+    )
+      AND EXTRACT(MONTH FROM TRANSACTION_DATE) = #{month}
+  </update>
+
+  <!-- 이번 달 지출 금액 조회 -->
+  <select id="getCurrentMonthExpenses" resultType="int">
+    SELECT SUM(T.TRANSACTION_AMOUNT)
+    FROM TB_TRANSACTION T
+           JOIN TB_USERS U ON T.USER_NO = U.USER_NO
+    WHERE U.FAMILY_ID = #{familyId}
+      AND T.TRANSACTION_TYPE = 1
+      AND TO_CHAR(T.TRANSACTION_DATE, 'YYYY-MM') = TO_CHAR(SYSDATE, 'YYYY-MM')
+  </select>
+
+  <!-- 이번 달 수입 금액 조회 -->
+  <select id="getCurrentMonthIncome" resultType="int">
+    SELECT SUM(BS.TRANSACTION_AMOUNT)
+    FROM TB_BANKSTATEMENT BS
+    JOIN TB_USERS U ON BS.USER_NO = U.USER_NO
+    WHERE U.FAMILY_ID = #{familyId}
+    AND BS.TRANSACTION_TYPE = 1
+    AND TO_CHAR(BS.TRANSACTION_DATE, 'YYYY-MM') = TO_CHAR(SYSDATE, 'YYYY-MM')
+  </select>
+
+  <select id="getUserNosByFamilyId" resultType="java.lang.Integer">
+    SELECT USER_NO
+    FROM TB_USERS
+    WHERE FAMILY_ID = #{familyId}
+  </select>
+
+  <select id="getEmptyCategoryTransactionsByUserNosAndMonth" resultType="kr.ac.kopo.hanafamily.mydata.dto.TransactionDTO">
+    SELECT *
+    FROM TB_TRANSACTION
+    WHERE USER_NO IN
+    <foreach item="userNo" collection="userNos" open="(" separator="," close=")">
+      #{userNo}
+    </foreach>
+    AND EXTRACT(MONTH FROM TRANSACTION_DATE) = #{month}
+    AND TRANSACTION_CATEGORY IS NULL
+  </select>
+
+  <update id="updateEmptyTransactionCategory">
+    UPDATE TB_TRANSACTION
+    SET TRANSACTION_CATEGORY = #{categoryId}
+    WHERE TRANSACTION_ID = #{transactionId}
+  </update>
+
+  <select id="getTransactionsByMonth" resultMap="TransactionResultMap">
+    SELECT
+      T.TRANSACTION_ID,
+      T.CARD_NO,
+      T.TRANSACTION_AMOUNT,
+      T.TRANSACTION_DATE,
+      T.TRANSACTION_TYPE,
+      T.TRANSACTION_ACCOUNT_BALANCE,
+      T.USER_NO,
+      T.TRANSACTION_BEFORE_BALANCE,
+      T.TRANSACTION_LOCATION,
+      T.TRANSACTION_CATEGORY,
+      T.TRANSACTION_STATUS
+    FROM
+      TB_TRANSACTION T
+        JOIN TB_USERS U ON T.USER_NO = U.USER_NO
+    WHERE
+      U.FAMILY_ID = #{familyId}
+      AND EXTRACT(MONTH FROM T.TRANSACTION_DATE) = #{month}
+  </select>
+
+  <!-- 월별 카테고리별 지출 평균을 계산 -->
+  <select id="getMonthlyCategoryAvgExpenses" resultMap="BudgetCategoryResultMap">
+    SELECT
+      U.FAMILY_ID,
+      T.TRANSACTION_CATEGORY AS CATEGORY_ID,
+      (SUM(T.TRANSACTION_AMOUNT) / 3) AS BUDGET_AMOUNT -- 3개월 간 소비한 금액을 3으로 나눔
+    FROM
+      TB_TRANSACTION T
+        JOIN
+      TB_USERS U ON T.USER_NO = U.USER_NO
+    WHERE
+      U.FAMILY_ID = #{familyId}
+      AND T.TRANSACTION_DATE BETWEEN ADD_MONTHS(TRUNC(TO_DATE(#{month}, 'yyyy-MM'), 'MM'), -3)
+      AND LAST_DAY(ADD_MONTHS(TO_DATE(#{month}, 'yyyy-MM'), -1))
+    GROUP BY
+      U.FAMILY_ID,
+      T.TRANSACTION_CATEGORY
+  </select>
+
+  <!-- TB_BUDGET 테이블에 월별 평균 지출을 삽입 -->
+  <insert id="insertAvgBudget" parameterType="kr.ac.kopo.hanafamily.budget.dto.BudgetDTO">
+    INSERT INTO TB_BUDGET (
+      BUDGET_ID, FAMILY_ID, CATEGORY_ID, BUDGET_AMOUNT, ACTUAL_AMOUNT, START_DATE, END_DATE, CREATED_AT, UPDATED_AT
+    )
+    VALUES (
+             SEQ_BUDGET_ID.NEXTVAL, #{familyId}, #{categoryId}, #{budgetAmount}, #{actualAmount}, SYSDATE, SYSDATE, SYSTIMESTAMP, SYSTIMESTAMP
+           )
+  </insert>
+
+  <!-- TB_BUDGET 테이블에 예산 추가 -->
+  <insert id="insertBudget" parameterType="kr.ac.kopo.hanafamily.budget.dto.BudgetDTO">
+    INSERT INTO TB_BUDGET (
+      BUDGET_ID, FAMILY_ID, CATEGORY_ID, BUDGET_AMOUNT, START_DATE, END_DATE, CREATED_AT, UPDATED_AT
+    )
+    VALUES (
+             SEQ_BUDGET_ID.NEXTVAL, #{familyId}, #{categoryId}, #{budgetAmount}, SYSTIMESTAMP, SYSTIMESTAMP, SYSTIMESTAMP, SYSTIMESTAMP
+           )
+  </insert>
+
+</mapper>

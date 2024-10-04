@@ -26,4 +26,5 @@ public class InsuranceDTO {
   private String insuranceName;        // 보험 이름
   private String insuranceAccount;     // 보험 계좌
   private String insuranceCompany;     // 보험 회사
+  private Integer insuranceMonthlyPayment; // 보험 월 납입금
 }

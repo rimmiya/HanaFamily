@@ -2,6 +2,7 @@ package kr.ac.kopo.finance.service;
 
 import java.util.List;
 import kr.ac.kopo.finance.dto.BankStatementDTO;
+import kr.ac.kopo.finance.dto.LoanDTO;
 import kr.ac.kopo.finance.dto.StockDTO;
 import kr.ac.kopo.finance.dto.TransactionDTO;
 import kr.ac.kopo.finance.mapper.bank.BankMapper;
@@ -32,5 +33,9 @@ public class TransactionService {
 
   public List<StockDTO> getSecurityTransactionData (Integer userNo, String securityAccount) {
     return securityMapper.getStockData(userNo, securityAccount);
+  }
+
+  public List<LoanDTO> getLoanTransactionData (Integer userNo, String loanId) {
+    return bankMapper.getLoanTransactionData(userNo, loanId);
   }
 }

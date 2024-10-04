@@ -1,4 +1,4 @@
-package kr.ac.kopo.hanafamily.mydata.dto;
+package kr.ac.kopo.finance.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import java.util.Date;

@@ -1,30 +1,50 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button, Modal } from "antd";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
 
+// 랜덤 계좌번호 생성 함수
+function generateRandomAccountNo() {
+  // 세 부분으로 나눈 계좌번호 생성 (XXX-XXXX-XXXX 형식)
+  const part1 = Math.floor(100 + Math.random() * 900); // 100 ~ 999
+  const part2 = Math.floor(1000 + Math.random() * 9000); // 1000 ~ 9999
+  const part3 = Math.floor(1000 + Math.random() * 9000); // 1000 ~ 9999
+  return `${part1}-${part2}-${part3}`;
+}
+
 function ConfirmationPage() {
   const navigate = useNavigate();
   const { state } = useLocation(); // TogetherAccountJoinContent에서 전달된 state 값
-  const [isModalVisible, setIsModalVisible] = useState(false); // 모달 표시 상태
+  const [isModalVisible, setIsModalVisible] = useState(false);
   const selectedFamilyMembers = state.selectedFamilyMembers || [];
   const user = useSelector((state) => state.user.userInfo);
+
+  // 계좌번호 상태 관리 (랜덤 생성)
+  const [randomAccountNo, setRandomAccountNo] = useState("");
+
+  // 컴포넌트 마운트 시 랜덤 계좌번호 생성
+  useEffect(() => {
+    const generatedAccountNo = generateRandomAccountNo(); // 랜덤 계좌번호 생성
+    setRandomAccountNo(generatedAccountNo); // 상태로 저장
+    // console.log("가족 구성원:", selectedFamilyMembers);
+  }, []);
 
   // 최종 가입 실행 API 호출 함수
   const handleConfirm = async () => {
     const savingProduct = {
-      savingAccountNo: "123-456-789", // 랜덤 계좌번호
+      savingAccountNo: randomAccountNo, // 랜덤 생성된 계좌번호
       accountName: state.accountAlias, // 계좌 별칭
-      accountPassword: state.accountPassword, // 계좌 비밀번호
-      bankCode: 1, // 은행 코드
+      accountPassword: state.newPassword, // 계좌 비밀번호
+      bankCode: 101, // 은행 코드
       userNo: user.userNo, // 로그인된 사용자 번호
       familyId: user.familyId, // 로그인된 사용자의 familyId
-      goalAmount: state.amount, // 목표 금액
+      currentAmount: 0, // 목표 금액
+      goalAmount: parseInt(state.goalAmount, 10), // 목표 금액
       startDate: new Date(), // 현재 날짜를 시작일로
       endDate: new Date(new Date().setFullYear(new Date().getFullYear() + 1)), // 종료일 (1년 후)
-      interestRate: 3.0, // 이자율
-      savingStatus: "ACTIVE", // 상태
+      interestRate: 3.0, // 이자율 (예시로 설정, 백엔드와 협의하여 동적으로 변경 가능)
+      savingStatus: "ACTIVE", // 적금 상태
       productId: 1, // 상품 ID
       representativeAccountNo: state.representativeAccountNo, // 대표자 계좌
     };
@@ -40,14 +60,16 @@ function ConfirmationPage() {
 
     const requestDTO = {
       savingProduct,
-      inviteeUserIds: state.selectedFamilyMembers, // 선택한 가족 구성원의 ID 리스트
+      inviteeUserIds: selectedFamilyMembers.map((member) => member.userNo), // 선택한 가족 구성원의 ID 리스트
       createSavingsRequest,
     };
-
+    console.log("상품 정보:", savingProduct);
+    console.log("적금 가입 요청:", createSavingsRequest);
+    console.log("최종 가입 요청:", requestDTO);
     try {
       // 최종 가입 API 요청
       const response = await axios.post(
-        "http://localhost:8080/api/savings/create",
+        "http://localhost:8080/api/savings/create", // 적금 가입 API 엔드포인트
         requestDTO
       );
       console.log("적금 가입 성공:", response.data);
@@ -77,13 +99,15 @@ function ConfirmationPage() {
           <div style={styles.formRow}>
             <div style={styles.formLabel}>출금계좌번호</div>
             <div style={styles.formContent}>
-              {state.accountNumber || "174-910702-76407"}
+              {state.representativeAccountNo || "계좌 정보 없음"}
             </div>
           </div>
           <div style={styles.formRow}>
-            <div style={styles.formLabel}>이메일주소</div>
+            <div style={styles.formLabel}>계좌명</div>
             <div style={styles.formContent}>
-              {state.email || "40*******@naver.com"}
+              {state.selectedAccount
+                ? state.selectedAccount.accountName
+                : "계좌명 없음"}
             </div>
           </div>
         </div>
@@ -94,46 +118,46 @@ function ConfirmationPage() {
           <div style={styles.productRow}>
             <div style={styles.formLabel}>상품종류</div>
             <div style={styles.formContent}>
-              {state.productType || "369 정기예금"}
+              {state.productType || "함께 적금"}
+            </div>
+
+            <div style={styles.formLabel}>적금 계좌번호</div>
+            <div style={styles.formContent}>
+              {randomAccountNo || "계좌번호 생성 중..."}
+            </div>
+          </div>
+          <div style={styles.productRow}>
+            <div style={styles.formLabel}>계좌 별명</div>
+            <div style={styles.formContent}>
+              {state.accountAlias || "계좌 별명 없음"}
             </div>
             <div style={styles.formLabel}>가입기간</div>
             <div style={styles.formContent}>{state.term || "12개월"}</div>
           </div>
           <div style={styles.productRow}>
+            {" "}
+            <div style={styles.formLabel}>목표금액</div>
+            <div style={styles.formContent}>
+              {`${state.goalAmount.toLocaleString()} 원` || "0 원"}
+            </div>
             <div style={styles.formLabel}>신규금액</div>
             <div style={styles.formContent}>
-              {`${state.amount.toLocaleString()} 원` || "10,000 원"}
+              {`${state.amount.toLocaleString()} 원` || "0 원"}
             </div>
-            <div style={styles.formLabel}>적용 우대금리</div>
-            <div style={styles.formContent}>0.00%</div>
           </div>
           <div style={styles.productRow}>
             <div style={styles.formLabel}>현재 적용금리</div>
-            <div style={styles.formContent}>3.00% (적용우대금리포함)</div>
-            <div style={styles.formLabel}>이자지급간격</div>
-            <div style={styles.formContent}>만기지급식</div>
-          </div>
-          <div style={styles.productRow}>
+            <div style={styles.formContent}>3.00%</div>
             <div style={styles.formLabel}>이자지급방식</div>
             <div style={styles.formContent}>
               {state.interestMethod || "만기일시지급식"}
             </div>
+          </div>
+          <div style={styles.productRow}>
             <div style={styles.formLabel}>만기해지구분</div>
             <div style={styles.formContent}>
               {state.maturityOption || "만기시 자동해지"}
             </div>
-          </div>
-          <div style={styles.productRow}>
-            <div style={styles.formLabel}>예/적금 만기 SMS통보</div>
-            <div style={styles.formContent}>
-              {state.smsOption || "신청안함"}
-            </div>
-            <div style={styles.formLabel}>세금우대</div>
-            <div style={styles.formContent}>일반과세</div>
-          </div>
-
-          {/* Display auto-transfer date */}
-          <div style={styles.productRow}>
             <div style={styles.formLabel}>자동이체일</div>
             <div style={styles.formContent}>
               {state.autoTransferDate

@@ -72,5 +72,52 @@
     WHERE
       INVITATION_ID = #{invitationId}
   </update>
+  <resultMap id="SavingProductResultMap" type="kr.ac.kopo.hanafamily.savings.dto.SavingProductDTO">
+    <id property="savingAccountNo" column="SAVING_ACCOUNT_NO" />
+    <result property="userNo" column="USER_NO" />
+    <result property="goalAmount" column="GOAL_AMOUNT" />
+    <result property="currentAmount" column="CURRENT_AMOUNT" />
+    <result property="startDate" column="START_DATE" />
+    <result property="endDate" column="END_DATE" />
+    <result property="interestRate" column="INTEREST_RATE" />
+    <result property="bonusInterestRate" column="BONUS_INTEREST_RATE" />
+    <result property="minDuration" column="MIN_DURATION" />
+    <result property="maxDuration" column="MAX_DURATION" />
+    <result property="savingStatus" column="SAVING_STATUS" />
+    <result property="productId" column="PRODUCT_ID" />
+    <result property="representativeAccountNo" column="REPRESENTATIVE_ACCOUNT_NO" />
+    <result property="familyId" column="FAMILY_ID" />
+    <result property="accountPassword" column="ACCOUNT_PASSWORD" />
+    <result property="accountName" column="ACCOUNT_NAME" />
+    <result property="bankCode" column="BANK_CODE" />
+    <!-- representativeAccountNo은 데이터베이스 컬럼에 없으므로 매핑하지 않음 -->
+  </resultMap>
+  <select id="selectFamilySavingsList" resultMap="SavingProductResultMap">
+    SELECT
+      T.SAVING_ACCOUNT_NO,
+      T.USER_NO,
+      T.GOAL_AMOUNT,
+      T.CURRENT_AMOUNT,
+      T.START_DATE,
+      T.END_DATE,
+      T.INTEREST_RATE,
+      T.BONUS_INTEREST_RATE,
+      T.MIN_DURATION,
+      T.MAX_DURATION,
+      T.SAVING_STATUS,
+      T.PRODUCT_ID,
+      T.REPRESENTATIVE_ACCOUNT_NO,
+      T.FAMILY_ID,
+      T.ACCOUNT_PASSWORD,
+      T.ACCOUNT_NAME,
+      T.BANK_CODE
+    FROM
+      TB_SAVING_PRODUCT T
+      JOIN
+      TB_USERS U ON T.FAMILY_ID = U.FAMILY_ID
+    WHERE
+      U.USER_NO = #{userNo}  <!-- 파라미터로 전달받은 userNo 사용 -->
+      AND T.SAVING_STATUS = 'TERMINATED'
+  </select>
 
 </mapper>

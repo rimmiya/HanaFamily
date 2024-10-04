@@ -9,9 +9,10 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class AccountDTO {
+public class AccountWithNameDTO {
   private String accountNo;
   private Integer userNo;
+  private String userName;
   private String accountName;
   private String accountPassword;
   private Integer accountBalance;

@@ -200,7 +200,10 @@ CREATE TABLE tb_Loan (
                          loan_balance      NUMBER,                    -- 대출 잔액
                          loan_interest     NUMBER,                    -- 대출 이자
                          loan_account      VARCHAR2(20),              -- 대출 계좌
-                         loan_bank         VARCHAR2(50)               -- 대출 은행
+                         loan_bank         VARCHAR2(50),                -- 대출 은행
+                         loan_repayment_date DATE                      -- 상환일
+
+
 );
 
 -- CREATE UNIQUE INDEX Loan_PK ON tb_Loan (loan_id);
@@ -231,6 +234,8 @@ CREATE TABLE tb_Insurance (
 
 );
 
+ALTER TABLE  TB_INSURANCE ADD INSURANCE_MONTHLY_PAYMENT NUMBER; -- 월 보험료
+commit;
 -- CREATE UNIQUE INDEX Insurance_PK ON tb_Insurance (insurance_id);
 ALTER TABLE tb_Insurance ADD CONSTRAINT Insurance_FK FOREIGN KEY (user_no) REFERENCES tb_Users (user_no);
 
@@ -281,3 +286,20 @@ FROM all_cons_columns
 WHERE table_name = 'TB_FAMILY' AND constraint_name LIKE 'SYS%';
 
 drop table tb_family;
+
+CREATE SEQUENCE BANKSTATEMENT_SEQ
+    START WITH 3 -- 초기 값
+    INCREMENT BY 1 -- 증가 값
+    NOCACHE;
+
+CREATE OR REPLACE TRIGGER trg_bankstatement_transaction_no
+    BEFORE INSERT ON TB_BANKSTATEMENT
+    FOR EACH ROW
+    WHEN (NEW.TRANSACTION_NO IS NULL)  -- TRANSACTION_NO가 NULL일 때만 시퀀스 할당
+BEGIN
+    -- TRANSACTION_NO에 시퀀스 값 할당
+    :NEW.TRANSACTION_NO := BANKSTATEMENT_SEQ.NEXTVAL;
+END;
+/
+
+commit;

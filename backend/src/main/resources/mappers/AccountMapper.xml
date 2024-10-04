@@ -5,12 +5,33 @@
 
 <mapper namespace="kr.ac.kopo.hanafamily.savings.mapper.AccountMapper">
 
-  <!-- Result Map for AccountDTO -->
   <resultMap id="AccountResultMap" type="kr.ac.kopo.hanafamily.mydata.dto.AccountDTO">
     <id property="accountNo" column="ACCOUNT_NO" />
     <result property="userNo" column="USER_NO" />
+    <result property="accountName" column="ACCOUNT_NAME" />
+    <result property="accountPassword" column="ACCOUNT_PASSWORD" />
     <result property="accountBalance" column="ACCOUNT_BALANCE" />
-    <!-- 필요한 추가 필드가 있다면 여기에 추가 -->
+    <result property="createDate" column="ACCOUNT_CREATE_DATE" />
+    <result property="accountStatus" column="ACCOUNT_STATUS" />
+    <result property="bankCode" column="BANK_CODE" />
+    <result property="accountType" column="ACCOUNT_TYPE" />
+    <result property="accountLimit" column="ACCOUNT_LIMIT" />
+    <result property="accountExpireDate" column="ACCOUNT_EXPIRE_DATE" />
+  </resultMap>
+
+  <resultMap id="AccountResultWithNameMap" type="kr.ac.kopo.hanafamily.mydata.dto.AccountWithNameDTO">
+    <id property="accountNo" column="ACCOUNT_NO" />
+    <result property="userNo" column="USER_NO" />
+    <result property="accountName" column="ACCOUNT_NAME" />
+    <result property="accountPassword" column="ACCOUNT_PASSWORD" />
+    <result property="accountBalance" column="ACCOUNT_BALANCE" />
+    <result property="createDate" column="ACCOUNT_CREATE_DATE" />
+    <result property="accountStatus" column="ACCOUNT_STATUS" />
+    <result property="bankCode" column="BANK_CODE" />
+    <result property="accountType" column="ACCOUNT_TYPE" />
+    <result property="accountLimit" column="ACCOUNT_LIMIT" />
+    <result property="accountExpireDate" column="ACCOUNT_EXPIRE_DATE" />
+    <result property="userName" column="USER_NAME" />
   </resultMap>
 
   <!-- Select Account by Account No -->
@@ -18,7 +39,15 @@
     SELECT
       ACCOUNT_NO,
       USER_NO,
-      ACCOUNT_BALANCE
+      ACCOUNT_NAME,
+      ACCOUNT_PASSWORD,
+      ACCOUNT_BALANCE,
+      ACCOUNT_CREATE_DATE,
+      ACCOUNT_STATUS,
+      BANK_CODE,
+      ACCOUNT_TYPE,
+      ACCOUNT_LIMIT,
+      ACCOUNT_EXPIRE_DATE
     FROM
       TB_ACCOUNT
     WHERE
@@ -30,9 +59,184 @@
     UPDATE
       TB_ACCOUNT
     SET
-      ACCOUNT_BALANCE = #{accountBalance}
+      ACCOUNT_BALANCE = #{accountBalance, jdbcType=INTEGER}
     WHERE
-      ACCOUNT_NO = #{accountNo}
+      ACCOUNT_NO = #{accountNo, jdbcType=VARCHAR}
   </update>
 
+  <!-- Insert Account -->
+  <insert id="insertMyDataAccounts" parameterType="kr.ac.kopo.hanafamily.mydata.dto.AccountDTO">
+    INSERT INTO TB_ACCOUNT (
+      ACCOUNT_NO,
+      USER_NO,
+      ACCOUNT_NAME,
+      ACCOUNT_PASSWORD,
+      ACCOUNT_BALANCE,
+      ACCOUNT_CREATE_DATE,
+      ACCOUNT_STATUS,
+      BANK_CODE,
+      ACCOUNT_TYPE,
+      ACCOUNT_LIMIT,
+      ACCOUNT_EXPIRE_DATE
+    ) VALUES (
+               #{accountNo, jdbcType=VARCHAR},
+               #{userNo, jdbcType=INTEGER},
+               #{accountName, jdbcType=VARCHAR},
+               #{accountPassword, jdbcType=VARCHAR},
+               #{accountBalance, jdbcType=INTEGER},
+               TO_DATE(#{createDate}, 'YYYY-MM-DD HH24:MI:SS'),
+               #{accountStatus, jdbcType=INTEGER},
+               #{bankCode, jdbcType=INTEGER},
+               #{accountType, jdbcType=INTEGER},
+               null,
+              null
+             )
+  </insert>
+
+  <select id="getIncomeByAccountNo" parameterType="String" resultType="kr.ac.kopo.hanafamily.mydata.dto.BankStatementDTO">
+    SELECT
+    TRANSACTION_NO,
+    ACCOUNT_NO,
+    TRANSACTION_AMOUNT,
+    TRANSACTION_DATE,
+    TRANSACTION_TYPE,
+    ACCOUNT_BALANCE,
+    USER_NO,
+    BEFORE_BALANCE,
+    ACCOUNT_NO_TO
+    FROM TB_BANKSTATEMENT
+    WHERE ACCOUNT_NO = #{accountNo, jdbcType=VARCHAR}
+    AND TRANSACTION_TYPE = 1  <!-- 입금을 의미하는 값으로 필터링 -->
+  </select>
+
+  <select id="getTransactionByAccountNo" parameterType="String" resultType="kr.ac.kopo.hanafamily.mydata.dto.BankStatementDTO">
+    SELECT
+    TRANSACTION_NO,
+    ACCOUNT_NO,
+    TRANSACTION_AMOUNT,
+    TRANSACTION_DATE,
+    TRANSACTION_TYPE,
+    ACCOUNT_BALANCE,
+    USER_NO,
+    BEFORE_BALANCE,
+    ACCOUNT_NO_TO
+    FROM TB_BANKSTATEMENT
+    WHERE ACCOUNT_NO = #{accountNo, jdbcType=VARCHAR}
+  </select>
+
+  <select id="getIncomeByFamilyId" parameterType="Integer" resultType="kr.ac.kopo.hanafamily.mydata.dto.BankStatementDTO">
+    SELECT
+      bs.TRANSACTION_NO,
+      bs.ACCOUNT_NO,
+      bs.TRANSACTION_AMOUNT,
+      bs.TRANSACTION_DATE,
+      bs.TRANSACTION_TYPE,
+      bs.ACCOUNT_BALANCE,
+      bs.USER_NO,
+      bs.BEFORE_BALANCE,
+      bs.ACCOUNT_NO_TO
+    FROM
+      TB_BANKSTATEMENT bs
+        JOIN TB_USERS u ON bs.USER_NO = u.USER_NO
+    WHERE
+      u.FAMILY_ID = #{familyId, jdbcType=INTEGER}
+      AND bs.TRANSACTION_TYPE = 1
+  </select>
+
+  <select id="findAccountByUserNo" parameterType="int" resultMap="AccountResultMap">
+    SELECT
+      ACCOUNT_NO,
+      USER_NO,
+      ACCOUNT_NAME,
+      ACCOUNT_PASSWORD,
+      ACCOUNT_BALANCE,
+      ACCOUNT_CREATE_DATE,
+      ACCOUNT_STATUS,
+      BANK_CODE,
+      ACCOUNT_TYPE,
+      ACCOUNT_LIMIT,
+      ACCOUNT_EXPIRE_DATE
+    FROM
+      TB_ACCOUNT
+    WHERE
+      USER_NO = #{userNo} AND BANK_CODE = 130
+  </select>
+
+  <select id="getMyAccountBalance" parameterType="int" resultType="int">
+    SELECT
+      SUM(ACCOUNT_BALANCE)
+    FROM
+      TB_ACCOUNT
+    WHERE
+      USER_NO = #{userNo}
+    GROUP BY
+      USER_NO
+  </select>
+
+  <select id="getFamilyAccountBalance" parameterType="int" resultType="int">
+    SELECT
+      SUM(ACCOUNT_BALANCE)
+    FROM
+      TB_ACCOUNT
+    WHERE
+      USER_NO IN (
+        SELECT
+          USER_NO
+        FROM
+          TB_USERS
+        WHERE
+          FAMILY_ID = #{familyId}
+      )
+  </select>
+
+  <select id="getFamilySavingsAccountBalance" parameterType="int" resultType="int">
+    SELECT
+      SUM(NVL(CURRENT_AMOUNT,0))
+    FROM
+      TB_SAVING_PRODUCT
+    WHERE
+      FAMILY_ID = #{familyId}
+  </select>
+
+  <select id="findAccountWithNameByPersonalUserNo" parameterType="int" resultMap="AccountResultWithNameMap">
+    SELECT
+      a.ACCOUNT_NO,
+      a.USER_NO,
+      a.ACCOUNT_NAME,
+      a.ACCOUNT_PASSWORD,
+      a.ACCOUNT_BALANCE,
+      a.ACCOUNT_CREATE_DATE,
+      a.ACCOUNT_STATUS,
+      a.BANK_CODE,
+      a.ACCOUNT_TYPE,
+      a.ACCOUNT_LIMIT,
+      a.ACCOUNT_EXPIRE_DATE,
+      u.USER_NAME
+    FROM
+      TB_ACCOUNT a
+        JOIN TB_USERS u ON a.USER_NO = u.USER_NO
+    WHERE
+      a.USER_NO = #{userNo}
+  </select>
+
+  <select id="findAccountWithNameByFamilyId" parameterType="int" resultMap="AccountResultWithNameMap">
+    SELECT
+      a.ACCOUNT_NO,
+      a.USER_NO,
+      a.ACCOUNT_NAME,
+      a.ACCOUNT_PASSWORD,
+      a.ACCOUNT_BALANCE,
+      a.ACCOUNT_CREATE_DATE,
+      a.ACCOUNT_STATUS,
+      a.BANK_CODE,
+      a.ACCOUNT_TYPE,
+      a.ACCOUNT_LIMIT,
+      a.ACCOUNT_EXPIRE_DATE,
+      u.USER_NAME
+    FROM
+      TB_ACCOUNT a
+        JOIN TB_USERS u ON a.USER_NO = u.USER_NO
+    WHERE
+      u.FAMILY_ID = #{familyId}
+  </select>
 </mapper>

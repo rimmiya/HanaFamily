@@ -70,4 +70,28 @@ public class SavingsController {
   public SavingProductDTO getSavingProduct(@RequestParam String savingAccountNo) {
     return savingsService.getSavingProduct(savingAccountNo);
   }
+
+  // 컨트롤러 설명 : 사용자의 저축 계좌에 대한 참여 정보를 반환합니다.
+  @GetMapping("/savings-participation-details")
+  public SavingsParticipationDTO getParticipationDetails(@RequestParam String savingAccountNo, @RequestParam Integer userNo) {
+    return savingsService.getParticipationDetails(savingAccountNo, userNo);
+  }
+
+  // 컨트롤러 설명 : 자동 이체 설정을 변경합니다.
+  @PostMapping("/update-auto-transfer")
+  public void changeParticipation(@RequestBody SavingsParticipationDTO savingsParticipationDTO) {
+    savingsService.changeParticipation(savingsParticipationDTO);
+  }
+
+  // 저축 목표 달성 혹은 적금 만기시 처리
+//  @GetMapping("/check-goal-achievement")
+//  public SavingProductDTO checkGoalAchievement(@RequestParam String savingAccountNo) {
+//    savingsService.checkGoalAchievement(savingAccountNo);
+//  }
+
+  // 초대 ID 기반 가족 조회
+  @GetMapping("/family-invitation")
+  public List<SavingsParticipationWithNameDTO> getFamilyInvitation(@RequestParam String savingAccountNo) {
+    return savingsService.selectParticipationWithNameBySavingAccountNo(savingAccountNo);
+  }
 }

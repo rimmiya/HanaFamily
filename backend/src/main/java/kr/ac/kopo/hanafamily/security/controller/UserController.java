@@ -2,6 +2,7 @@ package kr.ac.kopo.hanafamily.security.controller;
 
 import java.util.List;
 import kr.ac.kopo.hanafamily.security.jwt.service.CustomUserDetailsService;
+import kr.ac.kopo.hanafamily.sms.service.SendMessageService;
 import kr.ac.kopo.hanafamily.user.domain.LoginRequest;
 import kr.ac.kopo.hanafamily.user.domain.UserNameDTO;
 import kr.ac.kopo.hanafamily.user.domain.UserNameRequestDTO;
@@ -22,6 +23,10 @@ public class UserController {
 
   @Autowired
   private UserService userService;
+
+  @Autowired
+  private SendMessageService sendMessageService;
+
   @PostMapping("/login")
   public ResponseEntity<?> getUserDetails(@RequestBody LoginRequest loginRequest) {
     return ResponseEntity.ok(userService.signIn(loginRequest));
@@ -33,4 +38,9 @@ public class UserController {
     return userService.getUserNamesByUserNos(requestDTO.getUserNos());
   }
 
+  @PostMapping("/sms/send")
+  public ResponseEntity<?> sendSms(@RequestBody String phoneNumber) {
+    sendMessageService.sendMessage(phoneNumber, "인증번호는 9216입니다.");
+    return ResponseEntity.ok("success");
+  }
 }

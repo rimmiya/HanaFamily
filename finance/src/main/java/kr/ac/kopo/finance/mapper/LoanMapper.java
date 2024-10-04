@@ -7,6 +7,6 @@ import org.apache.ibatis.annotations.Param;
 
 @Mapper
 public interface LoanMapper {
-  List<LoanDTO> getLoanData(@Param("userNo") Integer userNo, @Param("loanCode") Integer loanCode);
+  List<LoanDTO> getLoanData(@Param("userNo") Integer userNo, @Param("loanCode") String loanCode);
 
 }

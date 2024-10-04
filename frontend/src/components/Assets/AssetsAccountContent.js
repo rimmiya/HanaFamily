@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Modal from "react-modal"; // react-modal import
 import {
   IoIosArrowDown,
@@ -11,44 +11,15 @@ import "../../style/AssetsAccountContent.css";
 import CustomProgressBar from "./Charts/CustomProgressBar";
 import { Swiper, SwiperSlide } from "swiper/react"; // Swiper와 SwiperSlide를 import
 import "swiper/swiper-bundle.css"; // Swiper 스타일 import
+import axios from "axios";
+import { useSelector } from "react-redux";
+import BucketListAccount from "../JointAssets/BucketListAccount";
+import { Table, Select } from "antd";
+
+const { Option } = Select;
 
 const hanalogo = `${process.env.PUBLIC_URL}/img/img-hana-symbol.png`;
-const data = [
-  {
-    category: "입출금",
-    accounts: [
-      {
-        type: "저축예금",
-        accountNumber: "443-910729-39307",
-        amount: 360580,
-        image: { hanalogo }, // 이미지 경로
-      },
-    ],
-  },
-  {
-    category: "예적금",
-    accounts: [
-      {
-        type: "하나 청년도약계좌",
-        accountNumber: "",
-        amount: 12600000,
-        interestRate: "4.70%",
-        maturityDate: "2029.02.26",
-        image: "/images/saving.png", // 이미지 경로
-      },
-      {
-        type: "하나 청년도약플러스 적금",
-        accountNumber: "",
-        amount: 2000000,
-        interestRate: "4.00%",
-        maturityDate: "2025.04.28 (D-254)",
-        image: "/images/saving2.png", // 다른 이미지 경로
-      },
-    ],
-  },
-];
 
-// 모달 스타일 설정
 const modalStyles = {
   content: {
     top: "50%",
@@ -61,15 +32,6 @@ const modalStyles = {
     borderRadius: "10px",
   },
 };
-
-// 레이더 차트 데이터
-const radarData = [
-  { subject: "입출금", value: 85 },
-  { subject: "증권", value: 65 },
-  { subject: "예적금", value: 90 },
-  { subject: "페이/포인트", value: 75 },
-  { subject: "기타", value: 60 },
-];
 
 const savingsProducts = [
   {
@@ -133,18 +95,110 @@ function AssetsAccountContent() {
   const [isHidden, setIsHidden] = useState(false);
   const [isExpandedDeposit, setIsExpandedDeposit] = useState(true);
   const [isExpandedSavings, setIsExpandedSavings] = useState(true);
-  const [modalIsOpen, setModalIsOpen] = useState(false);
+  const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedAccount, setSelectedAccount] = useState(null);
-  const [targetModalIsOpen, setTargetModalIsOpen] = useState(false);
-  const [targetAccounts, setTargetAccounts] = useState([]);
+  const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1); // 현재 달 설정
+  const [transactions, setTransactions] = useState([]); // 모든 거래 내역
+  const [filteredTransactions, setFilteredTransactions] = useState([]); // 필터링된 거래 내역
+  const [data, setData] = useState([]); // 서버에서 불러온 데이터를 저장할 상태
+  const [totalAssets, setTotalAssets] = useState(0); // 총 자산
+  const user = useSelector((state) => state.user.userInfo); // Redux에서 사용자 정보 가져오기
 
-  const [newAccount, setNewAccount] = useState("");
-  const [newName, setNewName] = useState("");
-  const [newPeriod, setNewPeriod] = useState("");
-  const [newGoalAmount, setNewGoalAmount] = useState("");
+  const [radarData, setRadarData] = useState([]);
+  const [activeTab, setActiveTab] = useState(0); // Initialize active tab state
+  const [swiperInstance, setSwiperInstance] = useState(null); // Store Swiper instance
 
-  const [activeTab, setActiveTab] = useState(0); // Initialize with 0 for "적금"
-  const [swiperInstance, setSwiperInstance] = useState(null);
+  // Function to handle tab clicks
+  const handleTabClick = (index) => {
+    setActiveTab(index); // Update the active tab index
+    if (swiperInstance) {
+      swiperInstance.slideTo(index); // Slide to the corresponding Swiper slide
+    }
+  };
+
+  useEffect(() => {
+    fetchAccountData(); // 컴포넌트 마운트 시 계좌 데이터 불러오기
+  }, []);
+
+  const handleSlideChange = (swiper) => {
+    setActiveTab(swiper.activeIndex); // Update active tab when slide changes
+  };
+
+  const fetchAccountData = async () => {
+    try {
+      if (!user.familyId) {
+        // familyId가 없을 때 개인 자산 API 호출
+        const totalResponse = await axios.get(
+          "http://localhost:8080/api/family/no-members",
+          {
+            params: { userNo: user.userNo },
+          }
+        );
+        const responseList = await axios.get(
+          "http://localhost:8080/api/savings/account/personal-list",
+          {
+            params: { userNo: user.userNo },
+          }
+        );
+        setTotalAssets(totalResponse.data);
+        processAccountData(responseList.data); // 받은 데이터를 처리
+      } else {
+        // familyId가 있을 때 가족 자산 API 호출
+        const totalResponse = await axios.get(
+          "http://localhost:8080/api/family/account-balance",
+          {
+            params: { familyId: user.familyId },
+          }
+        );
+        const responseList = await axios.get(
+          "http://localhost:8080/api/savings/account/family-list",
+          {
+            params: { familyId: user.familyId },
+          }
+        );
+        setTotalAssets(totalResponse.data);
+        processAccountData(responseList.data); // 받은 데이터를 처리
+      }
+      console.log("총 자산:", totalAssets);
+    } catch (error) {
+      console.error("자산 데이터를 불러오는 중 오류 발생:", error);
+    }
+  };
+
+  const processAccountData = (responseList) => {
+    const categorizedData = [
+      {
+        category: "입출금",
+        accounts: responseList.filter((account) => account.accountType === 3),
+      },
+      {
+        category: "적금",
+        accounts: responseList.filter((account) => account.accountType === 1),
+      },
+      {
+        category: "예금",
+        accounts: responseList.filter((account) => account.accountType === 2),
+      },
+    ];
+
+    const radarChartData = [
+      {
+        subject: "입출금",
+        value: calculateTotalAmountFromList(responseList, "입출금"),
+      },
+      {
+        subject: "예금",
+        value: calculateTotalAmountFromList(responseList, "예금"),
+      },
+      {
+        subject: "적금",
+        value: calculateTotalAmountFromList(responseList, "적금"),
+      },
+    ];
+
+    setRadarData(radarChartData); // 레이더 차트 데이터 설정
+    setData(categorizedData); // 카테고리 데이터 설정
+  };
 
   const toggleAmount = () => {
     setIsHidden(!isHidden);
@@ -160,61 +214,35 @@ function AssetsAccountContent() {
 
   const openModal = (account) => {
     setSelectedAccount(account);
-    setModalIsOpen(true);
+    fetchAccountTransactions(account.accountNo); // 계좌 거래 내역 호출
+    setIsModalVisible(true);
   };
 
   const closeModal = () => {
-    setModalIsOpen(false);
+    setIsModalVisible(false);
     setSelectedAccount(null);
-  };
-
-  const openTargetModal = () => {
-    setTargetModalIsOpen(true);
-  };
-
-  const closeTargetModal = () => {
-    setTargetModalIsOpen(false);
-    setNewAccount("");
-    setNewName("");
-    setNewPeriod("");
-    setNewGoalAmount("");
-  };
-
-  const addTargetAccount = () => {
-    const accountData = data
-      .flatMap((category) => category.accounts)
-      .find((account) => account.type === newAccount);
-
-    if (accountData) {
-      const targetAccount = {
-        account: newAccount,
-        name: newName,
-        period: newPeriod,
-        goalAmount: parseInt(newGoalAmount, 10),
-        currentAmount: accountData.amount,
-      };
-      setTargetAccounts([...targetAccounts, targetAccount]);
-      closeTargetModal();
-    }
-  };
-
-  const calculateProgress = (currentAmount, goalAmount) => {
-    return (currentAmount / goalAmount) * 100;
-  };
-
-  const calculateDDay = (period) => {
-    const endDate = new Date(period);
-    const today = new Date();
-    const diffTime = endDate - today;
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    return diffDays >= 0 ? diffDays : 0;
   };
 
   const calculateTotalAmount = (category) => {
     const categoryData = data.find((item) => item.category === category);
     if (categoryData) {
       return categoryData.accounts.reduce(
-        (total, account) => total + account.amount,
+        (total, account) => total + account.accountBalance,
+        0
+      );
+    }
+    return 0;
+  };
+
+  const calculateTotalAmountFromList = (responseList, category) => {
+    const categoryType =
+      category === "입출금" ? 3 : category === "적금" ? 1 : 2;
+    const categoryData = responseList.filter(
+      (account) => account.accountType === categoryType
+    );
+    if (categoryData.length > 0) {
+      return categoryData.reduce(
+        (total, account) => total + (account.accountBalance || 0),
         0
       );
     }
@@ -222,20 +250,61 @@ function AssetsAccountContent() {
   };
 
   const findMaxCategory = () => {
+    if (radarData.length === 0) return "";
+
     const maxData = radarData.reduce((prev, current) =>
       prev.value > current.value ? prev : current
     );
     return maxData.subject;
   };
 
-  const handleSlideChange = (swiper) => {
-    setActiveTab(swiper.activeIndex);
+  const handleMonthChange = (value) => {
+    setSelectedMonth(value);
+    filterTransactionsByMonth(transactions, value); // 달 변경 시 필터링
   };
 
-  const handleTabClick = (index) => {
-    setActiveTab(index);
-    if (swiperInstance) swiperInstance.slideTo(index); // Slide to the selected tab
+  const fetchAccountTransactions = async (accountNo) => {
+    try {
+      const response = await axios.get(
+        `http://localhost:8080/api/transactions/by-account-no`,
+        {
+          params: { accountNo: accountNo }, // accountNo 전달
+        }
+      );
+      setTransactions(response.data); // 전체 거래 내역 저장
+      filterTransactionsByMonth(response.data, selectedMonth); // 선택된 달에 맞춰 필터링
+    } catch (error) {
+      console.error("거래 내역을 불러오는 중 오류 발생:", error);
+    }
   };
+
+  const filterTransactionsByMonth = (transactions, month) => {
+    const filtered = transactions.filter((transaction) => {
+      const transactionDate = new Date(transaction.transactionDate);
+      return transactionDate.getMonth() + 1 === month; // 선택한 달에 맞는 거래 필터링
+    });
+    setFilteredTransactions(filtered);
+  };
+
+  const columns = [
+    {
+      title: "거래 금액",
+      dataIndex: "transactionAmount",
+      key: "transactionAmount",
+      render: (amount) => `${amount.toLocaleString()} 원`,
+    },
+    {
+      title: "거래 일자",
+      dataIndex: "transactionDate",
+      key: "transactionDate",
+      render: (date) => new Date(date).toLocaleDateString(),
+    },
+    {
+      title: "거래 내역",
+      dataIndex: "transactionDetail",
+      key: "transactionDetail",
+    },
+  ];
 
   return (
     <div className="assets-account-container">
@@ -250,16 +319,10 @@ function AssetsAccountContent() {
                 {isHidden ? "보이기" : "숨기기"}
               </button>
             </div>
-            <h1>
-              {isHidden
-                ? "???"
-                : `${(
-                    calculateTotalAmount("입출금") +
-                    calculateTotalAmount("예적금")
-                  ).toLocaleString()}원`}
-            </h1>
+            <h1>{isHidden ? "???" : `${totalAssets.toLocaleString()}원`}</h1>
           </div>
 
+          {/* 입출금 카테고리 */}
           <div className="account-section">
             <div
               style={{
@@ -273,10 +336,8 @@ function AssetsAccountContent() {
               <h4 style={{ fontWeight: "600" }}>
                 입출금{" "}
                 <span style={{ fontWeight: "bold", color: "#00978d" }}>
-                  {
-                    data.find((item) => item.category === "입출금").accounts
-                      .length
-                  }
+                  {data.find((item) => item.category === "입출금")?.accounts
+                    .length || 0}
                 </span>
               </h4>
               <div style={{ display: "flex", alignItems: "center" }}>
@@ -297,7 +358,7 @@ function AssetsAccountContent() {
               <div className="account-card">
                 {data
                   .find((item) => item.category === "입출금")
-                  .accounts.map((account, index) => (
+                  ?.accounts.map((account, index) => (
                     <div key={index} className="account-details-row">
                       <div
                         className="account-detail-item"
@@ -316,8 +377,10 @@ function AssetsAccountContent() {
                             style={{ width: "30px", height: "30px" }}
                           />
                           <div style={{ marginLeft: "15px" }}>
-                            <p style={{ fontWeight: "600" }}>{account.type}</p>
-                            {account.accountNumber && (
+                            <p style={{ fontWeight: "600" }}>
+                              {account.accountName}
+                            </p>
+                            {account.accountNo && (
                               <p
                                 style={{
                                   color: "gray",
@@ -325,11 +388,14 @@ function AssetsAccountContent() {
                                   paddingTop: "5px",
                                 }}
                               >
-                                {account.accountNumber}
+                                {account.accountNo}
                               </p>
                             )}
                             <p style={{ fontWeight: "600" }}>
-                              {account.amount.toLocaleString()}원
+                              {account.userName}
+                            </p>
+                            <p style={{ fontWeight: "600" }}>
+                              {account.accountBalance.toLocaleString()}원
                             </p>
                           </div>
                         </div>
@@ -344,8 +410,8 @@ function AssetsAccountContent() {
                         />
                       </div>
                       {index <
-                        data.find((item) => item.category === "입출금").accounts
-                          .length -
+                        data.find((item) => item.category === "입출금")
+                          ?.accounts.length -
                           1 && (
                         <hr
                           style={{
@@ -361,6 +427,7 @@ function AssetsAccountContent() {
             )}
           </div>
 
+          {/* 예적금 카테고리 */}
           <div className="account-section">
             <div
               style={{
@@ -372,17 +439,15 @@ function AssetsAccountContent() {
               onClick={toggleExpandedSavings}
             >
               <h4 style={{ fontWeight: "600" }}>
-                예적금{" "}
+                적금{" "}
                 <span style={{ fontWeight: "bold", color: "#00978d" }}>
-                  {
-                    data.find((item) => item.category === "예적금").accounts
-                      .length
-                  }
+                  {data.find((item) => item.category === "적금")?.accounts
+                    .length || 0}
                 </span>
               </h4>
               <div style={{ display: "flex", alignItems: "center" }}>
                 <p style={{ fontSize: "20px", fontWeight: "bold" }}>
-                  {calculateTotalAmount("예적금").toLocaleString()}원
+                  {calculateTotalAmount("적금").toLocaleString()}원
                 </p>
                 <span style={{ paddingLeft: "10px" }}>
                   {isExpandedSavings ? (
@@ -397,8 +462,8 @@ function AssetsAccountContent() {
             {isExpandedSavings && (
               <div className="account-card">
                 {data
-                  .find((item) => item.category === "예적금")
-                  .accounts.map((account, index) => (
+                  .find((item) => item.category === "적금")
+                  ?.accounts.map((account, index) => (
                     <div key={index} className="account-details-row">
                       <div
                         className="account-detail-item"
@@ -412,7 +477,7 @@ function AssetsAccountContent() {
                           style={{ display: "flex", alignItems: "flex-start" }}
                         >
                           <img
-                            src={account.image}
+                            src={account.image || hanalogo}
                             alt={account.type}
                             style={{ width: "30px", height: "30px" }}
                           />
@@ -420,12 +485,20 @@ function AssetsAccountContent() {
                             <p
                               style={{ fontWeight: "600", marginBottom: "5px" }}
                             >
-                              {account.type}
+                              {account.accountName}
                             </p>
                             <p
                               style={{ fontWeight: "600", marginBottom: "5px" }}
                             >
-                              {account.amount.toLocaleString()}원
+                              {account.accountNo}
+                            </p>
+                            <p
+                              style={{ fontWeight: "600", marginBottom: "5px" }}
+                            >
+                              {account.accountBalance.toLocaleString()}원
+                            </p>
+                            <p style={{ fontWeight: "600" }}>
+                              {account.userName}
                             </p>
                             {account.interestRate && (
                               <p
@@ -462,7 +535,7 @@ function AssetsAccountContent() {
                         />
                       </div>
                       {index <
-                        data.find((item) => item.category === "예적금").accounts
+                        data.find((item) => item.category === "적금")?.accounts
                           .length -
                           1 && (
                         <hr
@@ -477,11 +550,141 @@ function AssetsAccountContent() {
                   ))}
               </div>
             )}
+
+            {/* 예적금 카테고리 */}
+            <div className="account-section">
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  cursor: "pointer",
+                }}
+                onClick={toggleExpandedSavings}
+              >
+                <h4 style={{ fontWeight: "600" }}>
+                  예금{" "}
+                  <span style={{ fontWeight: "bold", color: "#00978d" }}>
+                    {data.find((item) => item.category === "예금")?.accounts
+                      .length || 0}
+                  </span>
+                </h4>
+                <div style={{ display: "flex", alignItems: "center" }}>
+                  <p style={{ fontSize: "20px", fontWeight: "bold" }}>
+                    {calculateTotalAmount("예금").toLocaleString()}원
+                  </p>
+                  <span style={{ paddingLeft: "10px" }}>
+                    {isExpandedSavings ? (
+                      <IoIosArrowUp size={20} />
+                    ) : (
+                      <IoIosArrowDown size={20} />
+                    )}
+                  </span>
+                </div>
+              </div>
+
+              {isExpandedSavings && (
+                <div className="account-card">
+                  {data
+                    .find((item) => item.category === "예금")
+                    ?.accounts.map((account, index) => (
+                      <div key={index} className="account-details-row">
+                        <div
+                          className="account-detail-item"
+                          style={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                            alignItems: "center",
+                          }}
+                        >
+                          <div
+                            style={{
+                              display: "flex",
+                              alignItems: "flex-start",
+                            }}
+                          >
+                            <img
+                              src={account.image || hanalogo}
+                              alt={account.type}
+                              style={{ width: "30px", height: "30px" }}
+                            />
+                            <div style={{ marginLeft: "15px" }}>
+                              <p
+                                style={{
+                                  fontWeight: "600",
+                                  marginBottom: "5px",
+                                }}
+                              >
+                                {account.type}
+                              </p>
+                              <p
+                                style={{
+                                  fontWeight: "600",
+                                  marginBottom: "5px",
+                                }}
+                              >
+                                {account.accountBalance.toLocaleString()}원
+                              </p>
+                              <p style={{ fontWeight: "600" }}>
+                                {account.userName}
+                              </p>
+                              {account.interestRate && (
+                                <p
+                                  style={{
+                                    fontSize: "15px",
+                                    color: "#26b3b0",
+                                    fontWeight: "600",
+                                  }}
+                                >
+                                  이자율 {account.interestRate}
+                                </p>
+                              )}
+                              {account.maturityDate && (
+                                <p
+                                  style={{
+                                    fontSize: "15px",
+                                    color: "#879deb",
+                                    fontWeight: "600",
+                                  }}
+                                >
+                                  만기일 {account.maturityDate}
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                          <IoIosArrowForward
+                            size={20}
+                            onClick={() => openModal(account)}
+                            style={{
+                              cursor: "pointer",
+                              color: "#00978d",
+                              marginLeft: "auto",
+                            }}
+                          />
+                        </div>
+                        {index <
+                          data.find((item) => item.category === "예금")
+                            ?.accounts.length -
+                            1 && (
+                          <hr
+                            style={{
+                              borderColor: "#e0e0e0",
+                              margin: "10px 0",
+                              border: "0.7px solid",
+                            }}
+                          />
+                        )}
+                      </div>
+                    ))}
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
+        {/* 거래 내역 모달 */}
         <Modal
-          isOpen={modalIsOpen}
+          isOpen={isModalVisible}
           onRequestClose={closeModal}
           style={modalStyles}
           contentLabel="Account Details Modal"
@@ -489,67 +692,37 @@ function AssetsAccountContent() {
           {selectedAccount && (
             <div>
               <h2>{selectedAccount.type}</h2>
-              <p>{selectedAccount.amount.toLocaleString()}원</p>
+              <p>{selectedAccount.accountBalance.toLocaleString()}원</p>
               {selectedAccount.interestRate && (
                 <p>이자율: {selectedAccount.interestRate}</p>
               )}
               {selectedAccount.maturityDate && (
                 <p>만기일: {selectedAccount.maturityDate}</p>
               )}
+
+              {/* 월 선택기 */}
+              <Select
+                value={selectedMonth}
+                onChange={handleMonthChange}
+                style={{ width: 120, marginBottom: "20px" }}
+              >
+                {Array.from({ length: 12 }, (_, i) => (
+                  <Option key={i + 1} value={i + 1}>
+                    {i + 1}월
+                  </Option>
+                ))}
+              </Select>
+
+              {/* 거래 내역 테이블 */}
+              <Table
+                columns={columns}
+                dataSource={filteredTransactions}
+                pagination={false} // 페이징 없음
+              />
+
               <button onClick={closeModal}>닫기</button>
             </div>
           )}
-        </Modal>
-
-        <Modal
-          isOpen={targetModalIsOpen}
-          onRequestClose={closeTargetModal}
-          style={modalStyles}
-          contentLabel="Target Account Modal"
-        >
-          <h2>목표 계좌 추가</h2>
-          <div>
-            <label>계좌 유형:</label>
-            <select
-              value={newAccount}
-              onChange={(e) => setNewAccount(e.target.value)}
-            >
-              <option value="">선택하세요</option>
-              {data
-                .flatMap((category) => category.accounts)
-                .map((account, index) => (
-                  <option key={index} value={account.type}>
-                    {account.type}
-                  </option>
-                ))}
-            </select>
-          </div>
-          <div>
-            <label>이름:</label>
-            <input
-              type="text"
-              value={newName}
-              onChange={(e) => setNewName(e.target.value)}
-            />
-          </div>
-          <div>
-            <label>목표 기간:</label>
-            <input
-              type="date"
-              value={newPeriod}
-              onChange={(e) => setNewPeriod(e.target.value)}
-            />
-          </div>
-          <div>
-            <label>목표 금액:</label>
-            <input
-              type="number"
-              value={newGoalAmount}
-              onChange={(e) => setNewGoalAmount(e.target.value)}
-            />
-          </div>
-          <button onClick={addTargetAccount}>추가</button>
-          <button onClick={closeTargetModal}>취소</button>
         </Modal>
 
         <div className="assets-account-right">
@@ -566,51 +739,13 @@ function AssetsAccountContent() {
                 {findMaxCategory()} 계좌가 가장 많아요 !
               </p>
             </div>
-            <AccountRaderChart />
+            <AccountRaderChart radarData={radarData} />
           </div>
 
-          <div className="target-account-container">
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                marginBottom: "10px",
-              }}
-            >
-              <h4 style={{ fontWeight: "600" }}>목표 금액 모으기</h4>
-              <button onClick={openTargetModal}>목표 추가하기</button>
-            </div>
-            <div className="target-account-content">
-              {targetAccounts.map((target, index) => (
-                <div key={index} className="target-account-item">
-                  <h4>{target.name}</h4>
-                  <div
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "space-between",
-                    }}
-                  >
-                    <div style={{ display: "flex", alignItems: "center" }}>
-                      <p style={{ fontWeight: "600" }}>
-                        {target.currentAmount.toLocaleString()}원
-                      </p>
-                      <p style={{ color: "gray" }}>
-                        &nbsp;/ {target.goalAmount.toLocaleString()}원
-                      </p>
-                    </div>
-                    <p>
-                      ~{target.period}(D-{calculateDDay(target.period)})
-                    </p>
-                  </div>
-                  <CustomProgressBar {...target} />
-                </div>
-              ))}
-            </div>
-          </div>
+          <BucketListAccount />
 
           <div className="popular-financial-products">
-            <h4 style={{ fontWeight: "600" }}>또래 인기 금융상품</h4>
+            <h4 style={{ fontWeight: "600" }}>인기 금융상품</h4>
             <div
               style={{
                 width: "90%",
@@ -647,7 +782,6 @@ function AssetsAccountContent() {
                       >
                         <div className="product-rank">{product.rank}</div>
                         <img
-                          // src={product.icon}
                           src={hanalogo}
                           alt="product icon"
                           className="product-icon"
@@ -678,7 +812,6 @@ function AssetsAccountContent() {
                       >
                         <div className="product-rank">{product.rank}</div>
                         <img
-                          // src={product.icon}
                           src={hanalogo}
                           alt="product icon"
                           className="product-icon"

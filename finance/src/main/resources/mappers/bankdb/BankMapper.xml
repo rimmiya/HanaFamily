@@ -40,11 +40,13 @@
       loan_balance AS loanBalance,     -- 대출 잔액
       loan_interest AS loanInterest,   -- 대출 이자
       loan_account AS loanAccount,     -- 대출 계좌
-      loan_bank AS loanBank            -- 대출 은행
+      loan_bank AS loanBank,            -- 대출 은행
+      loan_repayment_date AS loanRepaymentDate,-- 대출 상환 날짜
+      loan_monthly_repayment AS loanMonthlyRepayment-- 대출 월 상환액
     FROM tb_loan
     WHERE
       user_no = #{userNo}
-      AND loan_code = #{loanCode}
+      AND loan_bank = #{loanBank}
   </select>
 
   <select id="getBankStatementData" resultType="kr.ac.kopo.finance.dto.BankStatementDTO">
@@ -64,5 +66,28 @@
       AND account_no = #{accountNo}
   </select>
 
-
+ <select id="getLoanTransactionData" resultType="kr.ac.kopo.finance.dto.LoanDTO">
+    SELECT
+      loan_id AS loanId,                      -- 대출 ID
+      loan_type AS loanType,                  -- 대출 유형
+      loan_amount AS loanAmount,              -- 대출 금액
+      loan_date AS loanDate,                  -- 대출 날짜
+      loan_state AS loanState,                -- 대출 상태
+      loan_term AS loanTerm,                  -- 대출 기간
+      loan_code AS loanCode,                  -- 대출 코드
+      loan_end_date AS loanEndDate,           -- 대출 종료일
+      loan_name AS loanName,                  -- 대출 이름
+      loan_rate AS loanRate,                  -- 대출 이자율
+      loan_interest AS loanInterest,          -- 대출 이자
+      loan_account AS loanAccount,            -- 대출 계좌
+      loan_bank AS loanBank,                  -- 대출 은행
+      loan_balance AS loanBalance,            -- 거래 후 대출 잔액
+      user_no AS userNo,                      -- 사용자 번호
+      loan_repayment_date AS loanRepaymentDate,-- 대출 상환 날짜
+      loan_monthly_payment AS loanMonthlyPayment,-- 대출 월 상환액
+    FROM tb_loan
+    WHERE
+      user_no = #{userNo}
+      AND loan_id = #{loanId}
+  </select>
 </mapper>

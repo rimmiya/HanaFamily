@@ -1,4 +1,4 @@
-package kr.ac.kopo.hanafamily.mydata.dto;
+package kr.ac.kopo.finance.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import java.util.Date;
@@ -29,5 +29,5 @@ public class LoanDTO {
   private String loanBank;
   @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
   private Date loanRepaymentDate;
-  private Integer loanMonthlyPayment;
+  private Integer loanMonthlyRepayment;
 }

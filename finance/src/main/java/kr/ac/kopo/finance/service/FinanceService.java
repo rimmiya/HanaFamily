@@ -6,6 +6,7 @@ import kr.ac.kopo.finance.dto.CardDTO;
 import kr.ac.kopo.finance.dto.InsuranceDTO;
 import kr.ac.kopo.finance.dto.LoanDTO;
 import kr.ac.kopo.finance.dto.SecurityDTO;
+import kr.ac.kopo.finance.mapper.LoanMapper;
 import kr.ac.kopo.finance.mapper.bank.BankMapper;
 import kr.ac.kopo.finance.mapper.card.CardMapper;
 import kr.ac.kopo.finance.mapper.insurance.InsuranceMapper;
@@ -28,6 +29,7 @@ public class FinanceService {
   @Autowired
   private InsuranceMapper insuranceMapper;
 
+
   public List<AccountDTO> getBankAccountData(Integer userNo, Integer bankCode) {
     // 사용자의 은행 코드로 사용자의 계좌 정보를 가져옴
     return bankMapper.getBankAccountData(userNo, bankCode);
@@ -38,9 +40,9 @@ public class FinanceService {
     return cardMapper.getCardData(userNo, cardCode);
   }
 
-  public List<LoanDTO> getLoanAccountData(Integer userNo, String loanCode) {
+  public List<LoanDTO> getLoanAccountData(Integer userNo, String loanBank) {
     // 사용자의 대출 코드로 사용자의 대출 정보를 가져옴
-    return bankMapper.getLoanData(userNo, loanCode);
+    return bankMapper.getLoanData(userNo, loanBank);
   }
 
   public List<SecurityDTO> getSecurityData(Integer userNo, String securityCode) {

@@ -29,7 +29,7 @@ public class MyDataController {
 
     List<AccountDTO> accountList = myDataService.getBankAccountData(requestData.getUserNo(), requestData.getBankCode());
     List<CardDTO> cardList = myDataService.getCardData(requestData.getUserNo(), requestData.getCardCode());
-    List<LoanDTO> loanList = myDataService.getLoanData(requestData.getUserNo(), requestData.getLoanCode());
+    List<LoanDTO> loanList = myDataService.getLoanData(requestData.getUserNo(), requestData.getLoanBank());
     List<InsuranceDTO> insuranceList = myDataService.getInsuranceData(requestData.getUserNo(), requestData.getInsuranceCode());
     List<SecurityDTO> securityList = myDataService.getSecurityData(requestData.getUserNo(), requestData.getSecurityCode());
 

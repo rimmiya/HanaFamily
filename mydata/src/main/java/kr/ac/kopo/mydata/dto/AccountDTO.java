@@ -12,7 +12,7 @@ public class AccountDTO {
   private String accountNo;
   private Integer userNo;
   private String accountName;
-  private Integer accountPassword;
+  private String accountPassword;
   private Integer accountBalance;
   private Date createDate;
   private Integer accountStatus;

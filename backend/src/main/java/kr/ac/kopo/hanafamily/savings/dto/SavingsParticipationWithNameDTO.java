@@ -9,9 +9,10 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class SavingsParticipationDTO {
+public class SavingsParticipationWithNameDTO {
   private String savingAccountNo; // SAVING_ACCOUNT_NO
   private Integer userId; // USER_ID
+  private String userName; // USER_NAME
   private String userAccountNo; // USER_ACCOUNT_NO
   private Integer familyId; // FAMILY_ID
   @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")

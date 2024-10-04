@@ -50,13 +50,20 @@ const InvitationNotifications = () => {
           params: { userNo: user.userNo }, // 실제 로그인된 사용자의 userNo를 넣어줍니다.
         }
       );
-      setNotifications(response.data); // 상태에 저장
-      // 초대 ID 저장
-      setParticipationDetails((prev) => ({
-        ...prev,
-        invitationId: response.data[0]?.invitationId,
-        savingAccountNo: response.data[0]?.savingAccountNo,
-      }));
+
+      // 알림이 존재하는지 확인하고 처리
+      if (response.data && response.data.length > 0) {
+        setNotifications(response.data); // 상태에 저장
+
+        // 첫 번째 알림의 invitationId와 savingAccountNo만 저장 (알림이 있을 때만)
+        setParticipationDetails((prev) => ({
+          ...prev,
+          invitationId: response.data[0]?.invitationId,
+          savingAccountNo: response.data[0]?.savingAccountNo,
+        }));
+      } else {
+        setNotifications([]); // 알림이 없으면 빈 배열로 설정
+      }
     } catch (error) {
       console.error("알림 목록을 불러오는 중 오류 발생:", error);
     }
@@ -72,7 +79,11 @@ const InvitationNotifications = () => {
       userId: user.userNo, // Redux의 user 정보에서 userId 설정
       familyId: user.familyId, // Redux의 user 정보에서 familyId 설정
     }));
-    setIsModalVisible(true); // 모달 표시
+    // 상태로 데이터를 전달
+    navigate("/inviteeconfirmaccount", {
+      state: { invitationId, savingAccountNo },
+    });
+    // navigate("/inviteeconfirmaccount");
   };
 
   // 가족 초대 수락 시 페이지 이동하고 알림 삭제
@@ -88,6 +99,20 @@ const InvitationNotifications = () => {
       navigate("/assetsjoin");
     } catch (error) {
       console.error("가족 초대 수락 중 오류 발생:", error);
+    }
+  };
+
+  // 저축 해지
+  const handleTerminateSavings = async (savingAccountNo) => {
+    try {
+      setNotifications((prev) =>
+        prev.filter(
+          (notification) => notification.savingAccountNo !== savingAccountNo
+        )
+      );
+      navigate("/successsavings");
+    } catch (error) {
+      console.error("저축 해지 중 오류 발생:", error);
     }
   };
 
@@ -156,9 +181,9 @@ const InvitationNotifications = () => {
       {/* 알림 드롭다운 */}
       {isDropdownVisible && (
         <div style={styles.dropdown}>
-          <h4>알림</h4>
+          <h4 className="text-center mb-3">알림</h4>
           {notifications.length === 0 ? (
-            <p>새로운 알림이 없습니다.</p>
+            <p className="text-center">새로운 알림이 없습니다.</p>
           ) : (
             notifications.map((notification, index) => (
               <div key={index} style={styles.notificationItem}>
@@ -182,95 +207,20 @@ const InvitationNotifications = () => {
                   >
                     가족 초대 수락
                   </Button>
+                ) : notification.type === "savings_terminate" ? (
+                  <Button
+                    onClick={() =>
+                      handleTerminateSavings(notification.savingAccountNo)
+                    }
+                  >
+                    저축 해지
+                  </Button>
                 ) : null}
               </div>
             ))
           )}
         </div>
       )}
-
-      {/* 모달 - 저축 초대 정보 입력 */}
-      <Modal
-        title="저축 초대 정보 입력"
-        visible={isModalVisible}
-        onOk={handleModalOk}
-        onCancel={() => setIsModalVisible(false)}
-      >
-        <Select placeholder="은행명" style={{ marginBottom: "10px" }}>
-          <Option value="하나은행">하나은행</Option>
-          <Option value="신한은행">신한은행</Option>
-          <Option value="국민은행">국민은행</Option>
-          <Option value="우리은행">우리은행</Option>
-        </Select>
-        <Input
-          placeholder="사용자 계좌번호"
-          value={participationDetails.userAccountNo}
-          onChange={(e) => handleInputChange("userAccountNo", e.target.value)}
-          style={{ marginBottom: "10px" }}
-        />
-        <Input
-          placeholder="자동 이체 금액"
-          type="number"
-          value={participationDetails.autoTransferAmount}
-          onChange={(e) =>
-            handleInputChange("autoTransferAmount", e.target.value)
-          }
-          style={{ marginBottom: "10px" }}
-        />
-        <Select
-          placeholder="자동 이체 날짜"
-          value={participationDetails.autoTransferDate}
-          onChange={(value) => handleInputChange("autoTransferDate", value)}
-          style={{ marginBottom: "10px" }}
-        >
-          <Option value="1">1일</Option>
-          <Option value="2">2일</Option>
-          <Option value="3">3일</Option>
-          <Option value="4">4일</Option>
-          <Option value="5">5일</Option>
-          <Option value="6">6일</Option>
-          <Option value="7">7일</Option>
-          <Option value="8">8일</Option>
-          <Option value="9">9일</Option>
-          <Option value="10">10일</Option>
-          <Option value="11">11일</Option>
-          <Option value="12">12일</Option>
-          <Option value="13">13일</Option>
-          <Option value="14">14일</Option>
-          <Option value="15">15일</Option>
-          <Option value="16">16일</Option>
-          <Option value="17">17일</Option>
-          <Option value="18">18일</Option>
-          <Option value="19">19일</Option>
-          <Option value="20">20일</Option>
-          <Option value="21">21일</Option>
-          <Option value="22">22일</Option>
-          <Option value="23">23일</Option>
-          <Option value="24">24일</Option>
-          <Option value="25">25일</Option>
-          <Option value="26">26일</Option>
-          <Option value="27">27일</Option>
-          <Option value="28">28일</Option>
-          <Option value="29">29일</Option>
-          <Option value="30">30일</Option>
-          <Option value="31">31일</Option>
-        </Select>
-        <Checkbox
-          checked={participationDetails.autoTransferSmsYn}
-          onChange={(e) =>
-            handleInputChange("autoTransferSmsYn", e.target.checked)
-          }
-        >
-          자동 이체 SMS 알림
-        </Checkbox>
-        <Checkbox
-          checked={participationDetails.maturitySmsYn}
-          onChange={(e) => handleInputChange("maturitySmsYn", e.target.checked)}
-          style={{ marginLeft: "20px" }}
-        >
-          만기 SMS 알림
-        </Checkbox>
-      </Modal>
     </div>
   );
 };
@@ -278,8 +228,7 @@ const InvitationNotifications = () => {
 const styles = {
   dropdown: {
     position: "absolute",
-    top: "30px",
-    right: "0px",
+    top: "35px",
     width: "250px",
     backgroundColor: "#fff",
     border: "1px solid #ccc",

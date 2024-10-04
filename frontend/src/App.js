@@ -10,7 +10,7 @@ import AssetsSecurities from "./pages/Assets/AssetsSecurities";
 import AssetsLoan from "./pages/Assets/AssetsLoan";
 import AssetsInsurance from "./pages/Assets/AssetsInsurance";
 import JointAssets from "./pages/JointAssets/JointAssets";
-import JointAssetsJoin from "./pages/JointAssets/JointAssetsJoin";
+// import JointAssetsJoin from "./pages/JointAssets/JointAssetsJoin";
 import FamilyJoinRedirect from "./pages/JointAssets/FamilyJoinRedirect";
 import InviteSuccess from "./components/JointAssets/InviteSuccess";
 import InviteFailed from "./components/JointAssets/InviteFailed";
@@ -18,6 +18,8 @@ import TogetherAccount from "./pages/TogetherAccount/TogetherAccount";
 import TogetherAccountJoin from "./pages/TogetherAccount/TogetherAccountJoin";
 import ConfirmationAccount from "./pages/TogetherAccount/ConfirmationAccount";
 import TogetherAccountSetting from "./pages/TogetherAccount/TogetherAccountSetting";
+import SuccessSavings from "./pages/TogetherAccount/SuccessSavings";
+import InviteeConfirmAccount from "./pages/TogetherAccount/InviteeConfirmAccount";
 import AccountBook from "./pages/AccountBook/AccountBook";
 
 function App() {
@@ -33,17 +35,23 @@ function App() {
         <Route path="/assetsloan" element={<AssetsLoan />} />
         <Route path="/assetsinsurance" element={<AssetsInsurance />} />
         <Route path="/jointassets" element={<JointAssets />} />
-        <Route path="/jointassetsjoin" element={<JointAssetsJoin />} />
+        {/* <Route path="/jointassetsjoin" element={<JointAssetsJoin />} /> */}
         <Route path="/invite-success" element={<InviteSuccess />} />
         <Route path="/invite-failed" element={<InviteFailed />} />
         <Route path="/familyjoinredirect" element={<FamilyJoinRedirect />} />
         <Route path="/togetheraccount" element={<TogetherAccount />} />
         <Route path="/togetheraccountjoin" element={<TogetherAccountJoin />} />
         <Route path="/confirmationaccount" element={<ConfirmationAccount />} />
+        <Route path="/successsavings" element={<SuccessSavings />} />
         <Route
           path="/togetheraccountsetting"
           element={<TogetherAccountSetting />}
         />
+        <Route
+          path="/inviteeconfirmaccount"
+          element={<InviteeConfirmAccount />}
+        />
+        <Route path="/accountbook" element={<AccountBook />} />
         <Route path="/auth" element={<Auth />} />
       </Routes>
     </div>

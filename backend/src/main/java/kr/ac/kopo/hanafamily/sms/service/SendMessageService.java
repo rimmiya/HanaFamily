@@ -16,10 +16,10 @@ public class SendMessageService {
   final DefaultMessageService messageService;
 
 //  @Value("${coolSMS.api.key}")
-  private String apiKey="NCSHINAFFUJIEDQQ";
+  private String apiKey="NCSWXELQBBIFHHLP";
 
 //  @Value("${coolSMS.api.secret}")
-  private String apiSecret="3G6M0OLKUOJKGFSTRXIUSEWRNICYTDYM";
+  private String apiSecret="IFTIDF1RT7ITB3BWMBEW9Y4WKLIPK5P2";
 
 //  @Value("${coolSMS.api.url}")
   private String apiUrl="https://api.coolsms.co.kr";
@@ -29,7 +29,7 @@ public class SendMessageService {
   }
   public void sendMessage(String to, String text){
     Message message = new Message();
-    message.setFrom("01073604760"); // 01012345678 형태여야 함.
+    message.setFrom("01082076120"); // 01012345678 형태여야 함.
     message.setTo("01073604760"); // 01012345678 형태여야 함.
     message.setText(text);
     SingleMessageSentResponse response = this.messageService.sendOne(new SingleMessageSendingRequest(message));

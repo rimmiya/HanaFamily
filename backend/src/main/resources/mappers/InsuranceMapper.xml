@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.ac.kopo.hanafamily.mydata.mapper.InsuranceMapper">
+
+  <resultMap id="InsuranceResultWithNameMap" type="kr.ac.kopo.hanafamily.mydata.dto.InsuranceWithNameDTO">
+    <id column="INSURANCE_ID" property="insuranceId"/>
+    <result column="INSURANCE_TYPE" property="insuranceType"/>
+    <result column="INSURANCE_AMOUNT" property="insuranceAmount"/>
+    <result column="INSURANCE_START_DATE" property="insuranceStartDate"/>
+    <result column="INSURANCE_END_DATE" property="insuranceEndDate"/>
+    <result column="INSURANCE_TERM" property="insuranceTerm"/>
+    <result column="INSURANCE_STATE" property="insuranceState"/>
+    <result column="INSURANCE_RENEWAL" property="insuranceRenewal"/>
+    <result column="INSURANCE_PAYMENT_TYPE" property="insurancePaymentType"/>
+    <result column="INSURANCE_PAYMENT_CYCLE" property="insurancePaymentCycle"/>
+    <result column="INSURANCE_PAYMENT_TOTAL" property="insurancePaymentTotal"/>
+    <result column="INSURANCE_PAYMENT_DATE" property="insurancePaymentDate"/>
+    <result column="USER_NO" property="userNo"/>
+    <result column="USER_NAME" property="userName"/>
+    <result column="INSURANCE_CODE" property="insuranceCode"/>
+    <result column="INSURANCE_NAME" property="insuranceName"/>
+    <result column="INSURANCE_ACCOUNT" property="insuranceAccount"/>
+    <result column="INSURANCE_COMPANY" property="insuranceCompany"/>
+    <result column="INSURANCE_MONTHLY_PAYMENT" property="insuranceMonthlyPayment"/>
+  </resultMap>
+
+  <select id="getInsurancePersonalData" resultMap="InsuranceResultWithNameMap">
+    SELECT
+      I.INSURANCE_ID,
+      I.INSURANCE_TYPE,
+      I.INSURANCE_AMOUNT,
+      I.INSURANCE_START_DATE,
+      I.INSURANCE_END_DATE,
+      I.INSURANCE_TERM,
+      I.INSURANCE_STATE,
+      I.INSURANCE_RENEWAL,
+      I.INSURANCE_PAYMENT_TYPE,
+      I.INSURANCE_PAYMENT_CYCLE,
+      I.INSURANCE_PAYMENT_TOTAL,
+      I.INSURANCE_PAYMENT_DATE,
+      I.USER_NO,
+      I.INSURANCE_CODE,
+      I.INSURANCE_NAME,
+      I.INSURANCE_ACCOUNT,
+      I.INSURANCE_COMPANY,
+      I.INSURANCE_MONTHLY_PAYMENT,
+      U.USER_NAME
+    FROM
+      TB_INSURANCE I
+        JOIN TB_USERS U
+             ON I.USER_NO = U.USER_NO
+    WHERE
+      I.USER_NO = #{userNo}
+  </select>
+
+  <select id="getInsuranceFamilyData" resultMap="InsuranceResultWithNameMap">
+    SELECT
+      I.INSURANCE_ID,
+      I.INSURANCE_TYPE,
+      I.INSURANCE_AMOUNT,
+      I.INSURANCE_START_DATE,
+      I.INSURANCE_END_DATE,
+      I.INSURANCE_TERM,
+      I.INSURANCE_STATE,
+      I.INSURANCE_RENEWAL,
+      I.INSURANCE_PAYMENT_TYPE,
+      I.INSURANCE_PAYMENT_CYCLE,
+      I.INSURANCE_PAYMENT_TOTAL,
+      I.INSURANCE_PAYMENT_DATE,
+      I.USER_NO,
+      I.INSURANCE_CODE,
+      I.INSURANCE_NAME,
+      I.INSURANCE_ACCOUNT,
+      I.INSURANCE_COMPANY,
+      I.INSURANCE_MONTHLY_PAYMENT,
+      U.USER_NAME
+    FROM
+      TB_INSURANCE I
+        JOIN TB_USERS U
+             ON I.USER_NO = U.USER_NO
+    WHERE
+      U.FAMILY_ID = #{familyId}
+  </select>
+</mapper>

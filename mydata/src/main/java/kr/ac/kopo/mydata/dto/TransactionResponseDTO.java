@@ -13,4 +13,5 @@ public class TransactionResponseDTO {
   private List<BankStatementDTO> bankStatement;
   private List<TransactionDTO> cardStatement;
   private List<StockDTO> stockStatement;
+  private List<LoanDTO> loanStatement;
 }

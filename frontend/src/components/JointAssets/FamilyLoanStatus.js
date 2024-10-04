@@ -1,16 +1,74 @@
-import { background } from "@chakra-ui/react";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import ProgressBar from "react-bootstrap/ProgressBar";
+import axios from "axios";
+import { useSelector } from "react-redux";
 
-function FamilyLoanStatus({ data, totalLoanAmount }) {
+function FamilyLoanStatus() {
+  const [loanData, setLoanData] = useState([]); // 대출 정보
+  const [totalLoanAmount, setTotalLoanAmount] = useState(0); // 총 대출 금액
+  const [totalLoanBalance, setTotalLoanBalance] = useState(0); // 총 대출 잔액
+  const user = useSelector((state) => state.user.userInfo);
+
+  useEffect(() => {
+    fetchLoanData(); // 컴포넌트 마운트 시 대출 정보 불러오기
+  }, []);
+
+  // familyId가 있을 때와 없을 때 각각 다른 API를 호출하여 데이터 불러오기
+  const fetchLoanData = async () => {
+    try {
+      if (!user.familyId) {
+        // familyId가 없을 때 개인 자산 API 호출
+        const response = await axios.get(
+          "http://localhost:8080/api/mydata/loan/personal-list",
+          {
+            params: { userNo: user.userNo },
+          }
+        );
+        setLoanData(response.data);
+        const totalLoanAmount = response.data.reduce(
+          (sum, loan) => sum + loan.loanAmount,
+          0
+        );
+        const totalLoanBalance = response.data.reduce(
+          (sum, loan) => sum + loan.loanBalance,
+          0
+        );
+        setTotalLoanBalance(totalLoanBalance); // 총 대출 잔액 설정
+        setTotalLoanAmount(totalLoanAmount); // 총 대출 금액 설정
+      } else {
+        // familyId가 있을 때 가족 자산 API 호출
+        const response = await axios.get(
+          "http://localhost:8080/api/mydata/loan/family-list",
+          {
+            params: { familyId: user.familyId },
+          }
+        );
+        setLoanData(response.data);
+        const total = response.data.reduce(
+          (sum, loan) => sum + loan.loanAmount,
+          0
+        );
+        const totalLoanBalance = response.data.reduce(
+          (sum, loan) => sum + loan.loanBalance,
+          0
+        );
+        setTotalLoanBalance(totalLoanBalance); // 총 대출 잔액 설정
+        setTotalLoanAmount(total); // 총 대출 금액 설정
+      }
+    } catch (error) {
+      console.error("대출 데이터를 불러오는 중 오류 발생:", error);
+    }
+  };
+
   // 총 대출 금액 대비 퍼센트 계산
-  const progress = (totalLoanAmount / 1000000000) * 100; // 예산에 따른 대출 비율
+  const progress =
+    ((totalLoanAmount - totalLoanBalance) / totalLoanAmount) * 100; // 예산에 따른 대출 비율
 
   return (
     <div style={styles.container}>
       <h3 style={styles.title}>가족대출현황</h3>
       <div style={styles.amount}>
-        대출 잔액 {totalLoanAmount.toLocaleString()}원
+        총 대출 잔액 {totalLoanBalance.toLocaleString()}원
       </div>
       <div style={styles.progressContainer}>
         {/* ProgressBar 디자인 수정 */}
@@ -31,21 +89,25 @@ function FamilyLoanStatus({ data, totalLoanAmount }) {
         </ProgressBar>
       </div>
       <div style={styles.loanDetails}>
-        {data.map((loan, index) => (
+        {loanData.map((loan, index) => (
           <div key={index} style={styles.loanItem}>
             <div style={styles.loanName}>
-              {loan.name}{" "}
+              {loan.loanName}{" "}
               <span style={styles.interestRate}>
-                이자율: {loan.interestRate}%
+                이자율: {loan.loanRate.toFixed(2)}%
               </span>
             </div>
-            <div style={styles.loanPerson}>대출인: {loan.person}</div>
+            <div style={styles.loanPerson}>대출인: {loan.userName}</div>
             <div style={{ display: "flex", justifyContent: "space-between" }}>
               <div>
-                이번 달 예상 상환 금액: {loan.monthlyPayment.toLocaleString()}원
+                이번 달 예상 상환 금액:{" "}
+                {loan.loanMonthlyRepayment
+                  ? loan.loanMonthlyRepayment.toLocaleString()
+                  : "데이터 없음"}
+                원
               </div>
               <div style={styles.loanValue}>
-                {loan.value.toLocaleString()}원
+                {loan.loanBalance.toLocaleString()}원
               </div>
             </div>
           </div>
