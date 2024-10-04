@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.ac.kopo.hanafamily.consumption.mapper.TransactionMapper">
+
+  <!-- 특정 가족의 거래 내역 조회 -->
+  <select id="getTransactionsByFamilyId" parameterType="int" resultType="kr.ac.kopo.hanafamily.mydata.dto.TransactionDTO">
+    SELECT
+      t.TRANSACTION_ID,
+      t.CARD_NO,
+      t.TRANSACTION_AMOUNT,
+      t.TRANSACTION_DATE,
+      t.TRANSACTION_TYPE,
+      t.TRANSACTION_ACCOUNT_BALANCE,
+      t.USER_NO,
+      t.TRANSACTION_BEFORE_BALANCE,
+      t.TRANSACTION_LOCATION,
+      t.TRANSACTION_CATEGORY,
+      t.TRANSACTION_STATUS
+    FROM
+      TB_TRANSACTION t
+        INNER JOIN
+      TB_USERS u ON t.USER_NO = u.USER_NO
+    WHERE
+      u.FAMILY_ID = #{familyId}
+    ORDER BY
+      t.TRANSACTION_DATE DESC
+  </select>
+
+</mapper>

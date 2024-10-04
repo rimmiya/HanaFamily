@@ -13,7 +13,7 @@ public class AccountDTO {
   private String accountNo;
   private Integer userNo;
   private String accountName;
-  private Integer accountPassword;
+  private String accountPassword;
   private Integer accountBalance;
   @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
   private Date createDate;

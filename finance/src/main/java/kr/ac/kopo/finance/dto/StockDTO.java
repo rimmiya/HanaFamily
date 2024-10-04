@@ -1,5 +1,6 @@
-package kr.ac.kopo.finance.dto;
+package kr.ac.kopo.hanafamily.mydata.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import java.util.Date;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -13,6 +14,7 @@ public class StockDTO {
   private String stockType;            // 주식 유형
   private Integer stockCount;          // 주식 수량
   private Integer stockAmount;         // 주식 매입 단가
+  @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
   private Date stockDate;              // 주식 날짜
   private Integer stockState;          // 주식 상태
   private Integer userNo;              // 사용자 번호 (외래키)

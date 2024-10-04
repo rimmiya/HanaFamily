@@ -1,5 +1,6 @@
-package kr.ac.kopo.finance.dto;
+package kr.ac.kopo.hanafamily.mydata.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import java.util.Date;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -12,12 +13,13 @@ public class TransactionDTO {
   private String transactionId;
   private String cardNo;
   private Integer transactionAmount;
+  @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
   private Date transactionDate;
   private Integer transactionType;
   private Integer accountBalance;
   private Integer userNo;
   private Integer beforeBalance;
   private String location;
-  private String category;
+  private Integer category;
   private Integer transactionStatus;
 }
